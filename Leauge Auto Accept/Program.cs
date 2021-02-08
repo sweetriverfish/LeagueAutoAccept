@@ -45,7 +45,7 @@ namespace Leauge_Auto_Accept
                         var phase = result["phase"];*/
 
                         // Get the current game state
-                        string phase = gameSession[1].Split(new string[] { "phase" }, StringSplitOptions.None)[2].Split('"')[2];
+                        string phase = gameSession[1].Split(new string[] { "phase" }, StringSplitOptions.None).Last().Split('"')[2];
 
                         // Get the current state, accept the queue if need to
                         string currentState = "";
