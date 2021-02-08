@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -47,50 +47,50 @@ namespace Leauge_Auto_Accept
                         // Get the current game state
                         string phase = gameSession[1].Split(new string[] { "phase" }, StringSplitOptions.None)[2].Split('"')[2];
 
-                        // Change the state on the console, accept the queue if need to
+                        // Get the current state, accept the queue if need to
+                        string currentState = "";
                         switch (phase)
                         {
                             case "Lobby":
-                                Console.SetCursorPosition(0, 1);
-                                Console.WriteLine("# Current state: In lobby        #");
+                                currentState = "In lobby";
                                 break;
                             case "Matchmaking":
-                                Console.SetCursorPosition(0, 1);
-                                Console.WriteLine("# Current state: In queue        #");
+                                currentState = "In queue";
                                 break;
                             case "ReadyCheck":
-                                Console.SetCursorPosition(0, 1);
-                                Console.WriteLine("# Current state: Accept ready    #");
                                 // Accept queue if found
                                 string[] matchAccept = clientRequest(leagueAuth, "POST", "lol-matchmaking/v1/ready-check/accept", "");
                                 if (matchAccept[0] == "204")
                                 {
-                                    Console.SetCursorPosition(0, 1);
-                                    Console.WriteLine("# Current state: Match accepted  #");
+                                    currentState = "Match accepted";
                                 }
                                 else
                                 {
                                     // This probably shouldn't happen?
-                                    Console.SetCursorPosition(0, 1);
-                                    Console.WriteLine("# Current state: Accept failed   #");
+                                    currentState = "Accept failed";
                                 }
                                 break;
                             case "ChampSelect":
-                                Console.SetCursorPosition(0, 1);
-                                Console.WriteLine("# Current state: In champ select #");
+                                currentState = "In champ select";
                                 break;
                             case "InProgress":
-                                Console.SetCursorPosition(0, 1);
-                                Console.WriteLine("# Current state: In game         #");
+                                currentState = "In game";
                                 // No need to spam requests while in game
                                 Thread.Sleep(9000);
                                 break;
                             default:
-                                Console.SetCursorPosition(0, 1);
-                                Console.WriteLine("# Current state: Not in game     #");
+                                currentState = phase;
                                 break;
                         }
-                    } else if (gameSession[0] == "404")
+
+                        // Add spaces after the text
+                        currentState = currentState.PadRight(15, ' ');
+
+                        // Update the current state on the console
+                        Console.SetCursorPosition(0, 1);
+                        Console.WriteLine("# Current state: {0} #", currentState);
+                    }
+                    else if (gameSession[0] == "404")
                     {
                         // Chances are we are just not in game
                         Console.SetCursorPosition(0, 1);
@@ -163,7 +163,7 @@ namespace Leauge_Auto_Accept
 
                 // Send POST data when doing a post request
                 Stream dataStream;
-                if (method == "POST")
+                if (method == "POST" || method == "PUT")
                 {
                     string postData = body;
                     byte[] byteArray = Encoding.UTF8.GetBytes(postData);
@@ -174,62 +174,36 @@ namespace Leauge_Auto_Accept
                 }
 
                 // Get the response
+                WebResponse response;
                 try
                 {
-                    using (WebResponse response = request.GetResponse())
-                    {
-                        // If the response is null (League client closed?)
-                        if (((HttpWebResponse)response) == null)
-                        {
-                            string[] outputDef = { "999", "" };
-                            return outputDef;
-                        }
-
-                        // Get the HTTP status code
-                        int statusCode = (int)((HttpWebResponse)response).StatusCode;
-                        string statusString = statusCode.ToString();
-
-                        // Get the body
-                        string responseFromServer = new StreamReader(response.GetResponseStream()).ReadToEnd();
-
-                        // Clean up the stream
-                        response.Close();
-
-                        // Return content
-                        string[] output = { statusString, responseFromServer };
-                        return output;
-                    }
+                    response = request.GetResponse();
                 }
                 catch (WebException e)
                 {
-                    using (WebResponse response = e.Response)
-                    {
-                        // If the response is null (League client closed?)
-                        if (((HttpWebResponse)response) == null)
-                        {
-                            string[] outputDef = { "999", "" };
-                            return outputDef;
-                        }
-
-                        // Get the HTTP status code
-                        int statusCode = (int)((HttpWebResponse)response).StatusCode;
-                        string statusString = statusCode.ToString();
-
-                        // Get the body
-                        dataStream = response.GetResponseStream();
-                        StreamReader reader = new StreamReader(dataStream);
-                        string responseFromServer = reader.ReadToEnd();
-
-                        // Clean up the stream
-                        reader.Close();
-                        dataStream.Close();
-                        response.Close();
-
-                        // Return content
-                        string[] output = { statusString, responseFromServer };
-                        return output;
-                    }
+                    response = e.Response;
                 }
+
+                // If the response is null (League client closed?)
+                if (((HttpWebResponse)response) == null)
+                {
+                    string[] outputDef = { "999", "" };
+                    return outputDef;
+                }
+
+                // Get the HTTP status code
+                int statusCode = (int)((HttpWebResponse)response).StatusCode;
+                string statusString = statusCode.ToString();
+
+                // Get the body
+                string responseFromServer = new StreamReader(response.GetResponseStream()).ReadToEnd();
+
+                // Clean up the stream
+                response.Close();
+
+                // Return content
+                string[] output = { statusString, responseFromServer };
+                return output;
             }
             catch
             {
