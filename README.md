@@ -18,4 +18,4 @@ LeagueAutoAccept is a C# console app made using the LCU API to automatically acc
 - The code is probably bad don't bully too much :x
 
 ## License
-Distributed under the MIT License. See [LICENSE.md](LICENSE.md) for more information.
+Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
