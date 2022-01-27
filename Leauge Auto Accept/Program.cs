@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -42,7 +42,6 @@ namespace Leauge_Auto_Accept
         public static List<itemList> spellsSorted = new List<itemList>();
 
         public static string currentWindow = "";
-        public static int currentWindowNum = 0;
 
         public static string[] currentChamp = { "None", "0" };
         public static string[] currentBan = { "None", "0" };
@@ -68,7 +67,6 @@ namespace Leauge_Auto_Accept
 
         private static void Main()
         {
-            currentWindowNum++;
             canMovePos = false;
             currentWindow = "initializing";
             Console.SetCursorPosition(1, 15);
@@ -115,15 +113,19 @@ namespace Leauge_Auto_Accept
                             loadChampionsList();
                             loadSpellsList();
                         }
-                        mainScreen();
+                        if (currentWindow != "exitMenu")
+                        {
+                            mainScreen();
+                        }
                     }
-                } else
+                }
+                else
                 {
                     isLeagueOpen = false;
                     isAutoAcceptOn = false;
                     champsSorterd.Clear();
                     spellsSorted.Clear();
-                    if (currentWindow != "lcuClosed")
+                    if (currentWindow != "lcuClosed" && currentWindow != "exitMenu")
                     {
                         LeagueClientIsClosedMsg();
                     }
@@ -134,7 +136,6 @@ namespace Leauge_Auto_Accept
 
         private static void LeagueClientIsClosedMsg()
         {
-            currentWindowNum++;
             canMovePos = false;
             currentWindow = "lcuClosed";
 
@@ -146,7 +147,6 @@ namespace Leauge_Auto_Accept
 
         private static void mainScreen()
         {
-            currentWindowNum++;
             canMovePos = false;
             currentWindow = "mainScreen";
             currentPos = lastPosMainNav;
@@ -236,7 +236,6 @@ namespace Leauge_Auto_Accept
 
         private static void settingsMenu()
         {
-            currentWindowNum++;
             canMovePos = false;
             currentWindow = "settingsMenu";
             currentPos = 0;
@@ -333,7 +332,6 @@ namespace Leauge_Auto_Accept
 
         private static void infoMenu()
         {
-            currentWindowNum++;
             canMovePos = false;
             currentWindow = "infoMenu";
             currentPos = 0;
@@ -351,7 +349,6 @@ namespace Leauge_Auto_Accept
 
         private static void exitMenu()
         {
-            currentWindowNum++;
             canMovePos = false;
             currentWindow = "exitMenu";
             currentPos = 0;
@@ -378,14 +375,20 @@ namespace Leauge_Auto_Accept
             }
             else if (currentPos == 1)
             {
-                mainScreen();
+                if (isLeagueOpen)
+                {
+                    mainScreen();
+                }
+                else
+                {
+                    LeagueClientIsClosedMsg();
+                }
             }
         }
 
         private static void champSelector()
         {
             // Allows you to select which champion you wanna instalock
-            currentWindowNum++;
             currentWindow = "champSelector";
             filterKeyword = "";
             Console.Clear();
@@ -566,7 +569,6 @@ namespace Leauge_Auto_Accept
 
         private static void spellSelector()
         {
-            currentWindowNum++;
             currentWindow = "spellSelector";
             filterKeyword = "";
             Console.Clear();
@@ -637,12 +639,10 @@ namespace Leauge_Auto_Accept
                 enabledSpells = enabledSpells.Distinct().ToList();
 
                 // Get sepll names
-                // TODO: replace this with something else
                 writeLineWhenPossible(1, 15, padSides("Getting summoner spell names...", 118)[0], true);
-                string[] spellsJson = webRequest("GET", "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/summoner-spells.json", "");
+                string[] spellsJson = clientRequest(leagueAuth, "GET", "lol-game-data/assets/v1/summoner-spells.json", "");
                 Console.Clear();
                 string[] spellsJsonSplit = spellsJson[1].Split('{');
-                Debug.WriteLine(spellsJson[1]);
 
                 // Add to list with names
                 foreach (var spell in enabledSpells)
@@ -664,7 +664,6 @@ namespace Leauge_Auto_Accept
                 }
 
                 // Sort alphabetically
-                //spellsFullSorted = spellsFullSorted.OrderBy(o => o.name).ToList();
                 spellsSorted = spellsSorted.OrderBy(o => o.name).ToList();
             }
         }
@@ -786,9 +785,6 @@ namespace Leauge_Auto_Accept
             string consoleLine = "Search: " + filterKeyword;
             string[] consoleLine2 = padSides(consoleLine, 118);
             writeLineWhenPossible(1, 29, consoleLine2[0], false);
-
-            //searchPos = 45 + Convert.ToInt32(consoleLine2[1]);
-            //Console.SetCursorPosition(searchPos, 29);
         }
 
         private static void settingsSave()
@@ -1166,20 +1162,35 @@ namespace Leauge_Auto_Accept
                         break;
 
                     case ConsoleKey.Escape:
-                        if (currentWindow != "mainScreen")
-                        {
-                            if (filterKeyword == "Lochel")
-                            {
-                                filterKeyword = "";
-                            }
-                            mainScreen();
-                        }
-                        else if (currentWindow == "mainScreen")
+                        if (currentWindow == "mainScreen")
                         {
                             exitMenu();
                         }
                         else if (currentWindow == "exitMenu")
                         {
+                            if (isLeagueOpen)
+                            {
+                                mainScreen();
+                            }
+                            else
+                            {
+                                LeagueClientIsClosedMsg();
+                            }
+                        }
+                        else if (currentWindow == "lcuClosed")
+                        {
+                            exitMenu();
+                        }
+                        else if (currentWindow == "initializing")
+                        {
+                            // do nothing I guess sounds pointless
+                        }
+                        else if (currentWindow != "mainScreen")
+                        {
+                            if (filterKeyword == "Lochel")
+                            {
+                                filterKeyword = "";
+                            }
                             mainScreen();
                         }
                         break;
@@ -1415,9 +1426,6 @@ namespace Leauge_Auto_Accept
             Console.WriteLine("o o");
             Console.SetCursorPosition(59, 19);
             Console.WriteLine("o");
-
-            // Set cursor back on search
-            Console.SetCursorPosition(67, 29);
         }
 
         private static string[] getLeagueAuth(Process client)
@@ -1513,68 +1521,6 @@ namespace Leauge_Auto_Accept
             catch
             {
                 // If the URL is invalid (League client closed?)
-                string[] output = { "999", "" };
-                return output;
-            }
-        }
-
-        private static string[] webRequest(string method, string url, string body)
-        {
-            try
-            {
-                // Set URL
-                WebRequest request = WebRequest.Create(url);
-
-                // Set headers
-                request.Method = method;
-
-                // Send POST data when doing a post request
-                Stream dataStream;
-                if (method == "POST" || method == "PUT" || method == "PATCH")
-                {
-                    string postData = body;
-                    byte[] byteArray = Encoding.UTF8.GetBytes(postData);
-                    request.ContentLength = byteArray.Length;
-                    dataStream = request.GetRequestStream();
-                    dataStream.Write(byteArray, 0, byteArray.Length);
-                    dataStream.Close();
-                }
-
-                // Get the response
-                WebResponse response;
-                try
-                {
-                    response = request.GetResponse();
-                }
-                catch (WebException e)
-                {
-                    response = e.Response;
-                }
-
-                // If the response is null
-                if (((HttpWebResponse)response) == null)
-                {
-                    string[] outputDef = { "999", "" };
-                    return outputDef;
-                }
-
-                // Get the HTTP status code
-                int statusCode = (int)((HttpWebResponse)response).StatusCode;
-                string statusString = statusCode.ToString();
-
-                // Get the body
-                string responseFromServer = new StreamReader(response.GetResponseStream()).ReadToEnd();
-
-                // Clean up the stream
-                response.Close();
-
-                // Return content
-                string[] output = { statusString, responseFromServer };
-                return output;
-            }
-            catch
-            {
-                // If the URL is invalid
                 string[] output = { "999", "" };
                 return output;
             }
