@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
-VisualStudioVersion = 16.0.30907.101
+VisualStudioVersion = 16.0.31424.327
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Leauge Auto Accept", "Leauge Auto Accept\Leauge Auto Accept.csproj", "{86B1DF17-7F23-4168-81EF-0788B30A8EF5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Leauge Auto Accept", "Leauge Auto Accept\Leauge Auto Accept.csproj", "{B6101B2F-30CD-4D55-8357-034B57D171D6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{86B1DF17-7F23-4168-81EF-0788B30A8EF5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{86B1DF17-7F23-4168-81EF-0788B30A8EF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{86B1DF17-7F23-4168-81EF-0788B30A8EF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{86B1DF17-7F23-4168-81EF-0788B30A8EF5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6101B2F-30CD-4D55-8357-034B57D171D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6101B2F-30CD-4D55-8357-034B57D171D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6101B2F-30CD-4D55-8357-034B57D171D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6101B2F-30CD-4D55-8357-034B57D171D6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {2380D572-C0A2-4895-AD1D-11236733A552}
+		SolutionGuid = {A35D0309-8F6E-4550-BD4C-C9E2EBC556D6}
 	EndGlobalSection
 EndGlobal
