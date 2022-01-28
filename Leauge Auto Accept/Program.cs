@@ -985,7 +985,7 @@ namespace Leauge_Auto_Accept
                                                             // check the instalock setting
                                                             if (settings[2] == "false")
                                                             {
-                                                                string timer = currentChampSelect[1].Split("totalTimeInPhase\":")[1].Split(",")[0];
+                                                                string timer = currentChampSelect[1].Split("totalTimeInPhase\":")[1].Split("}")[0];
                                                                 long timerInt = Convert.ToInt64(timer) / 1000;
                                                                 long currentTime = DateTimeOffset.Now.ToUnixTimeSeconds();
                                                                 if (currentTime >= lastActStartTime + timerInt - 3)
@@ -1033,7 +1033,7 @@ namespace Leauge_Auto_Accept
                                                             // check the instalock setting
                                                             if (settings[2] == "false")
                                                             {
-                                                                string timer = currentChampSelect[1].Split("totalTimeInPhase\":")[1].Split(",")[0];
+                                                                string timer = currentChampSelect[1].Split("totalTimeInPhase\":")[1].Split("}")[0];
                                                                 long timerInt = Convert.ToInt64(timer) / 1000;
                                                                 long currentTime = DateTimeOffset.Now.ToUnixTimeSeconds();
                                                                 if (currentTime >= lastActStartTime + timerInt - 3)
