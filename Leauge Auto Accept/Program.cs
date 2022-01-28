@@ -49,6 +49,7 @@ namespace Leauge_Auto_Accept
         public static string[] currentSpell1 = { "None", "0" };
 
         public static bool isAutoAcceptOn = false;
+        public static bool shouldAutoAcceptbeOn = false;
 
         public static bool pickedChamp = false;
         public static bool lockedChamp = false;
@@ -113,6 +114,10 @@ namespace Leauge_Auto_Accept
                             loadChampionsList();
                             loadSpellsList();
                         }
+                        if (shouldAutoAcceptbeOn)
+                        {
+                            isAutoAcceptOn = true;
+                        }
                         if (currentWindow != "exitMenu")
                         {
                             mainScreen();
@@ -125,6 +130,7 @@ namespace Leauge_Auto_Accept
                     isAutoAcceptOn = false;
                     champsSorterd.Clear();
                     spellsSorted.Clear();
+                    currentSummonerId = "";
                     if (currentWindow != "lcuClosed" && currentWindow != "exitMenu")
                     {
                         LeagueClientIsClosedMsg();
@@ -152,7 +158,6 @@ namespace Leauge_Auto_Accept
             currentPos = lastPosMainNav;
             consolePosLast = lastPosMainNav;
 
-            Console.Clear();
             Console.Clear();
 
             writeLineWhenPossible(13, 3, "  _                                                 _                                     _   ", true);
@@ -342,7 +347,7 @@ namespace Leauge_Auto_Accept
 
             writeLineWhenPossible(35, 12, (" Artem").PadLeft(44, '.'), true);
             writeLineWhenPossible(35, 12, "Made by ", true);
-            writeLineWhenPossible(35, 13, (" 2.1").PadLeft(44, '.'), true);
+            writeLineWhenPossible(35, 13, (" 2.2").PadLeft(44, '.'), true);
             writeLineWhenPossible(35, 13, "Version ", true);
             writeLineWhenPossible(35, 15, padSides("Source code:", 46)[0], true);
             writeLineWhenPossible(35, 16, " github.com/sweetriverfish/LeagueAutoAccept", true);
@@ -790,7 +795,7 @@ namespace Leauge_Auto_Accept
 
         private static void settingsSave()
         {
-            string config = currentChamp[0] + ":" + currentChamp[1] + ":" + currentBan[0] + ":" + currentBan[1] + ":" + currentSpell0[0] + ":" + currentSpell0[1] + ":" + currentSpell1[0] + ":" + currentSpell1[1] + ":" + settings[1] + ":" + settings[2];
+            string config = "v2.2:" + currentChamp[0] + ":" + currentChamp[1] + ":" + currentBan[0] + ":" + currentBan[1] + ":" + currentSpell0[0] + ":" + currentSpell0[1] + ":" + currentSpell1[0] + ":" + currentSpell1[1] + ":" + shouldAutoAcceptbeOn + ":" + settings[1] + ":" + settings[2];
 
             string dirParameter = AppDomain.CurrentDomain.BaseDirectory + @"\Leauge Auto Accept Config.txt";
             FileStream fParameter = new FileStream(dirParameter, FileMode.Create, FileAccess.Write);
@@ -814,19 +819,32 @@ namespace Leauge_Auto_Accept
             {
                 string text = File.ReadAllText(dirParameter);
                 string[] text2 = text.Split(':');
-                currentChamp[0] = text2[0];
-                currentChamp[1] = text2[1];
-                currentBan[0] = text2[2];
-                currentBan[1] = text2[3];
-                currentSpell0[0] = text2[4];
-                currentSpell0[1] = text2[5];
-                currentSpell1[0] = text2[6];
-                currentSpell1[1] = text2[7];
-                settings[1] = text2[8];
-                settings[2] = text2[9];
+                if (text2[0] == "v2.2")
+                {
+                    currentChamp[0] = text2[1];
+                    currentChamp[1] = text2[2];
+                    currentBan[0] = text2[3];
+                    currentBan[1] = text2[4];
+                    currentSpell0[0] = text2[5];
+                    currentSpell0[1] = text2[6];
+                    currentSpell1[0] = text2[7];
+                    currentSpell1[1] = text2[8];
 
+                    if (text2[9] == "True")
+                    {
+                        shouldAutoAcceptbeOn = true;
+                    }
+                    if (text2[10] == "true")
+                    {
+                        settings[1] = "true";
+                    }
+                    if (text2[11] == "true")
+                    {
+                        settings[2] = "true";
+                    }
 
-                settings[0] = "true";
+                    settings[0] = "true";
+                }
             }
         }
 
@@ -835,12 +853,18 @@ namespace Leauge_Auto_Accept
             if (isAutoAcceptOn)
             {
                 isAutoAcceptOn = false;
+                shouldAutoAcceptbeOn = false;
                 writeLineWhenPossible(70, 18, " Disabled", false);
             }
             else
             {
                 isAutoAcceptOn = true;
+                shouldAutoAcceptbeOn = true;
                 writeLineWhenPossible(70, 18, ". Enabled", false);
+            }
+            if (settings[0] == "true")
+            {
+                settingsSave();
             }
         }
 
@@ -961,10 +985,10 @@ namespace Leauge_Auto_Accept
                                                             // check the instalock setting
                                                             if (settings[2] == "false")
                                                             {
-                                                                string timer = currentChampSelect[1].Split("adjustedTimeLeftInPhase\":")[1].Split(",")[0];
+                                                                string timer = currentChampSelect[1].Split("totalTimeInPhase\":")[1].Split(",")[0];
                                                                 long timerInt = Convert.ToInt64(timer) / 1000;
                                                                 long currentTime = DateTimeOffset.Now.ToUnixTimeSeconds();
-                                                                if (currentTime >= lastActStartTime + timerInt - 1)
+                                                                if (currentTime >= lastActStartTime + timerInt - 3)
                                                                 {
                                                                     string[] champSelectAction = clientRequest(leagueAuth, "PATCH", "lol-champ-select/v1/session/actions/" + actId, "{\"completed\":true,\"championId\":" + championId + "}");
                                                                     if (champSelectAction[0] == "204")
@@ -1009,10 +1033,10 @@ namespace Leauge_Auto_Accept
                                                             // check the instalock setting
                                                             if (settings[2] == "false")
                                                             {
-                                                                string timer = currentChampSelect[1].Split("adjustedTimeLeftInPhase\":")[1].Split(",")[0];
+                                                                string timer = currentChampSelect[1].Split("totalTimeInPhase\":")[1].Split(",")[0];
                                                                 long timerInt = Convert.ToInt64(timer) / 1000;
                                                                 long currentTime = DateTimeOffset.Now.ToUnixTimeSeconds();
-                                                                if (currentTime >= lastActStartTime + timerInt - 1)
+                                                                if (currentTime >= lastActStartTime + timerInt - 3)
                                                                 {
                                                                     string[] champSelectAction = clientRequest(leagueAuth, "PATCH", "lol-champ-select/v1/session/actions/" + actId, "{\"completed\":true,\"championId\":" + championId + "}");
                                                                     if (champSelectAction[0] == "204")
