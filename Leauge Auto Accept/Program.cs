@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -86,7 +86,7 @@ namespace Leauge_Auto_Accept
             taskKeys.Start();
             var taskQueue = new Task(acceptQueue);
             taskQueue.Start();
-            var taskLeagueAlive = new Task(CheckIfLeagueClientIsOpen);
+            var taskLeagueAlive = new Task(CheckIfLeagueClientIsOpenTask);
             taskLeagueAlive.Start();
 
             // Indefinitely await them
@@ -96,7 +96,7 @@ namespace Leauge_Auto_Accept
             Console.ReadKey();
         }
 
-        private static void CheckIfLeagueClientIsOpen()
+        private static void CheckIfLeagueClientIsOpenTask()
         {
             while (true)
             {
@@ -137,6 +137,19 @@ namespace Leauge_Auto_Accept
                     }
                 }
                 Thread.Sleep(2000);
+            }
+        }
+
+        private static bool CheckIfLeagueClientIsOpen()
+        {
+            Process client = Process.GetProcessesByName("LeagueClientUx").FirstOrDefault();
+            if (client != null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
@@ -416,13 +429,13 @@ namespace Leauge_Auto_Accept
                 if (currentSummonerId == "")
                 {
                     writeLineWhenPossible(1, 15, padSides("Getting summoner ID...", 118)[0], true);
-                    string[] currentSummoner = clientRequest(leagueAuth, "GET", "lol-summoner/v1/current-summoner", "");
+                    string[] currentSummoner = clientRequestUntilSuccess(leagueAuth, "GET", "lol-summoner/v1/current-summoner", "");
                     Console.Clear();
                     currentSummonerId = currentSummoner[1].Split("summonerId\":")[1].Split(',')[0];
                 }
 
                 writeLineWhenPossible(1, 15, padSides("Getting champions and ownership list...", 118)[0], true);
-                string[] ownedChamps = clientRequest(leagueAuth, "GET", "lol-champions/v1/inventories/" + currentSummonerId + "/champions-minimal", "");
+                string[] ownedChamps = clientRequestUntilSuccess(leagueAuth, "GET", "lol-champions/v1/inventories/" + currentSummonerId + "/champions-minimal", "");
                 Console.Clear();
                 string[] champsSplit = ownedChamps[1].Split("},{");
 
@@ -595,18 +608,18 @@ namespace Leauge_Auto_Accept
                 if (currentSummonerId == "")
                 {
                     writeLineWhenPossible(1, 15, padSides("Getting summoner ID...", 118)[0], true);
-                    string[] currentSummoner = clientRequest(leagueAuth, "GET", "lol-summoner/v1/current-summoner", "");
+                    string[] currentSummoner = clientRequestUntilSuccess(leagueAuth, "GET", "lol-summoner/v1/current-summoner", "");
                     Console.Clear();
                     currentSummonerId = currentSummoner[1].Split("summonerId\":")[1].Split(',')[0];
                 }
 
                 writeLineWhenPossible(1, 15, padSides("Getting a list of available summoner spells...", 118)[0], true);
-                string[] availableSpells = clientRequest(leagueAuth, "GET", "lol-collections/v1/inventories/" + currentSummonerId + "/spells", "");
+                string[] availableSpells = clientRequestUntilSuccess(leagueAuth, "GET", "lol-collections/v1/inventories/" + currentSummonerId + "/spells", "");
                 Console.Clear();
                 string[] spellsSplit = availableSpells[1].Split('[')[1].Split(']')[0].Split(',');
 
                 writeLineWhenPossible(1, 15, padSides("Getting a list of available gamemodes...", 118)[0], true);
-                string[] platformConfig = clientRequest(leagueAuth, "GET", "lol-platform-config/v1/namespaces", "");
+                string[] platformConfig = clientRequestUntilSuccess(leagueAuth, "GET", "lol-platform-config/v1/namespaces", "");
                 Console.Clear();
                 string[] enabledGameModes = platformConfig[1].Split("EnabledModes\":[")[1].Split(']')[0].Split(',');
                 string[] inactiveSpellsPerGameMode = platformConfig[1].Split("gameModeToInactiveSpellIds\":{")[1].Split('}')[0].Split("],");
@@ -1550,6 +1563,31 @@ namespace Leauge_Auto_Accept
                 string[] output = { "999", "" };
                 return output;
             }
+        }
+
+        private static string[] clientRequestUntilSuccess(string[] leagueAuth, string method, string url, string body)
+        {
+            string[] request = { "000", "" };
+            while (request[0].Substring(0, 1) != "2")
+            {
+                request = clientRequest(leagueAuth, method, url, body);
+                if (request[0].Substring(0, 1) == "2")
+                {
+                    return request;
+                }
+                else
+                {
+                    if (CheckIfLeagueClientIsOpen())
+                    {
+                        Thread.Sleep(1000);
+                    }
+                    else
+                    {
+                        return request;
+                    }
+                }
+            }
+            return request;
         }
 
         private static bool IsEnglishLetter(char c)
