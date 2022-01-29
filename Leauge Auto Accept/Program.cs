@@ -926,7 +926,6 @@ namespace Leauge_Auto_Accept
                                     {
                                         // Get more needed data from the current champ select
                                         string localPlayerCellId = currentChampSelect[1].Split("localPlayerCellId\":")[1].Split(',')[0];
-                                        string isCustomGame = currentChampSelect[1].Split("isCustomGame\":")[1].Split(',')[0];
 
                                         if (currentChamp[1] == "0")
                                         {
@@ -1010,8 +1009,10 @@ namespace Leauge_Auto_Accept
                                                 }
                                                 else if (ActCctorCellId == localPlayerCellId && ActCompleted == "false" && ActType == "ban")
                                                 {
+                                                    string champSelectPhase = currentChampSelect[1].Split("\"phase\":\"")[1].Split('"')[0];
+
                                                     // ActIsInProgress makes sure it's my turn to pick the champion
-                                                    if (ActIsInProgress == "true")
+                                                    if (ActIsInProgress == "true" && champSelectPhase != "PLANNING")
                                                     {
                                                         // Mark the start of the phase
                                                         if (actId != lastActId)
