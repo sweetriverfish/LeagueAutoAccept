@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -978,7 +978,7 @@ namespace Leauge_Auto_Accept
                                                         if (actId != lastActId)
                                                         {
                                                             lastActId = actId;
-                                                            lastActStartTime = DateTimeOffset.Now.ToUnixTimeSeconds();
+                                                            lastActStartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
                                                         }
                                                         if (!lockedChamp)
                                                         {
@@ -986,9 +986,9 @@ namespace Leauge_Auto_Accept
                                                             if (settings[2] == "false")
                                                             {
                                                                 string timer = currentChampSelect[1].Split("totalTimeInPhase\":")[1].Split("}")[0];
-                                                                long timerInt = Convert.ToInt64(timer) / 1000;
-                                                                long currentTime = DateTimeOffset.Now.ToUnixTimeSeconds();
-                                                                if (currentTime >= lastActStartTime + timerInt - 3)
+                                                                long timerInt = Convert.ToInt64(timer);
+                                                                long currentTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                                                                if (currentTime >= lastActStartTime + timerInt - 3000)
                                                                 {
                                                                     string[] champSelectAction = clientRequest(leagueAuth, "PATCH", "lol-champ-select/v1/session/actions/" + actId, "{\"completed\":true,\"championId\":" + championId + "}");
                                                                     if (champSelectAction[0] == "204")
@@ -1017,7 +1017,7 @@ namespace Leauge_Auto_Accept
                                                         if (actId != lastActId)
                                                         {
                                                             lastActId = actId;
-                                                            lastActStartTime = DateTimeOffset.Now.ToUnixTimeSeconds();
+                                                            lastActStartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
                                                         }
 
                                                         if (!pickedBan)
@@ -1026,17 +1026,17 @@ namespace Leauge_Auto_Accept
                                                             if (champSelectAction[0] == "204")
                                                             {
                                                                 pickedBan = true;
+                                                                Thread.Sleep(1000);
                                                             }
-                                                        }
-                                                        else if (!LockedBan)
+                                                        } else if (!LockedBan)
                                                         {
                                                             // check the instalock setting
                                                             if (settings[2] == "false")
                                                             {
                                                                 string timer = currentChampSelect[1].Split("totalTimeInPhase\":")[1].Split("}")[0];
-                                                                long timerInt = Convert.ToInt64(timer) / 1000;
-                                                                long currentTime = DateTimeOffset.Now.ToUnixTimeSeconds();
-                                                                if (currentTime >= lastActStartTime + timerInt - 3)
+                                                                long timerInt = Convert.ToInt64(timer);
+                                                                long currentTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                                                                if (currentTime >= (lastActStartTime + timerInt - 3000))
                                                                 {
                                                                     string[] champSelectAction = clientRequest(leagueAuth, "PATCH", "lol-champ-select/v1/session/actions/" + actId, "{\"completed\":true,\"championId\":" + championId + "}");
                                                                     if (champSelectAction[0] == "204")
