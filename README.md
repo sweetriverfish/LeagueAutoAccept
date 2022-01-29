@@ -14,9 +14,9 @@ Ever wanted to go pee or grab something but you're already 10 minutes into the q
 ## Notes and stuff
 - You can build your rune page via collection>runes. The last rune page you clicked is the currently selected one.
 - Might implement a runes picker later on if I won't be too lazy
-- Mac is (currently) not supported
+- Mac os is (currently) not supported
 - Feel free to suggest stuff
-- The code is probably bad don't bully too much :x
+- If it looks like I don't know what I'm doing that's probably because I don't know what I'm doing
 
 ## License
 Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
