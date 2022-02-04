@@ -958,7 +958,7 @@ namespace Leauge_Auto_Accept
                                         {
                                             pickedSpell1 = true;
                                         }
-                                        if (!pickedChamp || !lockedChamp)
+                                        if (!pickedChamp || !lockedChamp || !pickedBan || !LockedBan)
                                         {
                                             // First make sure we are actually able to pick a champion
                                             string csActs = currentChampSelect[1].Split("actions\":[[{")[1].Split("}]],")[0];
