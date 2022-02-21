@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -360,7 +360,7 @@ namespace Leauge_Auto_Accept
 
             writeLineWhenPossible(35, 12, (" Artem").PadLeft(44, '.'), true);
             writeLineWhenPossible(35, 12, "Made by ", true);
-            writeLineWhenPossible(35, 13, (" 2.3").PadLeft(44, '.'), true);
+            writeLineWhenPossible(35, 13, (" 2.4").PadLeft(44, '.'), true);
             writeLineWhenPossible(35, 13, "Version ", true);
             writeLineWhenPossible(35, 15, padSides("Source code:", 46)[0], true);
             writeLineWhenPossible(35, 16, " github.com/sweetriverfish/LeagueAutoAccept", true);
@@ -1000,6 +1000,13 @@ namespace Leauge_Auto_Accept
                                                                 string timer = currentChampSelect[1].Split("totalTimeInPhase\":")[1].Split("}")[0];
                                                                 long timerInt = Convert.ToInt64(timer);
                                                                 long currentTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                                                                /*Debug.WriteLine("aaaa");
+                                                                Debug.WriteLine(timer);
+                                                                Debug.WriteLine(timerInt);
+                                                                Debug.WriteLine(currentTime);
+                                                                Debug.WriteLine(lastActStartTime + timerInt - 3000);
+                                                                Debug.WriteLine(currentTime - (lastActStartTime + timerInt - 3000));
+                                                                Debug.WriteLine("aaaa");*/
                                                                 if (currentTime >= lastActStartTime + timerInt - 3000)
                                                                 {
                                                                     string[] champSelectAction = clientRequest(leagueAuth, "PATCH", "lol-champ-select/v1/session/actions/" + actId, "{\"completed\":true,\"championId\":" + championId + "}");
@@ -1050,6 +1057,13 @@ namespace Leauge_Auto_Accept
                                                                 string timer = currentChampSelect[1].Split("totalTimeInPhase\":")[1].Split("}")[0];
                                                                 long timerInt = Convert.ToInt64(timer);
                                                                 long currentTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                                                                /*Debug.WriteLine("bbbb");
+                                                                Debug.WriteLine(timer);
+                                                                Debug.WriteLine(timerInt);
+                                                                Debug.WriteLine(currentTime);
+                                                                Debug.WriteLine(lastActStartTime + timerInt - 3000);
+                                                                Debug.WriteLine(currentTime - (lastActStartTime + timerInt - 3000));
+                                                                Debug.WriteLine("bbbb");*/
                                                                 if (currentTime >= (lastActStartTime + timerInt - 3000))
                                                                 {
                                                                     string[] champSelectAction = clientRequest(leagueAuth, "PATCH", "lol-champ-select/v1/session/actions/" + actId, "{\"completed\":true,\"championId\":" + championId + "}");
