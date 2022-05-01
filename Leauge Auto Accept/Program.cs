@@ -63,7 +63,7 @@ namespace Leauge_Auto_Accept
 
         public static string currentSummonerId = "";
 
-        //                                 saveData preloadData autoLock
+        //                                 saveData preloadData instaLock
         public static string[] settings = { "false", "false", "false" };
 
         private static void Main()
@@ -264,7 +264,7 @@ namespace Leauge_Auto_Accept
 
             writeLineWhenPossible(35, 13, "Save settings/config ......................", true);
             writeLineWhenPossible(35, 14, "Preload data ..............................", true);
-            writeLineWhenPossible(35, 15, "Auto lock bans/picks ......................", true);
+            writeLineWhenPossible(35, 15, "Instalock bans/picks ......................", true);
 
             if (settings[0] == "true")
             {
@@ -318,7 +318,7 @@ namespace Leauge_Auto_Accept
                         // nodataPreload
                         break;
                     case 2:
-                        // autoLock
+                        // instalock
                         break;
                 }
             }
@@ -339,7 +339,7 @@ namespace Leauge_Auto_Accept
                         // dataPreload
                         break;
                     case 2:
-                        // autoLock
+                        // instalock
                         break;
                 }
             }
