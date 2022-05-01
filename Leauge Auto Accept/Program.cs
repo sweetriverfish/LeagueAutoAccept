@@ -161,7 +161,7 @@ namespace Leauge_Auto_Accept
             Console.Clear();
 
             Console.SetCursorPosition(1, 15);
-            Console.WriteLine(padSides("League client cannot be find.", 118)[0]);
+            Console.WriteLine(padSides("League client cannot be found.", 118)[0]);
         }
 
         private static void mainScreen()
