@@ -1496,13 +1496,15 @@ namespace Leauge_Auto_Accept
             cmd.StandardInput.WriteLine("wmic process where 'Processid=" + client.Id + "' get Commandline");
             cmd.StandardInput.Flush();
             cmd.StandardInput.Close();
-            cmd.WaitForExit();
 
             // Parse the port and key into variables
             string Commandline = cmd.StandardOutput.ReadToEnd();
             string port = Commandline.Split("--app-port=")[1].Split('"')[0];
             string key = Commandline.Split("--remoting-auth-token=")[1].Split('"')[0];
 
+            // Exit cmd
+            cmd.WaitForExit();
+            
             // Get the encoded auth key
             string auth = "riot:" + key;
             var authPlainText = System.Text.Encoding.UTF8.GetBytes(auth);
