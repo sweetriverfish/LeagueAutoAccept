@@ -918,7 +918,7 @@ namespace Leauge_Auto_Accept
                                 if (currentChampSelect[0] == "200")
                                 {
                                     // Get needed data from the current champ select
-                                    string currentChatRoom = currentChampSelect[1].Split("chatRoomName\":\"")[1].Split('"')[0];
+                                    string currentChatRoom = currentChampSelect[1].Split("multiUserChatId\":\"")[1].Split('"')[0];
                                     if (lastChatRoom != currentChatRoom || lastChatRoom == "")
                                     {
                                         // Reset stuff in case someone dodged the champ select
