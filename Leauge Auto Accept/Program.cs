@@ -1000,7 +1000,7 @@ namespace Leauge_Auto_Accept
                                                                 string timer = currentChampSelect[1].Split("totalTimeInPhase\":")[1].Split("}")[0];
                                                                 long timerInt = Convert.ToInt64(timer);
                                                                 long currentTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-                                                                if (currentTime >= lastActStartTime + timerInt - 3000)
+                                                                if (currentTime >= lastActStartTime + timerInt - 1500)
                                                                 {
                                                                     string[] champSelectAction = clientRequest(leagueAuth, "PATCH", "lol-champ-select/v1/session/actions/" + actId, "{\"completed\":true,\"championId\":" + championId + "}");
                                                                     if (champSelectAction[0] == "204")
@@ -1050,7 +1050,7 @@ namespace Leauge_Auto_Accept
                                                                 string timer = currentChampSelect[1].Split("totalTimeInPhase\":")[1].Split("}")[0];
                                                                 long timerInt = Convert.ToInt64(timer);
                                                                 long currentTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-                                                                if (currentTime >= (lastActStartTime + timerInt - 3000))
+                                                                if (currentTime >= (lastActStartTime + timerInt - 1500))
                                                                 {
                                                                     string[] champSelectAction = clientRequest(leagueAuth, "PATCH", "lol-champ-select/v1/session/actions/" + actId, "{\"completed\":true,\"championId\":" + championId + "}");
                                                                     if (champSelectAction[0] == "204")
