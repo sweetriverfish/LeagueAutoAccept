@@ -360,7 +360,7 @@ namespace Leauge_Auto_Accept
 
             writeLineWhenPossible(35, 12, (" Artem").PadLeft(44, '.'), true);
             writeLineWhenPossible(35, 12, "Made by ", true);
-            writeLineWhenPossible(35, 13, (" 2.5").PadLeft(44, '.'), true);
+            writeLineWhenPossible(35, 13, (" 2.6").PadLeft(44, '.'), true);
             writeLineWhenPossible(35, 13, "Version ", true);
             writeLineWhenPossible(35, 15, padSides("Source code:", 46)[0], true);
             writeLineWhenPossible(35, 16, " github.com/sweetriverfish/LeagueAutoAccept", true);
