@@ -298,6 +298,8 @@ namespace Leauge_Auto_Accept
             writeLineWhenPossible(32, 13, "->", false);
 
             canMovePos = true;
+
+            settingsMenuDesc(0);
         }
 
         private static void settingsMenuNav(int item)
@@ -367,9 +369,35 @@ namespace Leauge_Auto_Accept
                     }
                 }
             }
+
+            // save settings if needed
             if (settings[0] == "true")
             {
                 settingsSave();
+            }
+        }
+
+        private static void settingsMenuDesc(int item)
+        {
+            // settings descrptions
+            switch (item)
+            {
+                case 0:
+                    writeLineWhenPossible(17, 20, padSides("Save settings for the next time you open the app.", 81)[0], true);
+                    writeLineWhenPossible(17, 21, padSides("This will create a settings file in the app's folder.", 81)[0], true);
+                    break;
+                case 1:
+                    writeLineWhenPossible(17, 20, padSides("Preload all data the app will need on launch.", 81)[0], true);
+                    writeLineWhenPossible(17, 21, padSides("This includes champions list, summoner spells list and more.", 81)[0], true);
+                    break;
+                case 2:
+                    writeLineWhenPossible(17, 20, padSides("Instanly lock in picks/bans when it's your turn.", 81)[0], true);
+                    writeLineWhenPossible(17, 21, padSides("", 81)[0], true);
+                    break;
+                case 3:
+                    writeLineWhenPossible(17, 20, padSides("Lock in/ban delay before your turn to do so is over.", 81)[0], true);
+                    writeLineWhenPossible(17, 21, padSides("Value is in milliseconds. There's a 500 minimum.", 81)[0], true);
+                    break;
             }
         }
 
@@ -1457,6 +1485,14 @@ namespace Leauge_Auto_Accept
                     if (currentWindow == "champSelector" || currentWindow == "spellSelector")
                     {
                         Console.SetCursorPosition(searchPos, 29);
+                    }
+
+                    if (key.Key == ConsoleKey.UpArrow || key.Key == ConsoleKey.DownArrow || key.Key == ConsoleKey.LeftArrow || key.Key == ConsoleKey.RightArrow)
+                    {
+                        if (currentWindow == "settingsMenu")
+                        {
+                            settingsMenuDesc(currentPos);
+                        }
                     }
                     isMovingPos = false;
                 }
