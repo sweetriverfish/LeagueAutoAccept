@@ -1203,7 +1203,7 @@ namespace Leauge_Auto_Accept
                         currentPos -= totalRows;
                         movePointer = true;
                         break;
-
+/*
                     case ConsoleKey.D1:
                         mainScreen();
                         break;
@@ -1235,6 +1235,7 @@ namespace Leauge_Auto_Accept
                     case ConsoleKey.D7:
                         infoMenu();
                         break;
+*/
 
                     case ConsoleKey.Escape:
                         if (currentWindow == "mainScreen")
