@@ -315,6 +315,10 @@ namespace Leauge_Auto_Accept
                     settings[3] = settings[3].TrimStart('0');
                 }
                 lockDelay = Int32.Parse(settings[3]);
+                if (lockDelay < 500)
+                {
+                    lockDelay = 500;
+                }
                 writeLineWhenPossible(70, 16, (" " + settings[3]).PadLeft(9, '.'), true);
             }
             else
@@ -867,17 +871,26 @@ namespace Leauge_Auto_Accept
                     {
                         shouldAutoAcceptbeOn = true;
                     }
+
+                    // preload Data
                     if (text2[10] == "true")
                     {
                         settings[1] = "true";
                     }
+
+                    // instalock
                     if (text2[11] == "true")
                     {
                         settings[2] = "true";
                     }
 
+                    // lock/ban delay
                     settings[3] = text2[12];
                     lockDelay = Int32.Parse(settings[3]);
+                    if (lockDelay < 500)
+                    {
+                        lockDelay = 500;
+                    }
 
                     settings[0] = "true";
                 }
