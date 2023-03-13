@@ -63,8 +63,9 @@ namespace Leauge_Auto_Accept
 
         public static string currentSummonerId = "";
 
-        //                                 saveData preloadData instaLock
-        public static string[] settings = { "false", "false", "false" };
+        //                                 saveData preloadData instaLock lockDelay
+        public static string[] settings = { "false", "false", "false", "1500" };
+        public static int lockDelay = 1500;
 
         private static void Main()
         {
@@ -265,6 +266,7 @@ namespace Leauge_Auto_Accept
             writeLineWhenPossible(35, 13, "Save settings/config ......................", true);
             writeLineWhenPossible(35, 14, "Preload data ..............................", true);
             writeLineWhenPossible(35, 15, "Instalock bans/picks ......................", true);
+            writeLineWhenPossible(35, 16, "Lock/ban delay ............................", true);
 
             if (settings[0] == "true")
             {
@@ -291,6 +293,8 @@ namespace Leauge_Auto_Accept
                 writeLineWhenPossible(75, 15, ". No", true);
             }
 
+            writeLineWhenPossible(70, 16, (" " + settings[3]).PadLeft(9, '.'), true);
+
             writeLineWhenPossible(32, 13, "->", false);
 
             canMovePos = true;
@@ -300,47 +304,63 @@ namespace Leauge_Auto_Accept
         {
             // Select item to toggle from settings
             // TODO: maybe delete switches and put a simple IF
-            if (settings[item] == "true")
+            if (item == 3)
             {
-                settings[item] = "false";
-                writeLineWhenPossible(75, item + 13, ". No", false);
-                switch (item)
+                if (settings[3].Length == 0)
                 {
-                    case 0:
-                        if (settings[1] == "true")
-                        {
-                            // if autosave is off then turn data preload off becasue otherwise it doesn't make sense
-                            settingsMenuNav(1);
-                        }
-                        deleteSettings();
-                        break;
-                    case 1:
-                        // nodataPreload
-                        break;
-                    case 2:
-                        // instalock
-                        break;
+                    settings[3] = "0";
                 }
+                else
+                {
+                    settings[3] = settings[3].TrimStart('0');
+                }
+                lockDelay = Int32.Parse(settings[3]);
+                writeLineWhenPossible(70, 16, (" " + settings[3]).PadLeft(9, '.'), true);
             }
             else
             {
-                settings[item] = "true";
-                writeLineWhenPossible(75, item + 13, " Yes", false);
-                switch (item)
+                if (settings[item] == "true")
                 {
-                    case 0:
-                        break;
-                    case 1:
-                        if (settings[0] == "false")
-                        {
-                            // if autosave is off then turn it on becasue otherwise data preload being enabled doesn't make sense
-                            settingsMenuNav(0);
-                        }
-                        // dataPreload
-                        break;
-                    case 2:
-                        // instalock
-                        break;
+                    settings[item] = "false";
+                    writeLineWhenPossible(75, item + 13, ". No", false);
+                    switch (item)
+                    {
+                        case 0:
+                            if (settings[1] == "true")
+                            {
+                                // if autosave is off then turn data preload off becasue otherwise it doesn't make sense
+                                settingsMenuNav(1);
+                            }
+                            deleteSettings();
+                            break;
+                        case 1:
+                            // nodataPreload
+                            break;
+                        case 2:
+                            // instalock
+                            break;
+                    }
+                }
+                else
+                {
+                    settings[item] = "true";
+                    writeLineWhenPossible(75, item + 13, " Yes", false);
+                    switch (item)
+                    {
+                        case 0:
+                            break;
+                        case 1:
+                            if (settings[0] == "false")
+                            {
+                                // if autosave is off then turn it on becasue otherwise data preload being enabled doesn't make sense
+                                settingsMenuNav(0);
+                            }
+                            // dataPreload
+                            break;
+                        case 2:
+                            // instalock
+                            break;
+                    }
                 }
             }
             if (settings[0] == "true")
@@ -360,7 +380,7 @@ namespace Leauge_Auto_Accept
 
             writeLineWhenPossible(35, 12, (" Artem").PadLeft(44, '.'), true);
             writeLineWhenPossible(35, 12, "Made by ", true);
-            writeLineWhenPossible(35, 13, (" 2.6").PadLeft(44, '.'), true);
+            writeLineWhenPossible(35, 13, (" 2.7").PadLeft(44, '.'), true);
             writeLineWhenPossible(35, 13, "Version ", true);
             writeLineWhenPossible(35, 15, padSides("Source code:", 46)[0], true);
             writeLineWhenPossible(35, 16, " github.com/sweetriverfish/LeagueAutoAccept", true);
@@ -808,7 +828,7 @@ namespace Leauge_Auto_Accept
 
         private static void settingsSave()
         {
-            string config = "v2.2:" + currentChamp[0] + ":" + currentChamp[1] + ":" + currentBan[0] + ":" + currentBan[1] + ":" + currentSpell0[0] + ":" + currentSpell0[1] + ":" + currentSpell1[0] + ":" + currentSpell1[1] + ":" + shouldAutoAcceptbeOn + ":" + settings[1] + ":" + settings[2];
+            string config = "v2.7:" + currentChamp[0] + ":" + currentChamp[1] + ":" + currentBan[0] + ":" + currentBan[1] + ":" + currentSpell0[0] + ":" + currentSpell0[1] + ":" + currentSpell1[0] + ":" + currentSpell1[1] + ":" + shouldAutoAcceptbeOn + ":" + settings[1] + ":" + settings[2] + ":" + settings[3];
 
             string dirParameter = AppDomain.CurrentDomain.BaseDirectory + @"\Leauge Auto Accept Config.txt";
             FileStream fParameter = new FileStream(dirParameter, FileMode.Create, FileAccess.Write);
@@ -832,7 +852,7 @@ namespace Leauge_Auto_Accept
             {
                 string text = File.ReadAllText(dirParameter);
                 string[] text2 = text.Split(':');
-                if (text2[0] == "v2.2")
+                if (text2[0] == "v2.7")
                 {
                     currentChamp[0] = text2[1];
                     currentChamp[1] = text2[2];
@@ -855,6 +875,9 @@ namespace Leauge_Auto_Accept
                     {
                         settings[2] = "true";
                     }
+
+                    settings[3] = text2[12];
+                    lockDelay = Int32.Parse(settings[3]);
 
                     settings[0] = "true";
                 }
@@ -1000,7 +1023,7 @@ namespace Leauge_Auto_Accept
                                                                 string timer = currentChampSelect[1].Split("totalTimeInPhase\":")[1].Split("}")[0];
                                                                 long timerInt = Convert.ToInt64(timer);
                                                                 long currentTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-                                                                if (currentTime >= lastActStartTime + timerInt - 1500)
+                                                                if (currentTime >= lastActStartTime + timerInt - lockDelay)
                                                                 {
                                                                     string[] champSelectAction = clientRequest(leagueAuth, "PATCH", "lol-champ-select/v1/session/actions/" + actId, "{\"completed\":true,\"championId\":" + championId + "}");
                                                                     if (champSelectAction[0] == "204")
@@ -1050,7 +1073,7 @@ namespace Leauge_Auto_Accept
                                                                 string timer = currentChampSelect[1].Split("totalTimeInPhase\":")[1].Split("}")[0];
                                                                 long timerInt = Convert.ToInt64(timer);
                                                                 long currentTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-                                                                if (currentTime >= (lastActStartTime + timerInt - 1500))
+                                                                if (currentTime >= (lastActStartTime + timerInt - lockDelay))
                                                                 {
                                                                     string[] champSelectAction = clientRequest(leagueAuth, "PATCH", "lol-champ-select/v1/session/actions/" + actId, "{\"completed\":true,\"championId\":" + championId + "}");
                                                                     if (champSelectAction[0] == "204")
@@ -1273,6 +1296,17 @@ namespace Leauge_Auto_Accept
                                 updateCurrentFilter();
                             }
                         }
+                        else if (currentWindow == "settingsMenu")
+                        {
+                            if (currentPos == 3)
+                            {
+                                if (settings[3].Length > 0)
+                                {
+                                    settings[3] = settings[3].Remove(settings[3].Length - 1);
+                                    settingsMenuNav(currentPos);
+                                }
+                            }
+                        }
                         break;
 
                     default:
@@ -1284,6 +1318,20 @@ namespace Leauge_Auto_Accept
                                 {
                                     filterKeyword += key.KeyChar;
                                     updateCurrentFilter();
+                                }
+                            }
+                        }
+                        else if (currentWindow == "settingsMenu")
+                        {
+                            if (currentPos == 3)
+                            {
+                                if (IsNumeric(key.KeyChar))
+                                {
+                                    if (settings[3].Length < 5)
+                                    {
+                                        settings[3] += key.KeyChar;
+                                        settingsMenuNav(currentPos);
+                                    }
                                 }
                             }
                         }
@@ -1328,7 +1376,7 @@ namespace Leauge_Auto_Accept
                     {
                         topPad = 13;
                         leftPad = 32;
-                        maxPos = 3;
+                        maxPos = 4;
                     }
 
                     if (currentWindow == "mainScreen" && consolePosLast > 4)
@@ -1595,6 +1643,14 @@ namespace Leauge_Auto_Accept
         private static bool IsEnglishLetter(char c)
         {
             return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z' || c == ' ');
+        }
+
+        private static bool IsNumeric(object Expression)
+        {
+            double retNum;
+
+            bool isNum = Double.TryParse(Convert.ToString(Expression), System.Globalization.NumberStyles.Any, System.Globalization.NumberFormatInfo.InvariantInfo, out retNum);
+            return isNum;
         }
 
         private static string[] padSides(string source, int length)
