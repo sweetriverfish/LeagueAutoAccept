@@ -1574,27 +1574,26 @@ namespace Leauge_Auto_Accept
 
         private static void printHeart()
         {
-            // Print a heart
-            Console.SetCursorPosition(54, 10);
-            Console.WriteLine("oooo   oooo");
-            Console.SetCursorPosition(52, 11);
-            Console.WriteLine(" o    o o    o ");
-            Console.SetCursorPosition(52, 12);
-            Console.WriteLine("o      o      o");
-            Console.SetCursorPosition(53, 13);
-            Console.WriteLine("o           o");
-            Console.SetCursorPosition(54, 14);
-            Console.WriteLine("o         o");
-            Console.SetCursorPosition(55, 15);
-            Console.WriteLine("o       o");
-            Console.SetCursorPosition(56, 16);
-            Console.WriteLine("o     o");
-            Console.SetCursorPosition(57, 17);
-            Console.WriteLine("o   o");
-            Console.SetCursorPosition(58, 18);
-            Console.WriteLine("o o");
-            Console.SetCursorPosition(59, 19);
-            Console.WriteLine("o");
+            int[] position = { 54, 10 };
+
+            string[] lines = {
+                "  oooo   oooo",
+                " o    o o    o ",
+                "o      o      o",
+                " o           o",
+                "  o         o",
+                "   o       o",
+                "    o     o",
+                "     o   o",
+                "      o o",
+                "       o"
+            };
+
+            foreach (string line in lines)
+            {
+                Console.SetCursorPosition(position[0], position[1]++);
+                Console.WriteLine(line);
+            }
         }
 
         private static string[] getLeagueAuth(Process client)
