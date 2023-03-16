@@ -931,7 +931,7 @@ namespace Leauge_Auto_Accept
                             settings[3] = columns[1];
                             break;
                         case "autoAcceptOn":
-                            if (columns[1] == "true")
+                            if (columns[1] == "True")
                             {
                                 // false by default
                                 shouldAutoAcceptbeOn = true;
