@@ -896,12 +896,10 @@ namespace Leauge_Auto_Accept
                 ",lockTimer:"       + settings[3]           ;
 
             string dirParameter = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Leauge Auto Accept Config.txt";
-            FileStream fParameter = new FileStream(dirParameter, FileMode.Create, FileAccess.Write);
-            StreamWriter m_WriterParameter = new StreamWriter(fParameter);
-            m_WriterParameter.BaseStream.Seek(0, SeekOrigin.End);
-            m_WriterParameter.Write(config);
-            m_WriterParameter.Flush();
-            m_WriterParameter.Close();
+            using (StreamWriter m_WriterParameter = new StreamWriter(dirParameter, false))
+            {
+                m_WriterParameter.Write(config);
+            }
         }
 
         private static void deleteSettings()
@@ -952,25 +950,13 @@ namespace Leauge_Auto_Accept
                             settings[3] = columns[1];
                             break;
                         case "autoAcceptOn":
-                            if (columns[1] == "True")
-                            {
-                                // false by default
-                                shouldAutoAcceptbeOn = true;
-                            }
+                            shouldAutoAcceptbeOn = Boolean.Parse(columns[1]);
                             break;
                         case "preloadData":
-                            if (columns[1] == "true")
-                            {
-                                // false by default
-                                settings[1] = "true";
-                            }
+                            settings[1] = Boolean.Parse(columns[1]).ToString().ToLower();
                             break;
                         case "instalock":
-                            if (columns[1] == "true")
-                            {
-                                // false by default
-                                settings[2] = "true";
-                            }
+                            settings[2] = Boolean.Parse(columns[1]).ToString().ToLower();
                             break;
                     }
                     settings[0] = "true";
