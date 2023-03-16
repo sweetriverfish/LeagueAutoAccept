@@ -1750,11 +1750,8 @@ namespace Leauge_Auto_Accept
         {
             int spaces = length - source.Length;
             int padLeft = spaces / 2 + source.Length;
-            string output = source.PadLeft(padLeft);
-            int padRight = length - output.Length;
-            output = output.PadRight(length);
-            string[] final = { output, padLeft.ToString(), padRight.ToString() };
-            return final;
+            string output = source.PadLeft(padLeft).PadRight(length);
+            return new string[] { output, padLeft.ToString(), (length - padLeft).ToString() };
         }
     }
 }
