@@ -346,48 +346,25 @@ namespace Leauge_Auto_Accept
             }
             else
             {
-                if (settings[item] == "true")
+                bool wasEnabled = (settings[item] == "true");
+                settings[item] = wasEnabled ? "false" : "true";
+                writeLineWhenPossible(75, item + 13, wasEnabled ? ". No" : " Yes", false);
+                switch (item)
                 {
-                    settings[item] = "false";
-                    writeLineWhenPossible(75, item + 13, ". No", false);
-                    switch (item)
-                    {
-                        case 0:
-                            if (settings[1] == "true")
-                            {
-                                // if autosave is off then turn data preload off becasue otherwise it doesn't make sense
-                                settingsMenuNav(1);
-                            }
-                            deleteSettings();
-                            break;
-                        case 1:
-                            // nodataPreload
-                            break;
-                        case 2:
-                            // instalock
-                            break;
-                    }
-                }
-                else
-                {
-                    settings[item] = "true";
-                    writeLineWhenPossible(75, item + 13, " Yes", false);
-                    switch (item)
-                    {
-                        case 0:
-                            break;
-                        case 1:
-                            if (settings[0] == "false")
-                            {
-                                // if autosave is off then turn it on becasue otherwise data preload being enabled doesn't make sense
-                                settingsMenuNav(0);
-                            }
-                            // dataPreload
-                            break;
-                        case 2:
-                            // instalock
-                            break;
-                    }
+                    case 0:
+                        if (!wasEnabled && settings[1] == "true")
+                        {
+                            // if autosave is off then turn data preload off because otherwise it doesn't make sense
+                            settingsMenuNav(1);
+                        }
+                        break;
+                    case 1:
+                        if (wasEnabled && settings[0] == "false")
+                        {
+                            // if autosave is off then turn it on because otherwise data preload being enabled doesn't make sense
+                            settingsMenuNav(0);
+                        }
+                        break;
                 }
             }
 
