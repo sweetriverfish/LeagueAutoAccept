@@ -213,7 +213,7 @@ namespace Leauge_Auto_Accept
             // Print settings
             for (int i = 0; i < settings.Length; i++)
             {
-                writeLineWhenPossible(35, 14 + i, (settingsValue[i]).PadLeft(44, '.'), true);
+                writeLineWhenPossible(35, 14 + i, (" " + settingsValue[i]).PadLeft(44, '.'), true);
                 writeLineWhenPossible(35, 14 + i, settings[i] + " ", true);
             }
 
