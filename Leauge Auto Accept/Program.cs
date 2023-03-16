@@ -46,8 +46,8 @@ namespace Leauge_Auto_Accept
 
         public static string[] currentChamp = { "None", "0" };
         public static string[] currentBan = { "None", "0" };
-        public static string[] currentSpell0 = { "None", "0" };
         public static string[] currentSpell1 = { "None", "0" };
+        public static string[] currentSpell2 = { "None", "0" };
 
         public static bool isAutoAcceptOn = false;
         public static bool shouldAutoAcceptbeOn = false;
@@ -56,8 +56,8 @@ namespace Leauge_Auto_Accept
         public static bool lockedChamp = false;
         public static bool pickedBan = false;
         public static bool lockedBan = false;
-        public static bool pickedSpell0 = false;
         public static bool pickedSpell1 = false;
+        public static bool pickedSpell2 = false;
         public static long lastActStartTime;
         public static string lastActId = "";
         public static string lastChatRoom = "";
@@ -205,8 +205,8 @@ namespace Leauge_Auto_Accept
             string[] settingsValue = {
                 currentChamp[0],
                 currentBan[0],
-                currentSpell0[0],
                 currentSpell1[0],
+                currentSpell2[0],
                 isAutoAcceptOn ? "Enabled" : "Disabled"
             };
 
@@ -847,13 +847,13 @@ namespace Leauge_Auto_Accept
                 }
                 if (currentSpellSlot == 0)
                 {
-                    currentSpell0[0] = name;
-                    currentSpell0[1] = id;
+                    currentSpell1[0] = name;
+                    currentSpell1[1] = id;
                 }
                 else
                 {
-                    currentSpell1[0] = name;
-                    currentSpell1[1] = id;
+                    currentSpell2[0] = name;
+                    currentSpell2[1] = id;
                 }
                 if (settings[0] == "true")
                 {
@@ -886,10 +886,10 @@ namespace Leauge_Auto_Accept
                 ",champId:"         + currentChamp[1]       +
                 ",banName:"         + currentBan[0]         +
                 ",banId:"           + currentBan[1]         +
-                ",spell0Name:"      + currentSpell0[0]      +
-                ",spell0Id:"        + currentSpell0[1]      +
                 ",spell1Name:"      + currentSpell1[0]      +
                 ",spell1Id:"        + currentSpell1[1]      +
+                ",spell2Name:"      + currentSpell2[0]      +
+                ",spell2Id:"        + currentSpell2[1]      +
                 ",autoAcceptOn:"    + shouldAutoAcceptbeOn  +
                 ",preloadData:"     + settings[1]           +
                 ",instalock:"       + settings[2]           +
@@ -933,17 +933,17 @@ namespace Leauge_Auto_Accept
                         case "banId":
                             currentBan[1] = columns[1];
                             break;
-                        case "spell0Name":
-                            currentSpell0[0] = columns[1];
-                            break;
-                        case "spell0Id":
-                            currentSpell0[1] = columns[1];
-                            break;
                         case "spell1Name":
                             currentSpell1[0] = columns[1];
                             break;
                         case "spell1Id":
                             currentSpell1[1] = columns[1];
+                            break;
+                        case "spell2Name":
+                            currentSpell2[0] = columns[1];
+                            break;
+                        case "spell2Id":
+                            currentSpell2[1] = columns[1];
                             break;
                         case "lockTimer":
                             lockDelay = Int32.Parse(columns[1]);
@@ -1065,12 +1065,12 @@ namespace Leauge_Auto_Accept
                     lockedChamp = false;
                     pickedBan = false;
                     lockedBan = false;
-                    pickedSpell0 = false;
                     pickedSpell1 = false;
+                    pickedSpell2 = false;
                 }
                 lastChatRoom = currentChatRoom;
 
-                if (pickedChamp && lockedChamp && pickedBan && lockedBan && pickedSpell0 && pickedSpell1)
+                if (pickedChamp && lockedChamp && pickedBan && lockedBan && pickedSpell1 && pickedSpell2)
                 {
                     // Sleep a little if we already did everything we needed to do
                     Thread.Sleep(1000);
@@ -1090,32 +1090,32 @@ namespace Leauge_Auto_Accept
                         pickedBan = true;
                         lockedBan = true;
                     }
-                    if (currentSpell0[1] == "0")
-                    {
-                        pickedSpell0 = true;
-                    }
                     if (currentSpell1[1] == "0")
                     {
                         pickedSpell1 = true;
+                    }
+                    if (currentSpell2[1] == "0")
+                    {
+                        pickedSpell2 = true;
                     }
                     if (!pickedChamp || !lockedChamp || !pickedBan || !lockedBan)
                     {
                         handleChampSelectActions(currentChampSelect, localPlayerCellId);
                     }
-                    if (!pickedSpell0)
-                    {
-                        string[] champSelectAction = clientRequest(leagueAuth, "PATCH", "lol-champ-select/v1/session/my-selection", "{\"spell1Id\":" + currentSpell0[1] + "}");
-                        if (champSelectAction[0] == "204")
-                        {
-                            pickedSpell0 = true;
-                        }
-                    }
                     if (!pickedSpell1)
                     {
-                        string[] champSelectAction = clientRequest(leagueAuth, "PATCH", "lol-champ-select/v1/session/my-selection", "{\"spell2Id\":" + currentSpell1[1] + "}");
+                        string[] champSelectAction = clientRequest(leagueAuth, "PATCH", "lol-champ-select/v1/session/my-selection", "{\"spell1Id\":" + currentSpell1[1] + "}");
                         if (champSelectAction[0] == "204")
                         {
                             pickedSpell1 = true;
+                        }
+                    }
+                    if (!pickedSpell2)
+                    {
+                        string[] champSelectAction = clientRequest(leagueAuth, "PATCH", "lol-champ-select/v1/session/my-selection", "{\"spell2Id\":" + currentSpell2[1] + "}");
+                        if (champSelectAction[0] == "204")
+                        {
+                            pickedSpell2 = true;
                         }
                     }
                 }
