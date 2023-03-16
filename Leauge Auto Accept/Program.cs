@@ -384,7 +384,7 @@ namespace Leauge_Auto_Accept
             {
                 case 0:
                     writeLineWhenPossible(17, 20, padSides("Save settings for the next time you open the app.", 81)[0], true);
-                    writeLineWhenPossible(17, 21, padSides("This will create a settings file in the app's folder.", 81)[0], true);
+                    writeLineWhenPossible(17, 21, padSides("This will create a settings file in the %AppData% folder.", 81)[0], true);
                     break;
                 case 1:
                     writeLineWhenPossible(17, 20, padSides("Preload all data the app will need on launch.", 81)[0], true);
@@ -860,9 +860,21 @@ namespace Leauge_Auto_Accept
 
         private static void settingsSave()
         {
-            string config = "v2.7:" + currentChamp[0] + ":" + currentChamp[1] + ":" + currentBan[0] + ":" + currentBan[1] + ":" + currentSpell0[0] + ":" + currentSpell0[1] + ":" + currentSpell1[0] + ":" + currentSpell1[1] + ":" + shouldAutoAcceptbeOn + ":" + settings[1] + ":" + settings[2] + ":" + settings[3];
+            string config =
+                "champName:"        + currentChamp[0]       +
+                ",champId:"         + currentChamp[1]       +
+                ",banName:"         + currentBan[0]         +
+                ",banId:"           + currentBan[1]         +
+                ",spell0Name:"      + currentSpell0[0]      +
+                ",spell0Id:"        + currentSpell0[1]      +
+                ",spell1Name:"      + currentSpell1[0]      +
+                ",spell1Id:"        + currentSpell1[1]      +
+                ",autoAcceptOn:"    + shouldAutoAcceptbeOn  +
+                ",preloadData:"     + settings[1]           +
+                ",instalock:"       + settings[2]           +
+                ",lockTimer:"       + settings[3]           ;
 
-            string dirParameter = AppDomain.CurrentDomain.BaseDirectory + @"\Leauge Auto Accept Config.txt";
+            string dirParameter = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Leauge Auto Accept Config.txt";
             FileStream fParameter = new FileStream(dirParameter, FileMode.Create, FileAccess.Write);
             StreamWriter m_WriterParameter = new StreamWriter(fParameter);
             m_WriterParameter.BaseStream.Seek(0, SeekOrigin.End);
@@ -873,53 +885,73 @@ namespace Leauge_Auto_Accept
 
         private static void deleteSettings()
         {
-            string dirParameter = AppDomain.CurrentDomain.BaseDirectory + @"\Leauge Auto Accept Config.txt";
+            string dirParameter = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Leauge Auto Accept Config.txt";
             File.Delete(dirParameter);
         }
 
         private static void loadSettings()
         {
-            string dirParameter = AppDomain.CurrentDomain.BaseDirectory + @"\Leauge Auto Accept Config.txt";
+            string dirParameter = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Leauge Auto Accept Config.txt";
             if (File.Exists(dirParameter))
             {
                 string text = File.ReadAllText(dirParameter);
-                string[] text2 = text.Split(':');
-                if (text2[0] == "v2.7")
+                string[] commas = text.Split(',');
+                foreach (var comma in commas)
                 {
-                    currentChamp[0] = text2[1];
-                    currentChamp[1] = text2[2];
-                    currentBan[0] = text2[3];
-                    currentBan[1] = text2[4];
-                    currentSpell0[0] = text2[5];
-                    currentSpell0[1] = text2[6];
-                    currentSpell1[0] = text2[7];
-                    currentSpell1[1] = text2[8];
-
-                    if (text2[9] == "True")
+                    //Console.WriteLine(comma);
+                    string[] columns = comma.Split(':');
+                    switch (columns[0])
                     {
-                        shouldAutoAcceptbeOn = true;
+                        case "champName":
+                            currentChamp[0] = columns[1];
+                            break;
+                        case "champId":
+                            currentChamp[1] = columns[1];
+                            break;
+                        case "banName":
+                            currentBan[0] = columns[1];
+                            break;
+                        case "banId":
+                            currentBan[1] = columns[1];
+                            break;
+                        case "spell0Name":
+                            currentSpell0[0] = columns[1];
+                            break;
+                        case "spell0Id":
+                            currentSpell0[1] = columns[1];
+                            break;
+                        case "spell1Name":
+                            currentSpell1[0] = columns[1];
+                            break;
+                        case "spell1Id":
+                            currentSpell1[1] = columns[1];
+                            break;
+                        case "lockTimer":
+                            lockDelay = Int32.Parse(columns[1]);
+                            settings[3] = columns[1];
+                            break;
+                        case "autoAcceptOn":
+                            if (columns[1] == "true")
+                            {
+                                // false by default
+                                shouldAutoAcceptbeOn = true;
+                            }
+                            break;
+                        case "preloadData":
+                            if (columns[1] == "true")
+                            {
+                                // false by default
+                                settings[1] = "true";
+                            }
+                            break;
+                        case "instalock":
+                            if (columns[1] == "true")
+                            {
+                                // false by default
+                                settings[2] = "true";
+                            }
+                            break;
                     }
-
-                    // preload Data
-                    if (text2[10] == "true")
-                    {
-                        settings[1] = "true";
-                    }
-
-                    // instalock
-                    if (text2[11] == "true")
-                    {
-                        settings[2] = "true";
-                    }
-
-                    // lock/ban delay
-                    settings[3] = text2[12];
-                    lockDelay = Int32.Parse(settings[3]);
-                    if (lockDelay < 500)
-                    {
-                        lockDelay = 500;
-                    }
-
                     settings[0] = "true";
                 }
             }
