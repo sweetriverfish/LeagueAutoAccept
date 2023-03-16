@@ -55,7 +55,7 @@ namespace Leauge_Auto_Accept
         public static bool pickedChamp = false;
         public static bool lockedChamp = false;
         public static bool pickedBan = false;
-        public static bool LockedBan = false;
+        public static bool lockedBan = false;
         public static bool pickedSpell0 = false;
         public static bool pickedSpell1 = false;
         public static long lastActStartTime;
@@ -1002,17 +1002,14 @@ namespace Leauge_Auto_Accept
         {
             while (true)
             {
-
                 if (isAutoAcceptOn)
                 {
-                    // Get the current game session
                     string[] gameSession = clientRequest(leagueAuth, "GET", "lol-gameflow/v1/session", "");
+
                     if (gameSession[0] == "200")
                     {
-                        // Get the current game state
                         string phase = gameSession[1].Split("phase").Last().Split('"')[2];
 
-                        // Get the current state, accept the queue if need to
                         switch (phase)
                         {
                             case "Lobby":
@@ -1022,196 +1019,10 @@ namespace Leauge_Auto_Accept
                                 Thread.Sleep(2000);
                                 break;
                             case "ReadyCheck":
-                                // Accept queue if found
                                 string[] matchAccept = clientRequest(leagueAuth, "POST", "lol-matchmaking/v1/ready-check/accept", "");
-                                if (matchAccept[0] == "204")
-                                {
-                                    // Maybe I should add some sleep?
-                                }
                                 break;
                             case "ChampSelect":
-                                // Get data for the current ongoing champ select
-                                string[] currentChampSelect = clientRequest(leagueAuth, "GET", "lol-champ-select/v1/session", "");
-                                if (currentChampSelect[0] == "200")
-                                {
-                                    // Get needed data from the current champ select
-                                    string currentChatRoom = currentChampSelect[1].Split("multiUserChatId\":\"")[1].Split('"')[0];
-                                    if (lastChatRoom != currentChatRoom || lastChatRoom == "")
-                                    {
-                                        // Reset stuff in case someone dodged the champ select
-                                        pickedChamp = false;
-                                        lockedChamp = false;
-                                        pickedBan = false;
-                                        LockedBan = false;
-                                        pickedSpell0 = false;
-                                        pickedSpell1 = false;
-                                    }
-                                    lastChatRoom = currentChatRoom;
-                                    if (pickedChamp && lockedChamp && pickedBan && LockedBan && pickedSpell0 && pickedSpell1)
-                                    {
-                                        // Sleep a little if we already did everything we needed to do
-                                        Thread.Sleep(1000);
-                                    }
-                                    else
-                                    {
-                                        // Get more needed data from the current champ select
-                                        string localPlayerCellId = currentChampSelect[1].Split("localPlayerCellId\":")[1].Split(',')[0];
-
-                                        if (currentChamp[1] == "0")
-                                        {
-                                            pickedChamp = true;
-                                            lockedChamp = true;
-                                        }
-                                        if (currentBan[1] == "0")
-                                        {
-                                            pickedBan = true;
-                                            LockedBan = true;
-                                        }
-                                        if (currentSpell0[1] == "0")
-                                        {
-                                            pickedSpell0 = true;
-                                        }
-                                        if (currentSpell1[1] == "0")
-                                        {
-                                            pickedSpell1 = true;
-                                        }
-                                        if (!pickedChamp || !lockedChamp || !pickedBan || !LockedBan)
-                                        {
-                                            // First make sure we are actually able to pick a champion
-                                            string csActs = currentChampSelect[1].Split("actions\":[[{")[1].Split("}]],")[0];
-                                            csActs = csActs.Replace("}],[{", "},{");
-                                            string[] csActsArr = csActs.Split("},{");
-                                            foreach (var act in csActsArr)
-                                            {
-                                                string ActCctorCellId = act.Split("actorCellId\":")[1].Split(',')[0];
-                                                string championId = act.Split("championId\":")[1].Split(',')[0];
-                                                string actId = act.Split(",\"id\":")[1].Split(',')[0];
-                                                string ActCompleted = act.Split("completed\":")[1].Split(',')[0];
-                                                string ActIsInProgress = act.Split("isInProgress\":")[1].Split(',')[0];
-                                                string ActType = act.Split("type\":\"")[1].Split('"')[0];
-                                                if (ActCctorCellId == localPlayerCellId && ActCompleted == "false" && ActType == "pick")
-                                                {
-                                                    if (!pickedChamp)
-                                                    {
-                                                        // hover champion when champ select starts, no need to check for whenever it's my turn or not to pick it
-                                                        string[] champSelectAction = clientRequest(leagueAuth, "PATCH", "lol-champ-select/v1/session/actions/" + actId, "{\"championId\":" + currentChamp[1] + "}");
-                                                        if (champSelectAction[0] == "204")
-                                                        {
-                                                            pickedChamp = true;
-                                                        }
-                                                    }
-                                                    // ActIsInProgress makes sure it's my turn to pick the champion
-                                                    if (ActIsInProgress == "true")
-                                                    {
-                                                        // Mark the start of the phase
-                                                        if (actId != lastActId)
-                                                        {
-                                                            lastActId = actId;
-                                                            lastActStartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-                                                        }
-                                                        if (!lockedChamp)
-                                                        {
-                                                            // check the instalock setting
-                                                            if (settings[2] == "false")
-                                                            {
-                                                                string timer = currentChampSelect[1].Split("totalTimeInPhase\":")[1].Split("}")[0];
-                                                                long timerInt = Convert.ToInt64(timer);
-                                                                long currentTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-                                                                if (currentTime >= lastActStartTime + timerInt - lockDelay)
-                                                                {
-                                                                    string[] champSelectAction = clientRequest(leagueAuth, "PATCH", "lol-champ-select/v1/session/actions/" + actId, "{\"completed\":true,\"championId\":" + championId + "}");
-                                                                    if (champSelectAction[0] == "204")
-                                                                    {
-                                                                        lockedChamp = true;
-                                                                    }
-                                                                }
-                                                            }
-                                                            else
-                                                            {
-                                                                string[] champSelectAction = clientRequest(leagueAuth, "PATCH", "lol-champ-select/v1/session/actions/" + actId, "{\"completed\":true,\"championId\":" + championId + "}");
-                                                                if (champSelectAction[0] == "204")
-                                                                {
-                                                                    lockedChamp = true;
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                                else if (ActCctorCellId == localPlayerCellId && ActCompleted == "false" && ActType == "ban")
-                                                {
-                                                    string champSelectPhase = currentChampSelect[1].Split("\"phase\":\"")[1].Split('"')[0];
-
-                                                    // ActIsInProgress makes sure it's my turn to pick the champion
-                                                    if (ActIsInProgress == "true" && champSelectPhase != "PLANNING")
-                                                    {
-                                                        // Mark the start of the phase
-                                                        if (actId != lastActId)
-                                                        {
-                                                            lastActId = actId;
-                                                            lastActStartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-                                                        }
-
-                                                        if (!pickedBan)
-                                                        {
-                                                            string[] champSelectAction = clientRequest(leagueAuth, "PATCH", "lol-champ-select/v1/session/actions/" + actId, "{\"championId\":" + currentBan[1] + "}");
-                                                            if (champSelectAction[0] == "204")
-                                                            {
-                                                                pickedBan = true;
-                                                                Thread.Sleep(1000);
-                                                            }
-                                                        } else if (!LockedBan)
-                                                        {
-                                                            // check the instalock setting
-                                                            if (settings[2] == "false")
-                                                            {
-                                                                string timer = currentChampSelect[1].Split("totalTimeInPhase\":")[1].Split("}")[0];
-                                                                long timerInt = Convert.ToInt64(timer);
-                                                                long currentTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-                                                                if (currentTime >= (lastActStartTime + timerInt - lockDelay))
-                                                                {
-                                                                    string[] champSelectAction = clientRequest(leagueAuth, "PATCH", "lol-champ-select/v1/session/actions/" + actId, "{\"completed\":true,\"championId\":" + championId + "}");
-                                                                    if (champSelectAction[0] == "204")
-                                                                    {
-                                                                        LockedBan = true;
-                                                                    }
-                                                                }
-                                                            }
-                                                            else
-                                                            {
-                                                                string[] champSelectAction = clientRequest(leagueAuth, "PATCH", "lol-champ-select/v1/session/actions/" + actId, "{\"completed\":true,\"championId\":" + championId + "}");
-                                                                if (champSelectAction[0] == "204")
-                                                                {
-                                                                    LockedBan = true;
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        if (!pickedSpell0)
-                                        {
-                                            string[] champSelectAction = clientRequest(leagueAuth, "PATCH", "lol-champ-select/v1/session/my-selection", "{\"spell1Id\":" + currentSpell0[1] + "}");
-                                            if (champSelectAction[0] == "204")
-                                            {
-                                                pickedSpell0 = true;
-                                            }
-                                        }
-                                        if (!pickedSpell1)
-                                        {
-                                            string[] champSelectAction = clientRequest(leagueAuth, "PATCH", "lol-champ-select/v1/session/my-selection", "{\"spell2Id\":" + currentSpell1[1] + "}");
-                                            if (champSelectAction[0] == "204")
-                                            {
-                                                pickedSpell1 = true;
-                                            }
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    // Failed to get champ select data, should probably retry. maybe we did it too early? maybe the game was dodged?
-                                    // state = "Failed to get champ select data";
-                                }
+                                handleChampSelect();
                                 break;
                             case "InProgress":
                                 // No need to spam requests
@@ -1245,12 +1056,217 @@ namespace Leauge_Auto_Accept
                             lastChatRoom = "";
                         }
                     }
-                }
-                if (!isAutoAcceptOn)
-                {
+                    Thread.Sleep(50);
+                } else {
                     Thread.Sleep(1000);
                 }
-                Thread.Sleep(50);
+            }
+        }
+
+        private static void handleChampSelect()
+        {
+            // Get data for the current ongoing champ select
+            string[] currentChampSelect = clientRequest(leagueAuth, "GET", "lol-champ-select/v1/session", "");
+
+            if (currentChampSelect[0] == "200")
+            {
+                // Get needed data from the current champ select
+                string currentChatRoom = currentChampSelect[1].Split("multiUserChatId\":\"")[1].Split('"')[0];
+                if (lastChatRoom != currentChatRoom || lastChatRoom == "")
+                {
+                    // Reset stuff in case someone dodged the champ select
+                    pickedChamp = false;
+                    lockedChamp = false;
+                    pickedBan = false;
+                    lockedBan = false;
+                    pickedSpell0 = false;
+                    pickedSpell1 = false;
+                }
+                lastChatRoom = currentChatRoom;
+
+                if (pickedChamp && lockedChamp && pickedBan && lockedBan && pickedSpell0 && pickedSpell1)
+                {
+                    // Sleep a little if we already did everything we needed to do
+                    Thread.Sleep(1000);
+                }
+                else
+                {
+                    // Get more needed data from the current champ select
+                    string localPlayerCellId = currentChampSelect[1].Split("localPlayerCellId\":")[1].Split(',')[0];
+
+                    if (currentChamp[1] == "0")
+                    {
+                        pickedChamp = true;
+                        lockedChamp = true;
+                    }
+                    if (currentBan[1] == "0")
+                    {
+                        pickedBan = true;
+                        lockedBan = true;
+                    }
+                    if (currentSpell0[1] == "0")
+                    {
+                        pickedSpell0 = true;
+                    }
+                    if (currentSpell1[1] == "0")
+                    {
+                        pickedSpell1 = true;
+                    }
+                    if (!pickedChamp || !lockedChamp || !pickedBan || !lockedBan)
+                    {
+                        handleChampSelectActions(currentChampSelect, localPlayerCellId);
+                    }
+                    if (!pickedSpell0)
+                    {
+                        string[] champSelectAction = clientRequest(leagueAuth, "PATCH", "lol-champ-select/v1/session/my-selection", "{\"spell1Id\":" + currentSpell0[1] + "}");
+                        if (champSelectAction[0] == "204")
+                        {
+                            pickedSpell0 = true;
+                        }
+                    }
+                    if (!pickedSpell1)
+                    {
+                        string[] champSelectAction = clientRequest(leagueAuth, "PATCH", "lol-champ-select/v1/session/my-selection", "{\"spell2Id\":" + currentSpell1[1] + "}");
+                        if (champSelectAction[0] == "204")
+                        {
+                            pickedSpell1 = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        private static void handleChampSelectActions(string[] currentChampSelect, string localPlayerCellId)
+        {
+            string csActs = currentChampSelect[1].Split("actions\":[[{")[1].Split("}]],")[0];
+            csActs = csActs.Replace("}],[{", "},{");
+            string[] csActsArr = csActs.Split("},{");
+
+            foreach (var act in csActsArr)
+            {
+                string ActCctorCellId = act.Split("actorCellId\":")[1].Split(',')[0];
+                string ActCompleted = act.Split("completed\":")[1].Split(',')[0];
+                string ActType = act.Split("type\":\"")[1].Split('"')[0];
+                string championId = act.Split("championId\":")[1].Split(',')[0];
+                string actId = act.Split(",\"id\":")[1].Split(',')[0];
+                string ActIsInProgress = act.Split("isInProgress\":")[1].Split(',')[0];
+
+                if (ActCctorCellId == localPlayerCellId && ActCompleted == "false" && ActType == "pick")
+                {
+                    handlePickAction(actId, championId, ActIsInProgress, currentChampSelect);
+                }
+                else if (ActCctorCellId == localPlayerCellId && ActCompleted == "false" && ActType == "ban")
+                {
+                    handleBanAction(actId, championId, ActIsInProgress, currentChampSelect);
+                }
+            }
+        }
+
+        private static void handlePickAction(string actId, string championId, string ActIsInProgress, string[] currentChampSelect)
+        {
+            if (!pickedChamp)
+            {
+                // Hover champion when champ select starts, no need to check for whenever it's my turn or not to pick it
+                hoverChampion(actId, championId, currentChamp[1], "pick");
+            }
+
+            if (ActIsInProgress == "true")
+            {
+                markPhaseStart(actId);
+
+                if (!lockedChamp)
+                {
+                    // Check the instalock setting
+                    if (settings[2] == "false")
+                    {
+                        checkLockDelay(actId, championId, currentChampSelect, "pick");
+                    }
+                    else
+                    {
+                        lockChampion(actId, championId, "pick");
+                    }
+                }
+            }
+        }
+
+        private static void markPhaseStart(string actId)
+        {
+            if (actId != lastActId)
+            {
+                lastActId = actId;
+                lastActStartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            }
+        }
+
+        private static void hoverChampion(string actId, string championId, string currentChamp, string actType)
+        {
+            string[] champSelectAction = clientRequest(leagueAuth, "PATCH", "lol-champ-select/v1/session/actions/" + actId, "{\"championId\":" + currentChamp + "}");
+            if (champSelectAction[0] == "204")
+            {
+                if (actType == "pick")
+                {
+                    pickedChamp = true;
+                }
+                else if (actType == "ban")
+                {
+                    pickedBan = true;
+                }
+            }
+        }
+
+        private static void lockChampion(string actId, string championId, string actType)
+        {
+            string[] champSelectAction = clientRequest(leagueAuth, "PATCH", "lol-champ-select/v1/session/actions/" + actId, "{\"completed\":true,\"championId\":" + championId + "}");
+            if (champSelectAction[0] == "204")
+            {
+                if (actType == "pick")
+                {
+                    lockedChamp = true;
+                }
+                else if (actType == "ban")
+                {
+                    lockedBan = true;
+                }
+            }
+        }
+
+        private static void checkLockDelay(string actId, string championId, string[] currentChampSelect, string actType)
+        {
+            string timer = currentChampSelect[1].Split("totalTimeInPhase\":")[1].Split("}")[0];
+            long timerInt = Convert.ToInt64(timer);
+            long currentTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            if (currentTime >= lastActStartTime + timerInt - lockDelay)
+            {
+                lockChampion(actId, championId, actType);
+            }
+        }
+
+        private static void handleBanAction(string actId, string championId, string ActIsInProgress, string[] currentChampSelect)
+        {
+            string champSelectPhase = currentChampSelect[1].Split("\"phase\":\"")[1].Split('"')[0];
+
+            // make sure it's my turn to pick and that it is not the planning phase anymore
+            if (ActIsInProgress == "true" && champSelectPhase != "PLANNING")
+            {
+                markPhaseStart(actId);
+
+                if (!pickedBan)
+                {
+                    hoverChampion(actId, championId, currentBan[1], "ban");
+                }
+
+                if (!lockedBan)
+                {
+                    // Check the instalock setting
+                    if (settings[2] == "false")
+                    {
+                        checkLockDelay(actId, championId, currentChampSelect, "ban");
+                    }
+                    else
+                    {
+                        lockChampion(actId, championId, "ban");
+                    }
+                }
             }
         }
 
