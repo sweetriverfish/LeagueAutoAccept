@@ -1618,36 +1618,27 @@ namespace Leauge_Auto_Accept
 
         private static string[] getLeagueAuth(Process client)
         {
-            // Open a cmd window
+            string command = "wmic process where 'Processid=" + client.Id + "' get Commandline";
+            ProcessStartInfo psi = new ProcessStartInfo("cmd.exe", "/c " + command);
+            psi.RedirectStandardOutput = true;
+
             Process cmd = new Process();
-            cmd.StartInfo.FileName = "cmd.exe";
-            cmd.StartInfo.RedirectStandardInput = true;
-            cmd.StartInfo.RedirectStandardOutput = true;
-            cmd.StartInfo.CreateNoWindow = true;
-            cmd.StartInfo.UseShellExecute = false;
+            cmd.StartInfo = psi;
             cmd.Start();
 
-            // Get the command line for our process
-            cmd.StandardInput.WriteLine("wmic process where 'Processid=" + client.Id + "' get Commandline");
-            cmd.StandardInput.Flush();
-            cmd.StandardInput.Close();
-
-            // Parse the port and key into variables
-            string Commandline = cmd.StandardOutput.ReadToEnd();
-            string port = Commandline.Split("--app-port=")[1].Split('"')[0];
-            string key = Commandline.Split("--remoting-auth-token=")[1].Split('"')[0];
-
-            // Exit cmd
+            string output = cmd.StandardOutput.ReadToEnd();
             cmd.WaitForExit();
-            
-            // Get the encoded auth key
-            string auth = "riot:" + key;
-            var authPlainText = System.Text.Encoding.UTF8.GetBytes(auth);
-            string authBase64 = System.Convert.ToBase64String(authPlainText);
+
+            // Parse the port and auth token into variables
+            string port = Regex.Match(output, @"--app-port=""?(\d+)""?").Groups[1].Value;
+            string authToken = Regex.Match(output, @"--remoting-auth-token=([a-zA-Z0-9_-]+)").Groups[1].Value;
+
+            // Compute the encoded key
+            string auth = "riot:" + authToken;
+            string authBase64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(auth));
 
             // Return content
-            string[] output = { authBase64, port };
-            return output;
+            return new string[] { authBase64, port };
         }
 
         private static string[] clientRequest(string[] leagueAuth, string method, string url, string body)
