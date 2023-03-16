@@ -174,33 +174,53 @@ namespace Leauge_Auto_Accept
 
             Console.Clear();
 
-            writeLineWhenPossible(13, 3, "  _                                                 _                                     _   ", true);
-            writeLineWhenPossible(13, 4, " | |                                     /\\        | |            /\\                     | |  ", true);
-            writeLineWhenPossible(13, 5, " | |     ___  __ _  __ _ _   _  ___     /  \\  _   _| |_ ___      /  \\   ___ ___ ___ _ __ | |_ ", true);
-            writeLineWhenPossible(13, 6, " | |    / _ \\/ _` |/ _` | | | |/ _ \\   / /\\ \\| | | | __/ _ \\    / /\\ \\ / __/ __/ _ \\ '_ \\| __|", true);
-            writeLineWhenPossible(13, 7, " | |___|  __/ (_| | (_| | |_| |  __/  / ____ \\ |_| | || (_) |  / ____ \\ (_| (_|  __/ |_) | |_ ", true);
-            writeLineWhenPossible(13, 8, " |______\\___|\\__,_|\\__, |\\__,_|\\___| /_/    \\_\\__,_|\\__\\___/  /_/    \\_\\___\\___\\___| .__/ \\__|", true);
-            writeLineWhenPossible(13, 9, "                    __/ |                                                          | |        ", true);
-            writeLineWhenPossible(13, 10, "                   |___/                                                           |_|        ", true);
-
-            writeLineWhenPossible(35, 14, (" " + currentChamp[0]).PadLeft(44, '.'), true);
-            writeLineWhenPossible(35, 14, "Select a champion ", true);
-            writeLineWhenPossible(35, 15, (" " + currentBan[0]).PadLeft(44, '.'), true);
-            writeLineWhenPossible(35, 15, "Select a ban ", true);
-            writeLineWhenPossible(35, 16, (" " + currentSpell0[0]).PadLeft(44, '.'), true);
-            writeLineWhenPossible(35, 16, "Select summoner spell 1 ", true);
-            writeLineWhenPossible(35, 17, (" " + currentSpell1[0]).PadLeft(44, '.'), true);
-            writeLineWhenPossible(35, 17, "Select summoner spell 2 ", true);
-            writeLineWhenPossible(35, 18, (" " + "Disabled").PadLeft(44, '.'), true);
-            writeLineWhenPossible(35, 18, "Enable auto accept ", true);
-            writeLineWhenPossible(35, 20, (" Info").PadLeft(44, ' '), true);
-            writeLineWhenPossible(35, 20, "Settings ", true);
-
-            if (isAutoAcceptOn)
+            // Define logo
+            string[] logo =
             {
-                writeLineWhenPossible(70, 18, ". Enabled", false);
+                @"  _                                                 _                                     _   ",
+                @" | |                                     /\        | |            /\                     | |  ",
+                @" | |     ___  __ _  __ _ _   _  ___     /  \  _   _| |_ ___      /  \   ___ ___ ___ _ __ | |_ ",
+                @" | |    / _ \/ _` |/ _` | | | |/ _ \   / /\ \| | | | __/ _ \    / /\ \ / __/ __/ _ \ '_ \| __|",
+                @" | |___|  __/ (_| | (_| | |_| |  __/  / ____ \ |_| | || (_) |  / ____ \ (_| (_|  __/ |_) | |_ ",
+                @" |______\___|\__,_|\__, |\__,_|\___| /_/    \_\__,_|\__\___/  /_/    \_\___\___\___| .__/ \__|",
+                @"                    __/ |                                                          | |        ",
+                @"                   |___/                                                           |_|        "
+            };
+
+            // Print logo
+            for (int i = 0; i < logo.Length; i++)
+            {
+                writeLineWhenPossible(13, 3 + i, logo[i], true);
             }
 
+            // Define options
+            string[] settings = {
+                "Select a champion",
+                "Select a ban",
+                "Select summoner spell 1",
+                "Select summoner spell 2",
+                "Enable auto accept"
+            };
+            string[] settingsValue = {
+                currentChamp[0],
+                currentBan[0],
+                currentSpell0[0],
+                currentSpell1[0],
+                isAutoAcceptOn ? "Enabled" : "Disabled"
+            };
+
+            // Print settings
+            for (int i = 0; i < settings.Length; i++)
+            {
+                writeLineWhenPossible(35, 14 + i, (settingsValue[i]).PadLeft(44, '.'), true);
+                writeLineWhenPossible(35, 14 + i, settings[i] + " ", true);
+            }
+
+            // Print the two bottom buttons that are not actaul settings
+            writeLineWhenPossible(75, 20, "Info" , true);
+            writeLineWhenPossible(35, 20, "Settings ", true);
+
+            // Print arrow where the cursor was last time, special case for last two buttons
             if (consolePosLast == 5)
             {
                 writeLineWhenPossible(32, 20, "->", false);
