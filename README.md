@@ -17,7 +17,7 @@ Ever wanted to go pee or grab something but you're already 10 minutes into the q
 - Mac os is (currently) not supported
 - Feel free to suggest stuff
 - If it looks like I don't know what I'm doing that's probably because I don't know what I'm doing
-- If the application fails to launch, chances are you don't have .NET Runtime installed. You can find the latest version at https://dotnet.microsoft.com/en-us/download/dotnet/5.0
+- If the application fails to launch, chances are you don't have .NET Runtime installed. You can find the latest version at https://dotnet.microsoft.com/en-us/download/dotnet/7.0
 
 ## License
 Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
