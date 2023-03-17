@@ -1624,60 +1624,54 @@ namespace Leauge_Auto_Accept
         private static string[] clientRequest(string[] leagueAuth, string method, string url, string body)
         {
             // Ignore invalid https
-            ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+            var handler = new HttpClientHandler()
+            {
+                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            };
             try
             {
-                // Set URL
-                WebRequest request = WebRequest.Create("https://127.0.0.1:" + leagueAuth[1] + "/" + url);
-
-                // Set headers
-                request.Method = method;
-                request.Headers.Add("Authorization", "Basic " + leagueAuth[0]);
-                request.ContentType = "application/json";
-
-                // Send POST data when doing a post request
-                Stream dataStream;
-                if (method == "POST" || method == "PUT" || method == "PATCH")
+                using (HttpClient client = new HttpClient(handler))
                 {
-                    string postData = body;
-                    byte[] byteArray = Encoding.UTF8.GetBytes(postData);
-                    request.ContentLength = byteArray.Length;
-                    dataStream = request.GetRequestStream();
-                    dataStream.Write(byteArray, 0, byteArray.Length);
-                    dataStream.Close();
+                    // Set URL
+                    client.BaseAddress = new Uri("https://127.0.0.1:" + leagueAuth[1] + "/");
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", leagueAuth[0]);
+
+                    // Set headers
+                    HttpRequestMessage request = new HttpRequestMessage(new HttpMethod(method), url);
+                    request.Content = new StringContent(body, Encoding.UTF8, "application/json");
+
+                    // Send POST data when doing a post request
+                    if (method == "POST" || method == "PUT" || method == "PATCH")
+                    {
+                        string postData = body;
+                        byte[] byteArray = Encoding.UTF8.GetBytes(postData);
+                        request.Content = new ByteArrayContent(byteArray);
+                    }
+
+                    // Get the response
+                    HttpResponseMessage response = client.SendAsync(request).Result;
+
+                    // If the response is null (League client closed?)
+                    if (response == null)
+                    {
+                        string[] outputDef = { "999", "" };
+                        return outputDef;
+                    }
+
+                    // Get the HTTP status code
+                    int statusCode = (int)response.StatusCode;
+                    string statusString = statusCode.ToString();
+
+                    // Get the body
+                    string responseFromServer = response.Content.ReadAsStringAsync().Result;
+
+                    // Clean up the response
+                    response.Dispose();
+
+                    // Return content
+                    string[] output = { statusString, responseFromServer };
+                    return output;
                 }
-
-                // Get the response
-                WebResponse response;
-                try
-                {
-                    response = request.GetResponse();
-                }
-                catch (WebException e)
-                {
-                    response = e.Response;
-                }
-
-                // If the response is null (League client closed?)
-                if (((HttpWebResponse)response) == null)
-                {
-                    string[] outputDef = { "999", "" };
-                    return outputDef;
-                }
-
-                // Get the HTTP status code
-                int statusCode = (int)((HttpWebResponse)response).StatusCode;
-                string statusString = statusCode.ToString();
-
-                // Get the body
-                string responseFromServer = new StreamReader(response.GetResponseStream()).ReadToEnd();
-
-                // Clean up the stream
-                response.Close();
-
-                // Return content
-                string[] output = { statusString, responseFromServer };
-                return output;
             }
             catch
             {
