@@ -8,6 +8,9 @@ using System.Threading;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using System.Net.Http.Headers;
+using System.Net.Http;
+using System.Reflection;
 
 namespace Leauge_Auto_Accept
 {
@@ -21,6 +24,8 @@ namespace Leauge_Auto_Accept
 
     class Program
     {
+        public static string appVersion;
+
         public static string[] leagueAuth;
         public static int lcuPid = 0;
         public static bool isLeagueOpen = false;
@@ -70,6 +75,11 @@ namespace Leauge_Auto_Accept
 
         private static void Main()
         {
+            {
+                Version appVersionTmp = Assembly.GetExecutingAssembly().GetName().Version;
+                appVersion = appVersionTmp.Major + "." + appVersionTmp.Minor;
+            }
+
             canMovePos = false;
             currentWindow = "initializing";
             Console.SetCursorPosition(1, 15);
@@ -82,6 +92,8 @@ namespace Leauge_Auto_Accept
 
             // Attempt to load existing settings
             loadSettings();
+
+            versionCheck();
 
             // Start a bunch of task
             var taskKeys = new Task(ReadKeys);
@@ -96,6 +108,62 @@ namespace Leauge_Auto_Accept
             Task.WaitAll(tasks);
 
             Console.ReadKey();
+        }
+        
+        private static void versionCheck()
+        {
+            Console.SetCursorPosition(1, 15);
+            Console.WriteLine(padSides("Checking for an update...", 118)[0]);
+            string[] latestRelease = webRequest("https://api.github.com/repos/sweetriverfish/LeagueAutoAccept/releases/latest");
+            if (latestRelease[0] != "200")
+            {
+                Console.Clear();
+                Console.SetCursorPosition(1, 14);
+                Console.WriteLine(padSides("Failed to check for an update.", 118)[0]);
+                Console.WriteLine(padSides("You can disable this check in the settings.", 118)[0]);
+                Console.WriteLine(padSides("App will launch in 5 seconds.", 118)[0]);
+                Thread.Sleep(5000);
+            }
+            else
+            {
+                try
+                {
+                    string latestTag = latestRelease[1].Split("tag_name\": \"")[1].Split("\"")[0];
+                    if ('v' + appVersion == latestTag)
+                    {
+                        Console.Clear();
+                        Console.SetCursorPosition(1, 15);
+                        Console.WriteLine(padSides("No update found. Already using the latest version.", 118)[0]);
+                        Thread.Sleep(178);
+                        return;
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        Console.SetCursorPosition(1, 11);
+                        Console.WriteLine(padSides("An update has been found, consider updating.", 118)[0]);
+                        Console.WriteLine(padSides("Current version is v" + appVersion + ", latest version is " + latestTag, 118)[0]);
+                        Console.WriteLine();
+                        Console.WriteLine(padSides("Latest version can be found at:", 118)[0]);
+                        Console.WriteLine(padSides("github.com/sweetriverfish/LeagueAutoAccept/releases/latest", 118)[0]);
+                        Console.WriteLine();
+                        Console.WriteLine(padSides("You can disable this check in the settings.", 118)[0]);
+                        Console.WriteLine(padSides("App will launch in 5 seconds.", 118)[0]);
+                        Thread.Sleep(5000);
+                    }
+                }
+                catch
+                {
+                    // default case, in case github changes the json format
+                    Console.Clear();
+                    Console.SetCursorPosition(1, 14);
+                    Console.WriteLine(padSides("Failed to check for an update.", 118)[0]);
+                    Console.WriteLine(padSides("You can disable this check in the settings.", 118)[0]);
+                    Console.WriteLine(padSides("App will launch in 5 seconds.", 118)[0]);
+                    Thread.Sleep(5000);
+                }
+            }
+            //https://api.github.com/repos/sweetriverfish/LeagueAutoAccept/releases/latest
         }
 
         private static void CheckIfLeagueClientIsOpenTask()
@@ -410,7 +478,7 @@ namespace Leauge_Auto_Accept
 
             writeLineWhenPossible(35, 12, (" Artem").PadLeft(44, '.'), true);
             writeLineWhenPossible(35, 12, "Made by ", true);
-            writeLineWhenPossible(35, 13, (" 2.7").PadLeft(44, '.'), true);
+            writeLineWhenPossible(35, 13, (" " + appVersion).PadLeft(44, '.'), true);
             writeLineWhenPossible(35, 13, "Version ", true);
             writeLineWhenPossible(35, 15, padSides("Source code:", 46)[0], true);
             writeLineWhenPossible(35, 16, " github.com/sweetriverfish/LeagueAutoAccept", true);
@@ -1593,6 +1661,52 @@ namespace Leauge_Auto_Accept
             {
                 Console.SetCursorPosition(position[0], position[1]++);
                 Console.WriteLine(line);
+            }
+        }
+
+        private static string[] webRequest(string url)
+        {
+            try
+            {
+                using (HttpClient client = new HttpClient())
+                {
+                    // Set URL
+                    client.BaseAddress = new Uri(url);
+
+                    // Set headers
+                    HttpRequestMessage request = new HttpRequestMessage(new HttpMethod("GET"), url);
+                    client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36");
+
+                    // Get the response
+                    HttpResponseMessage response = client.SendAsync(request).Result;
+
+                    // If the response is null
+                    if (response == null)
+                    {
+                        string[] outputDef = { "999", "" };
+                        return outputDef;
+                    }
+
+                    // Get the HTTP status code
+                    int statusCode = (int)response.StatusCode;
+                    string statusString = statusCode.ToString();
+
+                    // Get the body
+                    string responseFromServer = response.Content.ReadAsStringAsync().Result;
+
+                    // Clean up the response
+                    response.Dispose();
+
+                    // Return content
+                    string[] output = { statusString, responseFromServer };
+                    return output;
+                }
+            }
+            catch
+            {
+                // If the URL is invalid
+                string[] output = { "999", "" };
+                return output;
             }
         }
 
