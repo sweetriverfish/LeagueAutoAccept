@@ -1670,36 +1670,18 @@ namespace Leauge_Auto_Accept
             {
                 using (HttpClient client = new HttpClient())
                 {
-                    // Set URL
+                    // Set URL, User-Agent
                     client.BaseAddress = new Uri(url);
-
-                    // Set headers
-                    HttpRequestMessage request = new HttpRequestMessage(new HttpMethod("GET"), url);
                     client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36");
 
                     // Get the response
-                    HttpResponseMessage response = client.SendAsync(request).Result;
-
-                    // If the response is null
-                    if (response == null)
+                    using (HttpResponseMessage response = client.GetAsync(url).Result)
                     {
-                        string[] outputDef = { "999", "" };
-                        return outputDef;
+                        response.EnsureSuccessStatusCode();
+                        string content = response.Content.ReadAsStringAsync().Result;
+
+                        return new[] { ((int)response.StatusCode).ToString(), content };
                     }
-
-                    // Get the HTTP status code
-                    int statusCode = (int)response.StatusCode;
-                    string statusString = statusCode.ToString();
-
-                    // Get the body
-                    string responseFromServer = response.Content.ReadAsStringAsync().Result;
-
-                    // Clean up the response
-                    response.Dispose();
-
-                    // Return content
-                    string[] output = { statusString, responseFromServer };
-                    return output;
                 }
             }
             catch
