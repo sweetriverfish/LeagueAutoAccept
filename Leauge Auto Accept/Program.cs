@@ -441,6 +441,10 @@ namespace Leauge_Auto_Accept
             {
                 settingsSave();
             }
+            else if (item == 0)
+            {
+                deleteSettings();
+            }
         }
 
         private static void settingsMenuDesc(int item)
