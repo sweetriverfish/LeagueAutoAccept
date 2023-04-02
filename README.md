@@ -11,9 +11,14 @@ Ever wanted to go pee or grab something but you're already 10 minutes into the q
 - Can instalock
 - Pick summoner spells
 
+## Planned
+- Backup champion to pick/ban
+- Send a chat message when entering lobby
+- Automatic runes picker (from the premade sets)
+- Manual runes creator, maybe
+
 ## Notes and stuff
 - You can build your rune page via collection>runes. The last rune page you clicked is the currently selected one.
-- Might implement a runes picker later on if I won't be too lazy
 - Mac os is (currently) not supported
 - Feel free to suggest stuff
 - If it looks like I don't know what I'm doing that's probably because I don't know what I'm doing
