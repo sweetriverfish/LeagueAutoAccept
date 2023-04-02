@@ -2,12 +2,13 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net7.0-windows</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <RootNamespace>Leauge_Auto_Accept</RootNamespace>
-    <Version>2.7</Version>
+    <Version>3.0</Version>
     <Company />
     <Product />
     <Authors>Artem</Authors>
+    <Title>League Auto Accept</Title>
   </PropertyGroup>
 
 </Project>
