@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,6 +20,25 @@ namespace Leauge_Auto_Accept
         public static List<itemList> spellsSorted = new List<itemList>();
 
         public static string currentSummonerId = "";
+        public static string currentChatId = "";
+
+        public static void loadSummonerId()
+        {
+            if (currentSummonerId == "")
+            {
+                Print.printCentered("Getting summoner ID...", 15);
+                string[] currentSummoner = LCU.clientRequestUntilSuccess("GET", "lol-summoner/v1/current-summoner", "");
+                Console.Clear();
+                currentSummonerId = currentSummoner[1].Split("summonerId\":")[1].Split(',')[0];
+            }
+        }
+
+        public static void loadChatId()
+        {
+            string[] myChatProfile = LCU.clientRequest("GET", "lol-chat/v1/me", "");
+            currentChatId = myChatProfile[1].Split("\"id\":\"")[1].Split("\",")[0];
+            currentSummonerId = myChatProfile[1].Split("\"summonerId\":")[1].Split(",\"")[0];
+        }
 
         public static void loadChampionsList()
         {
@@ -26,15 +46,9 @@ namespace Leauge_Auto_Accept
 
             if (!champsSorterd.Any())
             {
-                List<itemList> champs = new List<itemList>();
+                loadSummonerId();
 
-                if (currentSummonerId == "")
-                {
-                    Print.printCentered("Getting summoner ID...", 15);
-                    string[] currentSummoner = LCU.clientRequestUntilSuccess("GET", "lol-summoner/v1/current-summoner", "");
-                    Console.Clear();
-                    currentSummonerId = currentSummoner[1].Split("summonerId\":")[1].Split(',')[0];
-                }
+                List<itemList> champs = new List<itemList>();
 
                 Print.printCentered("Getting champions and ownership list...", 15);
                 string[] ownedChamps = LCU.clientRequestUntilSuccess("GET", "lol-champions/v1/inventories/" + currentSummonerId + "/champions-minimal", "");
@@ -79,15 +93,9 @@ namespace Leauge_Auto_Accept
             Console.Clear();
             if (!spellsSorted.Any())
             {
-                List<string> enabledSpells = new List<string>();
+                loadSummonerId();
 
-                if (currentSummonerId == "")
-                {
-                    Print.printCentered("Getting summoner ID...", 15);
-                    string[] currentSummoner = LCU.clientRequestUntilSuccess("GET", "lol-summoner/v1/current-summoner", "");
-                    Console.Clear();
-                    currentSummonerId = currentSummoner[1].Split("summonerId\":")[1].Split(',')[0];
-                }
+                List<string> enabledSpells = new List<string>();
 
                 Print.printCentered("Getting a list of available summoner spells...", 15);
                 string[] availableSpells = LCU.clientRequestUntilSuccess("GET", "lol-collections/v1/inventories/" + currentSummonerId + "/spells", "");

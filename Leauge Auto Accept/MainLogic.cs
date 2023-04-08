@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
@@ -14,6 +15,7 @@ namespace Leauge_Auto_Accept
         public static bool lockedBan = false;
         public static bool pickedSpell1 = false;
         public static bool pickedSpell2 = false;
+        public static bool sentChatMessages = false;
 
         public static long lastActStartTime;
         public static string lastActId = "";
@@ -104,10 +106,11 @@ namespace Leauge_Auto_Accept
                     lockedBan = false;
                     pickedSpell1 = false;
                     pickedSpell2 = false;
+                    sentChatMessages = false;
                 }
                 lastChatRoom = currentChatRoom;
 
-                if (pickedChamp && lockedChamp && pickedBan && lockedBan && pickedSpell1 && pickedSpell2)
+                if (pickedChamp && lockedChamp && pickedBan && lockedBan && pickedSpell1 && pickedSpell2 && sentChatMessages)
                 {
                     // Sleep a little if we already did everything we needed to do
                     Thread.Sleep(1000);
@@ -135,9 +138,45 @@ namespace Leauge_Auto_Accept
                     {
                         pickedSpell2 = true;
                     }
+                    if (!Settings.chatMessagesEnabled)
+                    {
+                        sentChatMessages = true;
+                    }
+                    else
+                    {
+                        if (Settings.chatMessages.Count == 0)
+                        {
+                            sentChatMessages = true;
+                        }
+                    }
+
                     if (!pickedChamp || !lockedChamp || !pickedBan || !lockedBan)
                     {
                         handleChampSelectActions(currentChampSelect, localPlayerCellId);
+                    }
+                    if (!sentChatMessages)
+                    {
+                        Data.loadChatId();
+
+                        string[] chats = LCU.clientRequest("GET", "lol-chat/v1/conversations", "");
+                        string[] chatsSplit = chats[1].Split("},{");
+                        foreach (var chat in chatsSplit)
+                        {
+                            if (chat.Contains("\"type\":\"championSelect\""))
+                            {
+                                string chatId = chat.Split("\"id\":\"")[1].Split("\",")[0];
+                                string todayString = DateTime.Now.ToString("yyyy-MM-dd");
+                                string clockString = DateTime.Now.ToString("HH:mm:ss.fff");
+                                string fullString = todayString + "T" + clockString + "Z";
+                                foreach (var message in Settings.chatMessages)
+                                {
+                                    string body = "{\"type\":\"chat\",\"fromId\":\"" + Data.currentChatId + "\",\"fromSummonerId\":" + Data.currentSummonerId + ",\"isHistorical\":false,\"timestamp\":\"" + fullString + "\",\"body\":\"" + message + "\"}";
+                                    string[] sendMessage = LCU.clientRequest("POST", "lol-chat/v1/conversations/" + chatId + "/messages", body);
+                                    Thread.Sleep(15);
+                                }
+                                sentChatMessages = true;
+                            }
+                        }
                     }
                     if (!pickedSpell1)
                     {

@@ -32,6 +32,10 @@ namespace Leauge_Auto_Accept
 
             Updater.initialize();
 
+            //Settings.chatMessagesEnabled = true;
+            //Settings.chatMessages.Add("Support");
+            //Settings.chatMessages.Add("Nami");
+
             // Start a bunch of task
             var taskKeys = new Task(Navigation.ReadKeys);
             taskKeys.Start();

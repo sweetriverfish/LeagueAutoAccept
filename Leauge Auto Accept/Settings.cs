@@ -10,6 +10,8 @@ namespace Leauge_Auto_Accept
         public static string[] currentBan = { "None", "0" };
         public static string[] currentSpell1 = { "None", "0" };
         public static string[] currentSpell2 = { "None", "0" };
+        public static bool chatMessagesEnabled = false;
+        public static List<string> chatMessages = new List<string>();
 
         public static bool saveSettings = false;
         public static bool preloadData = false;
