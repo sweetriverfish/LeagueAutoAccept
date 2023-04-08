@@ -33,7 +33,7 @@ namespace Leauge_Auto_Accept
             }
         }
 
-        public static void loadChatId()
+        public static void loadPlayerChatId()
         {
             string[] myChatProfile = LCU.clientRequest("GET", "lol-chat/v1/me", "");
             currentChatId = myChatProfile[1].Split("\"id\":\"")[1].Split("\",")[0];

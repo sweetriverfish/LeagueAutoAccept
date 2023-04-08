@@ -9,17 +9,17 @@ namespace Leauge_Auto_Accept
     {
         public static bool isAutoAcceptOn = false;
 
-        public static bool pickedChamp = false;
-        public static bool lockedChamp = false;
-        public static bool pickedBan = false;
-        public static bool lockedBan = false;
-        public static bool pickedSpell1 = false;
-        public static bool pickedSpell2 = false;
-        public static bool sentChatMessages = false;
+        private static bool pickedChamp = false;
+        private static bool lockedChamp = false;
+        private static bool pickedBan = false;
+        private static bool lockedBan = false;
+        private static bool pickedSpell1 = false;
+        private static bool pickedSpell2 = false;
+        private static bool sentChatMessages = false;
 
-        public static long lastActStartTime;
-        public static string lastActId = "";
-        public static string lastChatRoom = "";
+        private static long lastActStartTime;
+        private static string lastActId = "";
+        private static string lastChatRoom = "";
 
         public static void acceptQueue()
         {
@@ -156,27 +156,7 @@ namespace Leauge_Auto_Accept
                     }
                     if (!sentChatMessages)
                     {
-                        Data.loadChatId();
-
-                        string[] chats = LCU.clientRequest("GET", "lol-chat/v1/conversations", "");
-                        string[] chatsSplit = chats[1].Split("},{");
-                        foreach (var chat in chatsSplit)
-                        {
-                            if (chat.Contains("\"type\":\"championSelect\""))
-                            {
-                                string chatId = chat.Split("\"id\":\"")[1].Split("\",")[0];
-                                string todayString = DateTime.Now.ToString("yyyy-MM-dd");
-                                string clockString = DateTime.Now.ToString("HH:mm:ss.fff");
-                                string fullString = todayString + "T" + clockString + "Z";
-                                foreach (var message in Settings.chatMessages)
-                                {
-                                    string body = "{\"type\":\"chat\",\"fromId\":\"" + Data.currentChatId + "\",\"fromSummonerId\":" + Data.currentSummonerId + ",\"isHistorical\":false,\"timestamp\":\"" + fullString + "\",\"body\":\"" + message + "\"}";
-                                    string[] sendMessage = LCU.clientRequest("POST", "lol-chat/v1/conversations/" + chatId + "/messages", body);
-                                    Thread.Sleep(15);
-                                }
-                                sentChatMessages = true;
-                            }
-                        }
+                        handleChampSelectChat(currentChatRoom);
                     }
                     if (!pickedSpell1)
                     {
@@ -196,6 +176,22 @@ namespace Leauge_Auto_Accept
                     }
                 }
             }
+        }
+
+        private static void handleChampSelectChat(string chatId)
+        {
+            Data.loadPlayerChatId();
+
+            string todayString = DateTime.Now.ToString("yyyy-MM-dd");
+            string clockString = DateTime.Now.ToString("HH:mm:ss.fff");
+            string fullString = todayString + "T" + clockString + "Z";
+            foreach (var message in Settings.chatMessages)
+            {
+                string body = "{\"type\":\"chat\",\"fromId\":\"" + Data.currentChatId + "\",\"fromSummonerId\":" + Data.currentSummonerId + ",\"isHistorical\":false,\"timestamp\":\"" + fullString + "\",\"body\":\"" + message + "\"}";
+                LCU.clientRequest("POST", "lol-chat/v1/conversations/" + chatId + "/messages", body);
+                Thread.Sleep(15);
+            }
+            sentChatMessages = true;
         }
 
         private static void handleChampSelectActions(string[] currentChampSelect, string localPlayerCellId)
