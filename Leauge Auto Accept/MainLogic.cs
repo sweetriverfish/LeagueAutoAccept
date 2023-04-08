@@ -182,12 +182,10 @@ namespace Leauge_Auto_Accept
         {
             Data.loadPlayerChatId();
 
-            string todayString = DateTime.Now.ToString("yyyy-MM-dd");
-            string clockString = DateTime.Now.ToString("HH:mm:ss.fff");
-            string fullString = todayString + "T" + clockString + "Z";
+            string timestamp = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ");
             foreach (var message in Settings.chatMessages)
             {
-                string body = "{\"type\":\"chat\",\"fromId\":\"" + Data.currentChatId + "\",\"fromSummonerId\":" + Data.currentSummonerId + ",\"isHistorical\":false,\"timestamp\":\"" + fullString + "\",\"body\":\"" + message + "\"}";
+                string body = "{\"type\":\"chat\",\"fromId\":\"" + Data.currentChatId + "\",\"fromSummonerId\":" + Data.currentSummonerId + ",\"isHistorical\":false,\"timestamp\":\"" + timestamp + "\",\"body\":\"" + message + "\"}";
                 LCU.clientRequest("POST", "lol-chat/v1/conversations/" + chatId + "/messages", body);
                 Thread.Sleep(15);
             }
