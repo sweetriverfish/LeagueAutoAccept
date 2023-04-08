@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.Common;
 using System.Linq;
 using System.Threading;
 
@@ -72,13 +73,14 @@ namespace Leauge_Auto_Accept
                 }
                 else if (movePointer && !new[] { "infoMenu", "leagueClientIsClosedMessage", "initializing" }.Contains(UI.currentWindow))
                 {
+                    Print.isMovingPos = true;
                     handlePointerMovement();
                     if (UI.currentWindow == "settingsMenu")
                     {
                         UI.settingsMenuDesc(currentPos);
                     }
+                    Print.isMovingPos = false;
                 }
-                Print.isMovingPos = false;
             }
         }
 
@@ -201,13 +203,12 @@ namespace Leauge_Auto_Accept
             }
         }
 
-        private static void handlePointerMovement()
+        public static void handlePointerMovement()
         {
             while (!Print.canMovePos)
             {
                 Thread.Sleep(2);
             }
-            Print.isMovingPos = true;
 
             if (UI.currentWindow == "mainScreen" && consolePosLast > 4)
             {
@@ -228,7 +229,7 @@ namespace Leauge_Auto_Accept
             }
             else
             {
-                int[] consolePosOld = getPositionOnConsole(consolePosLast, UI.leftPad, UI.topPad);
+                int[] consolePosOld = getPositionOnConsole(consolePosLast);
                 Console.SetCursorPosition(consolePosOld[1], consolePosOld[0]);
             }
             Print.printWhenPossible("  ");
@@ -266,30 +267,32 @@ namespace Leauge_Auto_Accept
             }
             else
             {
-                int[] consolePos = getPositionOnConsole(currentPos, UI.leftPad, UI.topPad);
+                int[] consolePos = getPositionOnConsole(currentPos);
                 Console.SetCursorPosition(consolePos[1], consolePos[0]);
             }
             Print.printWhenPossible("->");
         }
 
-        private static int[] getPositionOnConsole(int pos, int leftPad, int topPad)
+        private static int[] getPositionOnConsole(int pos)
         {
-            // TODO: figure out what the fuck num1/num2/num3/num4/output1/output2 mean xd
-            double num1 = pos / UI.totalRows;  //  1.111111111111111
-            double num2 = Math.Floor(num1); //  1
-            double num3 = num2 * UI.totalRows; //  27
-            double num4 = pos - num3;       //  3
+            // Calculate the current row
+            double row1 = pos / UI.totalRows;       //  1.111111111111111
+            double row2 = Math.Floor(row1);         //  1
 
-            int output1 = Convert.ToInt32(num4);
-            int output2 = Convert.ToInt32(num2) * 20;
+            // Calculate the current column
+            double column1 = row2 * UI.totalRows;   //  27
+            double column2 = pos - column1;         //  3
 
-            if (output1 < 0)
-                output1 = 0;
-            if (output2 < 0)
-                output2 = 0;
+            // Convert to integer, caclulate column width
+            int column = Convert.ToInt32(column2);
+            int row = Convert.ToInt32(row2) * UI.columnWidth;
 
-            int[] output = { output1 + topPad, output2 + leftPad };
-            return output;
+            if (column < 0)
+                column = 0;
+            if (row < 0)
+                row = 0;
+
+            return new int[] { column + UI.topPad, row + UI.leftPad };
         }
 
         private static void exitMenuNav()

@@ -11,10 +11,11 @@ namespace Leauge_Auto_Accept
         public static int currentChampPicker = 0;
         public static int currentSpellSlot = 0;
 
-        public static int totalRows = SizeHandler.WindowHeight - 2;
         public static int totalChamps = 0;
         public static int totalSpells = 0;
 
+        public static int totalRows = SizeHandler.WindowHeight - 2;
+        public static int columnWidth = 20;
         public static int topPad = 0;
         public static int leftPad = 0;
         public static int maxPos = 0;
@@ -156,26 +157,9 @@ namespace Leauge_Auto_Accept
             
             Print.printWhenPossible("v" + Updater.appVersion, SizeHandler.WindowHeight - 1, 0, false);
 
-            handleMainScreenCursor();
+            Navigation.handlePointerMovement();
 
             Print.canMovePos = true;
-        }
-
-        public static void handleMainScreenCursor(string printContent = "->")
-        {
-            // Print arrow where the cursor was last time, special case for last two buttons
-            if (Navigation.consolePosLast == 5)
-            {
-                Print.printWhenPossible(printContent, SizeHandler.HeightCenter + 5, leftPad, false);
-            }
-            else if (Navigation.consolePosLast == 6)
-            {
-                Print.printWhenPossible(printContent, SizeHandler.HeightCenter + 5, leftPad + 40, false);
-            }
-            else
-            {
-                Print.printWhenPossible(printContent, topPad + Navigation.lastPosMainNav, leftPad, false);
-            }
         }
 
         public static void toggleAutoAcceptSettingUI()
@@ -218,7 +202,7 @@ namespace Leauge_Auto_Accept
                 Print.printCentered(addDotsInBetween(optionName[i], optionValue[i]), topPad + i);
             }
 
-            Print.printWhenPossible("->", topPad, leftPad, false);
+            Navigation.handlePointerMovement();
 
             Print.canMovePos = true;
 
@@ -303,8 +287,7 @@ namespace Leauge_Auto_Accept
             Print.printWhenPossible((" No").PadLeft(32, ' '), topPad, leftPad + 3, false);
             Print.printWhenPossible("Yes ", topPad, leftPad + 3, false);
 
-
-            Print.printWhenPossible("->", topPad, leftPad, false);
+            Navigation.handlePointerMovement();
 
             Print.canMovePos = true;
         }
@@ -321,8 +304,8 @@ namespace Leauge_Auto_Accept
 
             Data.loadChampionsList();
 
-            displayChamps();
             updateCurrentFilter();
+            displayChamps();
         }
 
         private static void displayChamps()
@@ -361,7 +344,7 @@ namespace Leauge_Auto_Accept
             foreach (var champ in champsFiltered)
             {
                 string line = "   " + champ.name;
-                line = line.PadRight(20, ' ');
+                line = line.PadRight(columnWidth, ' ');
 
                 champsOutput[currentRow] += line;
 
@@ -386,7 +369,7 @@ namespace Leauge_Auto_Accept
                 }
                 Print.printWhenPossible(lineNew);
             }
-            Print.printWhenPossible("->", 0, 0);
+            Navigation.handlePointerMovement();
             Print.canMovePos = true;
         }
 
@@ -402,8 +385,8 @@ namespace Leauge_Auto_Accept
 
             Data.loadSpellsList();
 
-            displaySpells();
             updateCurrentFilter();
+            displaySpells();
         }
 
         private static void displaySpells()
@@ -438,7 +421,7 @@ namespace Leauge_Auto_Accept
             foreach (var spell in spellsFiltered)
             {
                 string line = "   " + spell.name;
-                line = line.PadRight(20, ' ');
+                line = line.PadRight(columnWidth, ' ');
 
                 spelloutput[currentRow] += line;
 
@@ -463,7 +446,7 @@ namespace Leauge_Auto_Accept
                 }
                 Print.printWhenPossible(lineNew);
             }
-            Print.printWhenPossible("->", 0, 0);
+            Navigation.handlePointerMovement();
             Print.canMovePos = true;
         }
 
@@ -480,7 +463,6 @@ namespace Leauge_Auto_Accept
             Navigation.currentPos = 0;
             string consoleLine = "Search: " + Navigation.filterKeyword;
             Print.printCentered(consoleLine, Console.WindowHeight - 1, false);
-            Console.SetCursorPosition(0, 0);
         }
 
         public static void printHeart()
