@@ -27,7 +27,7 @@ namespace Leauge_Auto_Accept
             if (currentSummonerId == "")
             {
                 Print.printCentered("Getting summoner ID...", 15);
-                string[] currentSummoner = LCU.clientRequestUntilSuccess("GET", "lol-summoner/v1/current-summoner", "");
+                string[] currentSummoner = LCU.clientRequestUntilSuccess("GET", "lol-summoner/v1/current-summoner");
                 Console.Clear();
                 currentSummonerId = currentSummoner[1].Split("summonerId\":")[1].Split(',')[0];
             }
@@ -35,7 +35,7 @@ namespace Leauge_Auto_Accept
 
         public static void loadPlayerChatId()
         {
-            string[] myChatProfile = LCU.clientRequest("GET", "lol-chat/v1/me", "");
+            string[] myChatProfile = LCU.clientRequest("GET", "lol-chat/v1/me");
             currentChatId = myChatProfile[1].Split("\"id\":\"")[1].Split("\",")[0];
             currentSummonerId = myChatProfile[1].Split("\"summonerId\":")[1].Split(",\"")[0];
         }
@@ -51,7 +51,7 @@ namespace Leauge_Auto_Accept
                 List<itemList> champs = new List<itemList>();
 
                 Print.printCentered("Getting champions and ownership list...", 15);
-                string[] ownedChamps = LCU.clientRequestUntilSuccess("GET", "lol-champions/v1/inventories/" + currentSummonerId + "/champions-minimal", "");
+                string[] ownedChamps = LCU.clientRequestUntilSuccess("GET", "lol-champions/v1/inventories/" + currentSummonerId + "/champions-minimal");
                 Console.Clear();
                 string[] champsSplit = ownedChamps[1].Split("},{");
 
@@ -98,12 +98,12 @@ namespace Leauge_Auto_Accept
                 List<string> enabledSpells = new List<string>();
 
                 Print.printCentered("Getting a list of available summoner spells...", 15);
-                string[] availableSpells = LCU.clientRequestUntilSuccess("GET", "lol-collections/v1/inventories/" + currentSummonerId + "/spells", "");
+                string[] availableSpells = LCU.clientRequestUntilSuccess("GET", "lol-collections/v1/inventories/" + currentSummonerId + "/spells");
                 Console.Clear();
                 string[] spellsSplit = availableSpells[1].Split('[')[1].Split(']')[0].Split(',');
 
                 Print.printCentered("Getting a list of available gamemodes...", 15);
-                string[] platformConfig = LCU.clientRequestUntilSuccess("GET", "lol-platform-config/v1/namespaces", "");
+                string[] platformConfig = LCU.clientRequestUntilSuccess("GET", "lol-platform-config/v1/namespaces");
                 Console.Clear();
                 string[] enabledGameModes = platformConfig[1].Split("EnabledModes\":[")[1].Split(']')[0].Split(',');
                 string[] inactiveSpellsPerGameMode = platformConfig[1].Split("gameModeToInactiveSpellIds\":{")[1].Split('}')[0].Split("],");
@@ -143,7 +143,7 @@ namespace Leauge_Auto_Accept
 
                 // Get sepll names
                 Print.printCentered("Getting summoner spell names...", 15);
-                string[] spellsJson = LCU.clientRequest("GET", "lol-game-data/assets/v1/summoner-spells.json", "");
+                string[] spellsJson = LCU.clientRequest("GET", "lol-game-data/assets/v1/summoner-spells.json");
                 Console.Clear();
                 string[] spellsJsonSplit = spellsJson[1].Split('{');
 

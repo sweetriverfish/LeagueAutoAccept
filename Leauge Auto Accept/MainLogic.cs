@@ -27,7 +27,7 @@ namespace Leauge_Auto_Accept
             {
                 if (isAutoAcceptOn)
                 {
-                    string[] gameSession = LCU.clientRequest("GET", "lol-gameflow/v1/session", "");
+                    string[] gameSession = LCU.clientRequest("GET", "lol-gameflow/v1/session");
 
                     if (gameSession[0] == "200")
                     {
@@ -42,7 +42,7 @@ namespace Leauge_Auto_Accept
                                 Thread.Sleep(2000);
                                 break;
                             case "ReadyCheck":
-                                string[] matchAccept = LCU.clientRequest("POST", "lol-matchmaking/v1/ready-check/accept", "");
+                                string[] matchAccept = LCU.clientRequest("POST", "lol-matchmaking/v1/ready-check/accept");
                                 break;
                             case "ChampSelect":
                                 handleChampSelect();
@@ -91,7 +91,7 @@ namespace Leauge_Auto_Accept
         private static void handleChampSelect()
         {
             // Get data for the current ongoing champ select
-            string[] currentChampSelect = LCU.clientRequest("GET", "lol-champ-select/v1/session", "");
+            string[] currentChampSelect = LCU.clientRequest("GET", "lol-champ-select/v1/session");
 
             if (currentChampSelect[0] == "200")
             {

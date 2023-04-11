@@ -153,7 +153,7 @@ namespace Leauge_Auto_Accept
             }
         }
 
-        public static string[] clientRequestUntilSuccess(string method, string url, string body)
+        public static string[] clientRequestUntilSuccess(string method, string url, string body = null)
         {
             string[] request = { "000", "" };
             while (request[0].Substring(0, 1) != "2")
