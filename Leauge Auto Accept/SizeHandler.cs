@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 
 namespace Leauge_Auto_Accept
@@ -70,6 +71,30 @@ namespace Leauge_Auto_Accept
         {
             WidthCenter = WindowWidth / 2;
             HeightCenter = WindowHeight / 2;
+        }
+
+        public static void resizeBasedOnChampsCount()
+        {
+            // Calculate the amount of items the current console size can have
+            int totalRows = minHeight - 2;
+            int totalItems = totalRows * minWidth / 20; // 20 is the current column size for a champion name
+
+            // Check if the minimum console size too small
+            if (totalItems < Data.champsSorterd.Count)
+            {
+                // Figure out the needed size
+                double neededHeight = Data.champsSorterd.Count / 6; // 6 is the current amount of columns in a champions list
+                int newHeight = (int)Math.Ceiling(neededHeight) + 3;
+
+                // Set the new minimum console size
+                minHeight = newHeight;
+
+                // Resize if the current console is too small
+                if (WindowHeight < minHeight)
+                {
+                    initialize();
+                }
+            }
         }
     }
 }

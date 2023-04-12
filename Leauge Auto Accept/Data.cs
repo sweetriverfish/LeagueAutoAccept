@@ -85,6 +85,7 @@ namespace Leauge_Auto_Accept
                 champsSorterd = champs.OrderBy(o => o.name).ToList();
             }
 
+            SizeHandler.resizeBasedOnChampsCount();
             Console.Clear();
         }
 
