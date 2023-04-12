@@ -225,7 +225,7 @@ namespace Leauge_Auto_Accept
             else if (UI.currentWindow == "exitMenu" && consolePosLast == 1)
             {
                 // Handles the weird exit menu navigation
-                Console.SetCursorPosition(71, UI.topPad);
+                Console.SetCursorPosition(UI.leftPad + 30, UI.topPad);
             }
             else
             {
@@ -263,7 +263,7 @@ namespace Leauge_Auto_Accept
             else if (UI.currentWindow == "exitMenu" && currentPos == 1)
             {
                 // Handles the weird exit menu navigation
-                Console.SetCursorPosition(71, UI.topPad);
+                Console.SetCursorPosition(UI.leftPad + 30, UI.topPad);
             }
             else
             {
