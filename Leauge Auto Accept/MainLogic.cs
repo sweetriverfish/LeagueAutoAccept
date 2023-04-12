@@ -42,10 +42,11 @@ namespace Leauge_Auto_Accept
                                 Thread.Sleep(2000);
                                 break;
                             case "ReadyCheck":
-                                string[] matchAccept = LCU.clientRequest("POST", "lol-matchmaking/v1/ready-check/accept");
+                                LCU.clientRequest("POST", "lol-matchmaking/v1/ready-check/accept");
                                 break;
                             case "ChampSelect":
                                 handleChampSelect();
+                                handlePickOrderSwap();
                                 break;
                             case "InProgress":
                                 // No need to spam requests
@@ -323,6 +324,32 @@ namespace Leauge_Auto_Accept
                         lockChampion(actId, championId, "ban");
                     }
                 }
+            }
+        }
+        
+        private static void handlePickOrderSwap()
+        {
+            // Return if we already locked in or if the settings is off
+            if (!Settings.autoPickOrderTrade || lockedChamp)
+            {
+                return;
+            }
+
+            // Get ongoing swap data
+            string[] swap = LCU.clientRequest("GET", "lol-champ-select/v1/ongoing-swap");
+            if (swap[0] == "200")
+            {
+                // If the swap was called by local player, return
+                if (swap.Contains("initiatedByLocalPlayer\":true"))
+                {
+                    return;
+                }
+                // Get action ID
+                string swapId = swap[1].Split("\"id\":")[1].Split(',')[0];
+
+                // Swap pick order
+                LCU.clientRequest("POST", "lol-champ-select/v1/session/swaps/" + swapId + "/accept");
+                LCU.clientRequest("POST", "lol-champ-select/v1/ongoing-swap/" + swapId + "/clear");
             }
         }
     }

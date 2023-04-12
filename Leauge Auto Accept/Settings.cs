@@ -19,6 +19,7 @@ namespace Leauge_Auto_Accept
         public static int lockDelay = 1500;
         public static string lockDelayString = "1500";
         public static bool disableUpdateCheck = false;
+        public static bool autoPickOrderTrade = false;
         public static bool shouldAutoAcceptbeOn = false;
 
         public static void settingsModify(int item)
@@ -71,6 +72,9 @@ namespace Leauge_Auto_Accept
                         UI.settingsMenuUpdateUI(0);
                     }
                     disableUpdateCheck = !disableUpdateCheck;
+                    break;
+                case 5:
+                    autoPickOrderTrade = !autoPickOrderTrade;
                     break;
             }
 
@@ -199,6 +203,7 @@ namespace Leauge_Auto_Accept
                 ",preloadData:" + preloadData +
                 ",instaLock:" + instaLock +
                 ",lockDelay:" + lockDelay +
+                ",autoPickOrderTrade:" + autoPickOrderTrade +
                 ",disableUpdateCheck:" + disableUpdateCheck;
 
             string dirParameter = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Leauge Auto Accept Config.txt";
@@ -285,6 +290,9 @@ namespace Leauge_Auto_Accept
                             break;
                         case "disableUpdateCheck":
                             disableUpdateCheck = Boolean.Parse(columns[1]);
+                            break;
+                        case "autoPickOrderTrade":
+                            autoPickOrderTrade = Boolean.Parse(columns[1]);
                             break;
                     }
                     saveSettings = true;

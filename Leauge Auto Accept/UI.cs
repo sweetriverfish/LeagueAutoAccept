@@ -176,7 +176,7 @@ namespace Leauge_Auto_Accept
             currentWindow = "settingsMenu";
             topPad = SizeHandler.HeightCenter - 3;
             leftPad = SizeHandler.WidthCenter - 25;
-            maxPos = 5;
+            maxPos = 6;
 
             Console.Clear();
 
@@ -186,14 +186,16 @@ namespace Leauge_Auto_Accept
                 "Preload data",
                 "Instalock bans/picks",
                 "Lock/ban delay",
-                "Disable update check"
+                "Disable update check",
+                "Automatically trade pick order"
             };
             string[] optionValue = {
                 Settings.saveSettings ? "Yes" : "No",
                 Settings.preloadData ? "Yes" : "No",
                 Settings.instaLock ? "Yes" : "No",
                 Settings.lockDelay.ToString(),
-                Settings.disableUpdateCheck ? "Yes" : "No"
+                Settings.disableUpdateCheck ? "Yes" : "No",
+                Settings.autoPickOrderTrade ? "Yes" : "No"
             };
 
             // Print options
@@ -234,6 +236,10 @@ namespace Leauge_Auto_Accept
                     Print.printCentered("Disable update check on startup.", topPad + 7);
                     Print.printCentered("", topPad + 8);
                     break;
+                case 5:
+                    Print.printCentered("Automatically trade pick order when someone requests to.", topPad + 7);
+                    Print.printCentered("", topPad + 8);
+                    break;
             }
         }
 
@@ -248,6 +254,7 @@ namespace Leauge_Auto_Accept
                 2 => Settings.instaLock ? " Yes" : ". No",
                 3 => (" " + Settings.lockDelayString).PadLeft(9, '.'),
                 4 => Settings.disableUpdateCheck ? " Yes" : ". No",
+                5 => Settings.autoPickOrderTrade ? " Yes" : ". No",
                 _ => ""
             };
             Print.printWhenPossible(outputText, item + topPad, SizeHandler.WidthCenter + 22 - outputText.Length);
