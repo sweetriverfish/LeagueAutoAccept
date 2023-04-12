@@ -224,7 +224,7 @@ namespace Leauge_Auto_Accept
             if (!pickedChamp)
             {
                 // Hover champion when champ select starts, no need to check for whenever it's my turn or not to pick it
-                hoverChampion(actId, championId, Settings.currentChamp[1], "pick");
+                hoverChampion(actId, Settings.currentChamp[1], "pick");
             }
 
             if (ActIsInProgress == "true")
@@ -246,6 +246,35 @@ namespace Leauge_Auto_Accept
             }
         }
 
+        private static void handleBanAction(string actId, string championId, string ActIsInProgress, string[] currentChampSelect)
+        {
+            string champSelectPhase = currentChampSelect[1].Split("\"phase\":\"")[1].Split('"')[0];
+
+            // make sure it's my turn to pick and that it is not the planning phase anymore
+            if (ActIsInProgress == "true" && champSelectPhase != "PLANNING")
+            {
+                markPhaseStart(actId);
+
+                if (!pickedBan)
+                {
+                    hoverChampion(actId, Settings.currentBan[1], "ban");
+                }
+
+                if (!lockedBan)
+                {
+                    // Check the instalock setting
+                    if (!Settings.instaLock)
+                    {
+                        checkLockDelay(actId, championId, currentChampSelect, "ban");
+                    }
+                    else
+                    {
+                        lockChampion(actId, championId, "ban");
+                    }
+                }
+            }
+        }
+
         private static void markPhaseStart(string actId)
         {
             if (actId != lastActId)
@@ -255,7 +284,7 @@ namespace Leauge_Auto_Accept
             }
         }
 
-        private static void hoverChampion(string actId, string championId, string currentChamp, string actType)
+        private static void hoverChampion(string actId, string currentChamp, string actType)
         {
             string[] champSelectAction = LCU.clientRequest("PATCH", "lol-champ-select/v1/session/actions/" + actId, "{\"championId\":" + currentChamp + "}");
             if (champSelectAction[0] == "204")
@@ -295,35 +324,6 @@ namespace Leauge_Auto_Accept
             if (currentTime >= lastActStartTime + timerInt - Settings.lockDelay)
             {
                 lockChampion(actId, championId, actType);
-            }
-        }
-
-        private static void handleBanAction(string actId, string championId, string ActIsInProgress, string[] currentChampSelect)
-        {
-            string champSelectPhase = currentChampSelect[1].Split("\"phase\":\"")[1].Split('"')[0];
-
-            // make sure it's my turn to pick and that it is not the planning phase anymore
-            if (ActIsInProgress == "true" && champSelectPhase != "PLANNING")
-            {
-                markPhaseStart(actId);
-
-                if (!pickedBan)
-                {
-                    hoverChampion(actId, championId, Settings.currentBan[1], "ban");
-                }
-
-                if (!lockedBan)
-                {
-                    // Check the instalock setting
-                    if (!Settings.instaLock)
-                    {
-                        checkLockDelay(actId, championId, currentChampSelect, "ban");
-                    }
-                    else
-                    {
-                        lockChampion(actId, championId, "ban");
-                    }
-                }
             }
         }
         
