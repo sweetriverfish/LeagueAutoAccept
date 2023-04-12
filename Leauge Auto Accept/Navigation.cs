@@ -177,7 +177,7 @@ namespace Leauge_Auto_Accept
         {
             if (UI.currentWindow == "champSelector" || UI.currentWindow == "spellSelector")
             {
-                if (Functions.IsEnglishLetter(key))
+                if (Functions.IsEnglishLetter(key) || key == '\'')
                 {
                     if (filterKeyword.Length < 100)
                     {
