@@ -60,6 +60,7 @@ namespace Leauge_Auto_Accept
                     string champName = champ.Split("name\":\"")[1].Split('"')[0];
                     string champId = champ.Split("id\":")[1].Split(',')[0];
                     string champOwned = champ.Split("owned\":")[1].Split(',')[0];
+                    string champFreeXboxPass = champ.Split("xboxGPReward\":")[1].Split('}')[0];
                     string champFree = champ.Split("freeToPlay\":")[1].Split(',')[0];
 
                     // Fuck the yeti
@@ -69,16 +70,16 @@ namespace Leauge_Auto_Accept
                     }
 
                     // Check if the champ can be picked
-                    bool isFree;
-                    if (champOwned == "true" || champFree == "true")
+                    bool isAvailable;
+                    if (champOwned == "true" || champFree == "true" || champFreeXboxPass == "true")
                     {
-                        isFree = true;
+                        isAvailable = true;
                     }
                     else
                     {
-                        isFree = false;
+                        isAvailable = false;
                     }
-                    champs.Add(new itemList() { name = champName, id = champId, free = isFree });
+                    champs.Add(new itemList() { name = champName, id = champId, free = isAvailable });
                 }
 
                 // Sort alphabetically
