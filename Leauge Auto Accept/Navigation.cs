@@ -55,7 +55,7 @@ namespace Leauge_Auto_Accept
                         break;
                 }
 
-                if (currentInput == "Lochel")
+                if (currentInput == "Lochel" && UI.windowType == "grid")
                 {
                     UI.printHeart();
                 }
@@ -269,7 +269,7 @@ namespace Leauge_Auto_Accept
                     UI.chatMessagesWindow();
                     break;
                 default:
-                    if (currentInput == "Lochel")
+                    if (currentInput == "Lochel" && UI.windowType == "grid")
                     {
                         currentInput = "";
                     }
