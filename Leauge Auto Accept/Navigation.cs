@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data.Common;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
@@ -12,7 +13,7 @@ namespace Leauge_Auto_Accept
         public static int searchPos = 0;
         public static int lastPosMainNav = 0;
 
-        public static string filterKeyword = "";
+        public static string currentInput = "";
 
         public static void ReadKeys()
         {
@@ -31,23 +32,10 @@ namespace Leauge_Auto_Accept
                 switch (key.Key)
                 {
                     case ConsoleKey.UpArrow:
-                        currentPos--;
-                        movePointer = true;
-                        break;
-
                     case ConsoleKey.DownArrow:
-                        currentPos++;
-                        movePointer = true;
-                        break;
-
                     case ConsoleKey.RightArrow:
-                        currentPos += UI.totalRows;
-                        movePointer = true;
-                        break;
-
                     case ConsoleKey.LeftArrow:
-                        currentPos -= UI.totalRows;
-                        movePointer = true;
+                        movePointer = handlePointerMovement(key.Key);
                         break;
 
                     case ConsoleKey.Escape:
@@ -67,14 +55,15 @@ namespace Leauge_Auto_Accept
                         break;
                 }
 
-                if (filterKeyword == "Lochel")
+                if (currentInput == "Lochel")
                 {
                     UI.printHeart();
                 }
-                else if (movePointer && !new[] { "infoMenu", "leagueClientIsClosedMessage", "initializing" }.Contains(UI.currentWindow))
+                else if (movePointer)
                 {
                     Print.isMovingPos = true;
-                    handlePointerMovement();
+                    handlePointerMovementPrint();
+                    consolePosLast = currentPos;
                     if (UI.currentWindow == "settingsMenu")
                     {
                         UI.settingsMenuDesc(currentPos);
@@ -82,6 +71,175 @@ namespace Leauge_Auto_Accept
                     Print.isMovingPos = false;
                 }
             }
+        }
+
+        private static bool handlePointerMovement(ConsoleKey key)
+        {
+            switch (UI.windowType)
+            {
+                case "normal":
+                    return handlePointerMovementNormal(key);
+
+                case "messageEdit":
+                case "sideways":
+                    return handlePointerMovementSideways(key);
+
+                case "grid":
+                    return handlePointerMovementGrid(key);
+
+                case "nocursor":
+                    return false;
+
+                case "pages":
+                    return handlePointerMovementPages(key);
+            }
+            return false;
+        }
+
+        private static bool handlePointerMovementNormal(ConsoleKey key)
+        {
+            switch (key)
+            {
+                case ConsoleKey.UpArrow:
+                    if (currentPos == 0 )
+                    {
+                        return false;
+                    }
+                    currentPos--;
+                    return true;
+
+                case ConsoleKey.DownArrow:
+                    if (currentPos + 1 == UI.maxPos)
+                    {
+                        return false;
+                    }
+                    currentPos++;
+                    return true;
+            }
+            return false;
+        }
+
+        private static bool handlePointerMovementSideways(ConsoleKey key)
+        {
+            switch (key)
+            {
+                case ConsoleKey.LeftArrow:
+                    if (currentPos == 0)
+                    {
+                        return false;
+                    }
+                    currentPos--;
+                    return true;
+
+                case ConsoleKey.UpArrow:
+                    if (currentPos == 0)
+                    {
+                        return false;
+                    }
+                    currentPos--;
+                    return true;
+
+                case ConsoleKey.RightArrow:
+                    if (currentPos + 1 == UI.maxPos)
+                    {
+                        return false;
+                    }
+                    currentPos++;
+                    return true;
+
+                case ConsoleKey.DownArrow:
+                    if (currentPos + 1 == UI.maxPos)
+                    {
+                        return false;
+                    }
+                    currentPos++;
+                    return true;
+            }
+            return false;
+        }
+
+        private static bool handlePointerMovementGrid(ConsoleKey key)
+        {
+            switch (key)
+            {
+                case ConsoleKey.UpArrow:
+                    if (currentPos == 0)
+                    {
+                        return false;
+                    }
+                    currentPos--;
+                    return true;
+
+                case ConsoleKey.DownArrow:
+                    if (currentPos + 1 == UI.maxPos)
+                    {
+                        return false;
+                    }
+                    currentPos++;
+                    return true;
+
+                case ConsoleKey.RightArrow:
+                    if (currentPos + 1 == UI.maxPos)
+                    {
+                        return false;
+                    }
+                    currentPos += UI.totalRows;
+                    return true;
+
+                case ConsoleKey.LeftArrow:
+                    if (currentPos == 0)
+                    {
+                        return false;
+                    }
+                    currentPos -= UI.totalRows;
+                    return true;
+            }
+            return false;
+        }
+
+        private static bool handlePointerMovementPages(ConsoleKey key)
+        {
+            switch (key)
+            {
+                case ConsoleKey.UpArrow:
+                    if (currentPos == 0)
+                    {
+                        return false;
+                    }
+                    currentPos--;
+                    return true;
+
+                case ConsoleKey.DownArrow:
+                    if (currentPos + 1 == UI.maxPos)
+                    {
+                        return false;
+                    }
+                    currentPos++;
+                    return true;
+
+                case ConsoleKey.RightArrow:
+                    if (UI.currentPage + 1 == UI.totalPages)
+                    {
+                        return false;
+                    }
+                    // TODO: improve this somehow
+                    UI.currentPage++;
+                    currentPos = 0;
+                    UI.chatMessagesWindow(UI.currentPage);
+                    return true;
+
+                case ConsoleKey.LeftArrow:
+                    if (UI.currentPage == 0)
+                    {
+                        return false;
+                    }
+                    // TODO: improve this somehow
+                    UI.currentPage--;
+                    currentPos = 0;
+                    UI.chatMessagesWindow(UI.currentPage);
+                    return true;
+            }
+            return false;
         }
 
         private static void handleNavEscape()
@@ -107,10 +265,13 @@ namespace Leauge_Auto_Accept
                 case "initializing":
                     // do nothing
                     break;
+                case "chatMessagesEdit":
+                    UI.chatMessagesWindow();
+                    break;
                 default:
-                    if (filterKeyword == "Lochel")
+                    if (currentInput == "Lochel")
                     {
-                        filterKeyword = "";
+                        currentInput = "";
                     }
                     UI.mainScreen();
                     break;
@@ -133,7 +294,7 @@ namespace Leauge_Auto_Accept
                     break;
                 case "champSelector":
                 case "spellSelector":
-                    if (filterKeyword != "Lochel")
+                    if (currentInput != "Lochel")
                     {
                         if (UI.currentWindow == "champSelector")
                         {
@@ -146,6 +307,13 @@ namespace Leauge_Auto_Accept
                         UI.mainScreen();
                     }
                     break;
+                case "chatMessagesWindow":
+                    UI.messageIndex = currentPos;
+                    UI.chatMessagesEdit();
+                    break;
+                case "chatMessagesEdit":
+                    chatMessagesEditNav();
+                    break;
             }
         }
 
@@ -153,10 +321,18 @@ namespace Leauge_Auto_Accept
         {
             if (UI.currentWindow == "champSelector" || UI.currentWindow == "spellSelector")
             {
-                if (filterKeyword.Length > 0)
+                if (currentInput.Length > 0)
                 {
-                    filterKeyword = filterKeyword.Remove(filterKeyword.Length - 1);
+                    currentInput = currentInput.Remove(currentInput.Length - 1);
                     UI.updateCurrentFilter();
+                }
+            }
+            else if (UI.currentWindow == "chatMessagesEdit")
+            {
+                if (currentInput.Length > 0)
+                {
+                    currentInput = currentInput.Remove(currentInput.Length - 1);
+                    UI.updateMessageEdit();
                 }
             }
             else if (UI.currentWindow == "settingsMenu")
@@ -179,11 +355,19 @@ namespace Leauge_Auto_Accept
             {
                 if (Functions.IsEnglishLetter(key) || key == '\'' || key == '.')
                 {
-                    if (filterKeyword.Length < 100)
+                    if (currentInput.Length < 100)
                     {
-                        filterKeyword += key;
+                        currentInput += key;
                         UI.updateCurrentFilter();
                     }
+                }
+            }
+            if (UI.currentWindow == "chatMessagesEdit")
+            {
+                if (currentInput.Length < 200)
+                {
+                    currentInput += key;
+                    UI.updateMessageEdit();
                 }
             }
             else if (UI.currentWindow == "settingsMenu")
@@ -203,74 +387,122 @@ namespace Leauge_Auto_Accept
             }
         }
 
-        public static void handlePointerMovement()
+        public static void handlePointerMovementPrint()
         {
             while (!Print.canMovePos)
             {
                 Thread.Sleep(2);
             }
 
-            if (UI.currentWindow == "mainScreen" && consolePosLast > 4)
             {
-                // Handles the weird main menu navigation
-                if (consolePosLast == 5)
+                int positionLeft = 0;
+                int positionTop = 0;
+                if (UI.currentWindow == "mainScreen" && consolePosLast > 5)
                 {
-                    Console.SetCursorPosition(UI.leftPad, SizeHandler.HeightCenter + 5);
+                    // Handles the weird main menu navigation
+                    if (consolePosLast == 6)
+                    {
+                        //Console.SetCursorPosition(UI.leftPad, SizeHandler.HeightCenter + 6);
+                        positionLeft = UI.leftPad;
+                        positionTop = SizeHandler.HeightCenter + 6;
+                    }
+                    else if (consolePosLast == 7)
+                    {
+                        //Console.SetCursorPosition(UI.leftPad + 40, SizeHandler.HeightCenter + 6);
+                        positionLeft = UI.leftPad + 40;
+                        positionTop = SizeHandler.HeightCenter + 6;
+                    }
                 }
-                else if (consolePosLast == 6)
+                else if (UI.currentWindow == "exitMenu" && consolePosLast == 1)
                 {
-                    Console.SetCursorPosition(UI.leftPad + 40, SizeHandler.HeightCenter + 5);
+                    // Handles the weird exit menu navigation
+                    //Console.SetCursorPosition(UI.leftPad + 30, UI.topPad);
+                    positionLeft = UI.leftPad + 30;
+                    positionTop = UI.topPad;
                 }
+                else if (UI.currentWindow == "chatMessagesEdit")
+                {
+                    positionTop = UI.topPad + 3;
+                    switch (consolePosLast)
+                    {
+                        case 0:
+                            positionLeft = UI.leftPad - 21;
+                            break;
+                        case 1:
+                            positionLeft = UI.leftPad - 7;
+                            break;
+                        case 2:
+                            positionLeft = UI.leftPad + 8;
+                            break;
+                    }
+                }
+                else
+                {
+                    int[] consolePos = getPositionOnConsole(consolePosLast);
+                    //Console.SetCursorPosition(consolePosOld[1], consolePosOld[0]);
+                    positionLeft = consolePos[1];
+                    positionTop = consolePos[0];
+                }
+                Print.printWhenPossible("  ", positionTop, positionLeft, false);
             }
-            else if (UI.currentWindow == "exitMenu" && consolePosLast == 1)
-            {
-                // Handles the weird exit menu navigation
-                Console.SetCursorPosition(UI.leftPad + 30, UI.topPad);
-            }
-            else
-            {
-                int[] consolePosOld = getPositionOnConsole(consolePosLast);
-                Console.SetCursorPosition(consolePosOld[1], consolePosOld[0]);
-            }
-            Print.printWhenPossible("  ");
 
-            if (currentPos < 0)
-            {
-                currentPos = 0;
-            }
-            else if (currentPos >= UI.maxPos)
-            {
-                currentPos = UI.maxPos - 1;
-            }
-            consolePosLast = currentPos;
-            if (UI.currentWindow == "mainScreen")
-            {
-                lastPosMainNav = currentPos;
-            }
 
-            if (UI.currentWindow == "mainScreen" && currentPos > 4)
             {
-                // Handles the weird main menu navigation
-                if (currentPos == 5)
+                int positionLeft = 0;
+                int positionTop = 0;
+                if (UI.currentWindow == "mainScreen")
                 {
-                    Console.SetCursorPosition(UI.leftPad, SizeHandler.HeightCenter + 5);
+                    lastPosMainNav = currentPos;
                 }
-                else if (currentPos == 6)
+
+                if (UI.currentWindow == "mainScreen" && currentPos > 5)
                 {
-                    Console.SetCursorPosition(UI.leftPad + 40, SizeHandler.HeightCenter + 5);
+                    // Handles the weird main menu navigation
+                    if (currentPos == 6)
+                    {
+                        //Console.SetCursorPosition(UI.leftPad, SizeHandler.HeightCenter + 6);
+                        positionLeft = UI.leftPad;
+                        positionTop = SizeHandler.HeightCenter + 6;
+                    }
+                    else if (currentPos == 7)
+                    {
+                        //Console.SetCursorPosition(UI.leftPad + 40, SizeHandler.HeightCenter + 6);
+                        positionLeft = UI.leftPad + 40;
+                        positionTop = SizeHandler.HeightCenter + 6;
+                    }
                 }
+                else if (UI.currentWindow == "exitMenu" && currentPos == 1)
+                {
+                    // Handles the weird exit menu navigation
+                    //Console.SetCursorPosition(UI.leftPad + 30, UI.topPad);
+                    positionLeft = UI.leftPad + 30;
+                    positionTop = UI.topPad;
+                }
+                else if (UI.currentWindow == "chatMessagesEdit")
+                {
+                    positionTop = UI.topPad + 3;
+                    switch (currentPos)
+                    {
+                        case 0:
+                            positionLeft = UI.leftPad - 21;
+                            break;
+                        case 1:
+                            positionLeft = UI.leftPad - 7;
+                            break;
+                        case 2:
+                            positionLeft = UI.leftPad + 8;
+                            break;
+                    }
+                }
+                else
+                {
+                    int[] consolePos = getPositionOnConsole(currentPos);
+                    //Console.SetCursorPosition(consolePos[1], consolePos[0]);
+                    positionLeft = consolePos[1];
+                    positionTop = consolePos[0];
+                }
+                Print.printWhenPossible("->", positionTop, positionLeft, false);
             }
-            else if (UI.currentWindow == "exitMenu" && currentPos == 1)
-            {
-                // Handles the weird exit menu navigation
-                Console.SetCursorPosition(UI.leftPad + 30, UI.topPad);
-            }
-            else
-            {
-                int[] consolePos = getPositionOnConsole(currentPos);
-                Console.SetCursorPosition(consolePos[1], consolePos[0]);
-            }
-            Print.printWhenPossible("->");
         }
 
         private static int[] getPositionOnConsole(int pos)
@@ -285,7 +517,7 @@ namespace Leauge_Auto_Accept
 
             // Convert to integer, caclulate column width
             int column = Convert.ToInt32(column2);
-            int row = Convert.ToInt32(row2) * UI.columnWidth;
+            int row = Convert.ToInt32(row2) * UI.columnSize;
 
             if (column < 0)
                 column = 0;
@@ -293,6 +525,34 @@ namespace Leauge_Auto_Accept
                 row = 0;
 
             return new int[] { column + UI.topPad, row + UI.leftPad };
+        }
+
+        private static void chatMessagesEditNav()
+        {
+            if (currentPos == 0)
+            {
+                //save
+                if (currentInput.Length == 0)
+                {
+                    Settings.deleteChatMessage();
+                }
+                else
+                {
+                    Settings.updateChatMessage();
+                }
+                UI.chatMessagesWindow();
+            }
+            else if (currentPos == 1)
+            {
+                //delete
+                Settings.deleteChatMessage();
+                UI.chatMessagesWindow();
+            }
+            else if (currentPos == 2)
+            {
+                //cancel
+                UI.chatMessagesWindow();
+            }
         }
 
         private static void exitMenuNav()
@@ -336,13 +596,16 @@ namespace Leauge_Auto_Accept
                     UI.spellSelector();
                     break;
                 case 4:
+                    UI.chatMessagesWindow();
+                    break;
+                case 5:
                     Settings.toggleAutoAcceptSetting();
                     UI.toggleAutoAcceptSettingUI();
                     break;
-                case 5:
+                case 6:
                     UI.settingsMenu();
                     break;
-                case 6:
+                case 7:
                     UI.infoMenu();
                     break;
             }

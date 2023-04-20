@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace Leauge_Auto_Accept
 {
@@ -91,13 +93,13 @@ namespace Leauge_Auto_Accept
         public static void saveSelectedChamp()
         {
             List<itemList> champsFiltered = new List<itemList>();
-            if ("none".Contains(Navigation.filterKeyword.ToLower()))
+            if ("none".Contains(Navigation.currentInput.ToLower()))
             {
                 champsFiltered.Add(new itemList() { name = "None", id = "0" });
             }
             foreach (var champ in Data.champsSorterd)
             {
-                if (champ.name.ToLower().Contains(Navigation.filterKeyword.ToLower()))
+                if (champ.name.ToLower().Contains(Navigation.currentInput.ToLower()))
                 {
                     if (UI.currentChampPicker == 0)
                     {
@@ -144,13 +146,13 @@ namespace Leauge_Auto_Accept
         public static void saveSelectedSpell()
         {
             List<itemList> spellsFiltered = new List<itemList>();
-            if ("none".Contains(Navigation.filterKeyword.ToLower()))
+            if ("none".Contains(Navigation.currentInput.ToLower()))
             {
                 spellsFiltered.Add(new itemList() { name = "None", id = "0" });
             }
             foreach (var spell in Data.spellsSorted)
             {
-                if (spell.name.ToLower().Contains(Navigation.filterKeyword.ToLower()))
+                if (spell.name.ToLower().Contains(Navigation.currentInput.ToLower()))
                 {
                     spellsFiltered.Add(new itemList() { name = spell.name, id = spell.id });
                 }
@@ -185,7 +187,65 @@ namespace Leauge_Auto_Accept
                     settingsSave();
                 }
             }
+        }
 
+        public static void updateChatMessage()
+        {
+            if (chatMessages.Count > UI.messageIndex)
+            {
+                chatMessages[UI.messageIndex] = Navigation.currentInput;
+            }
+            else
+            {
+                chatMessages.Add(Navigation.currentInput);
+            }
+            updateChatMessagesToggle();
+            if (saveSettings)
+            {
+                settingsSave();
+            }
+        }
+
+        public static void deleteChatMessage()
+        {
+            if (chatMessages.Count > UI.messageIndex)
+            {
+                chatMessages.RemoveAt(UI.messageIndex);
+            }
+            updateChatMessagesToggle();
+
+            if (saveSettings)
+            {
+                settingsSave();
+            }
+        }
+
+        private static void updateChatMessagesToggle()
+        {
+            if (chatMessages.Count > 0)
+            {
+                chatMessagesEnabled = true;
+            }
+            else
+            {
+                chatMessagesEnabled = false;
+            }
+        }
+
+        private static string encodeMessagesIntoBase64()
+        {
+            byte[] byteArray = Encoding.UTF8.GetBytes(string.Join('|', chatMessages));
+            string base64String = Convert.ToBase64String(byteArray);
+
+            return base64String;
+        }
+
+        private static void decodeMessagesFromBase64(string messages)
+        {
+            if (messages == "") { return; }
+            byte[] byteArray = Convert.FromBase64String(messages);
+            string joinedString = Encoding.UTF8.GetString(byteArray);
+            chatMessages = new List<string>(joinedString.Split('|'));
         }
 
         public static void settingsSave()
@@ -204,7 +264,8 @@ namespace Leauge_Auto_Accept
                 ",instaLock:" + instaLock +
                 ",lockDelay:" + lockDelay +
                 ",autoPickOrderTrade:" + autoPickOrderTrade +
-                ",disableUpdateCheck:" + disableUpdateCheck;
+                ",disableUpdateCheck:" + disableUpdateCheck +
+                ",chatMessages:" + encodeMessagesIntoBase64();
 
             string dirParameter = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Leauge Auto Accept Config.txt";
             using (StreamWriter m_WriterParameter = new StreamWriter(dirParameter, false))
@@ -215,7 +276,6 @@ namespace Leauge_Auto_Accept
 
         public static void toggleAutoAcceptSetting()
         {
-            // TODO verify it works
             if (MainLogic.isAutoAcceptOn)
             {
                 MainLogic.isAutoAcceptOn = false;
@@ -247,7 +307,6 @@ namespace Leauge_Auto_Accept
                 string[] commas = text.Split(',');
                 foreach (var comma in commas)
                 {
-                    //Console.WriteLine(comma);
                     string[] columns = comma.Split(':');
                     switch (columns[0])
                     {
@@ -293,6 +352,10 @@ namespace Leauge_Auto_Accept
                             break;
                         case "autoPickOrderTrade":
                             autoPickOrderTrade = Boolean.Parse(columns[1]);
+                            break;
+                        case "chatMessages":
+                            decodeMessagesFromBase64(columns[1]);
+                            updateChatMessagesToggle();
                             break;
                     }
                     saveSettings = true;

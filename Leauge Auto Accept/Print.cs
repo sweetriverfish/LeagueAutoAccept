@@ -46,6 +46,12 @@ namespace Leauge_Auto_Accept
 
         public static void printCentered(string text, int row = -1, bool newLine = true)
         {
+            string paddedText = centerString(text);
+            printWhenPossible(paddedText, row, 0, newLine);
+        }
+
+        public static string centerString(string text)
+        {
             int windowWidth = Console.WindowWidth;
             int textLength = text.Length;
 
@@ -54,7 +60,19 @@ namespace Leauge_Auto_Accept
 
             string paddedText = text.PadLeft(leftPadding + textLength).PadRight(rightPadding + leftPadding + textLength);
 
-            printWhenPossible(paddedText, row, 0, newLine);
+            return paddedText;
+        }
+
+        public static string replaceAt(string text, string replacement, int replaceIndex)
+        {
+            if (text.Length >= replaceIndex)
+            {
+                return text.Substring(0, replaceIndex) + replacement + text.Substring(replaceIndex + replacement.Length);
+            }
+            else
+            {
+                return "";
+            }
         }
     }
 }
