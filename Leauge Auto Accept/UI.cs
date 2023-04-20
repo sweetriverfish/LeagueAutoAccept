@@ -499,6 +499,7 @@ namespace Leauge_Auto_Accept
             Navigation.currentPos = 0;
             string consoleLine = "Search: " + Navigation.currentInput;
             Print.printCentered(consoleLine, Console.WindowHeight - 1, false);
+            Console.SetCursorPosition(0, 0);
         }
 
         public static void printHeart()
