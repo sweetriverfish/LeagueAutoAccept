@@ -63,6 +63,12 @@ namespace Leauge_Auto_Accept
                     string champFreeXboxPass = champ.Split("xboxGPReward\":")[1].Split('}')[0];
                     string champFree = champ.Split("freeToPlay\":")[1].Split(',')[0];
 
+                    // For some reason Riot provides a "None" champion
+                    if (champName == "None")
+                    {
+                        continue;
+                    }
+
                     // Fuck the yeti
                     if (champName == "Nunu & Willump")
                     {
