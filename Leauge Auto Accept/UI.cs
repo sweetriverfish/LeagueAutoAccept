@@ -326,6 +326,8 @@ namespace Leauge_Auto_Accept
         {
             Print.canMovePos = false;
 
+            totalRows = SizeHandler.WindowHeight - 2;
+
             currentWindow = "champSelector";
             windowType = "grid";
 
@@ -407,6 +409,8 @@ namespace Leauge_Auto_Accept
         public static void spellSelector()
         {
             Print.canMovePos = false;
+
+            totalRows = SizeHandler.WindowHeight - 2;
 
             currentWindow = "spellSelector";
             windowType = "grid";
