@@ -27,6 +27,9 @@ namespace Leauge_Auto_Accept
             // Set console title
             Console.Title = "League Auto Accept";
 
+            // Set output to UTF8
+            Console.OutputEncoding = Encoding.UTF8;
+
             // Attempt to load existing settings
             Settings.loadSettings();
 
