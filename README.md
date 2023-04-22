@@ -10,10 +10,10 @@ Ever wanted to go pee or grab something but you're already 10 minutes into the q
 - Ban a champion
 - Can instalock
 - Pick summoner spells
+- Send a chat message when entering lobby
 
 ## Planned
 - Backup champion to pick/ban
-- Send a chat message when entering lobby
 - Automatic runes picker (from the premade sets)
 - Manual runes creator, maybe
 
