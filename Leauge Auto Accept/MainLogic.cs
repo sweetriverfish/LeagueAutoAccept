@@ -236,7 +236,7 @@ namespace Leauge_Auto_Accept
                 string champSelectPhase = currentChampSelect[1].Split("\"phase\":\"")[1].Split('"')[0];
                 long currentTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 
-                if (champSelectPhase == "PLANNING" && (currentTime - 10000) > champSelectStart // Check if enough time has passed since planning phase has started
+                if ((currentTime - 10000) > champSelectStart // Check if enough time has passed since planning phase has started
                     || champSelectPhase != "PLANNING" // Check if it's even planning phase at all
                     || Settings.instantHover) // Check if instahover setting is on
                 {
