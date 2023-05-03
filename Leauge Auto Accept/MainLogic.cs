@@ -18,6 +18,7 @@ namespace Leauge_Auto_Accept
         private static bool sentChatMessages = false;
 
         private static long lastActStartTime;
+        private static long champSelectStart;
         private static string lastActId = "";
         private static string lastChatRoom = "";
 
@@ -108,6 +109,7 @@ namespace Leauge_Auto_Accept
                     pickedSpell1 = false;
                     pickedSpell2 = false;
                     sentChatMessages = false;
+                    champSelectStart = DateTimeOffset.Now.ToUnixTimeMilliseconds();
                 }
                 lastChatRoom = currentChatRoom;
 
@@ -230,8 +232,16 @@ namespace Leauge_Auto_Accept
         {
             if (!pickedChamp)
             {
-                // Hover champion when champ select starts, no need to check for whenever it's my turn or not to pick it
-                hoverChampion(actId, Settings.currentChamp[1], "pick");
+                // Hover champion when champ select starts
+                string champSelectPhase = currentChampSelect[1].Split("\"phase\":\"")[1].Split('"')[0];
+                long currentTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+
+                if (champSelectPhase == "PLANNING" && (currentTime - 10000) > champSelectStart // Check if enough time has passed since planning phase has started
+                    || champSelectPhase != "PLANNING" // Check if it's even planning phase at all
+                    || Settings.instantHover) // Check if instahover setting is on
+                {
+                    hoverChampion(actId, Settings.currentChamp[1], "pick");
+                }
             }
 
             if (ActIsInProgress == "true")

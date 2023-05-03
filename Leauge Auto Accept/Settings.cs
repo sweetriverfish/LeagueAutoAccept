@@ -22,6 +22,7 @@ namespace Leauge_Auto_Accept
         public static string lockDelayString = "1500";
         public static bool disableUpdateCheck = false;
         public static bool autoPickOrderTrade = false;
+        public static bool instantHover = false;
         public static bool shouldAutoAcceptbeOn = false;
 
         public static void settingsModify(int item)
@@ -77,6 +78,9 @@ namespace Leauge_Auto_Accept
                     break;
                 case 5:
                     autoPickOrderTrade = !autoPickOrderTrade;
+                    break;
+                case 6:
+                    instantHover = !instantHover;
                     break;
             }
 
@@ -264,6 +268,7 @@ namespace Leauge_Auto_Accept
                 ",instaLock:" + instaLock +
                 ",lockDelay:" + lockDelay +
                 ",autoPickOrderTrade:" + autoPickOrderTrade +
+                ",instantHover:" + instantHover +
                 ",disableUpdateCheck:" + disableUpdateCheck +
                 ",chatMessages:" + encodeMessagesIntoBase64();
 
@@ -352,6 +357,9 @@ namespace Leauge_Auto_Accept
                             break;
                         case "autoPickOrderTrade":
                             autoPickOrderTrade = Boolean.Parse(columns[1]);
+                            break;
+                        case "instantHover":
+                            instantHover = Boolean.Parse(columns[1]);
                             break;
                         case "chatMessages":
                             decodeMessagesFromBase64(columns[1]);

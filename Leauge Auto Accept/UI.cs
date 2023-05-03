@@ -197,7 +197,7 @@ namespace Leauge_Auto_Accept
             windowType = "normal";
             topPad = SizeHandler.HeightCenter - 3;
             leftPad = SizeHandler.WidthCenter - 25;
-            maxPos = 6;
+            maxPos = 7;
 
             Console.Clear();
 
@@ -208,7 +208,8 @@ namespace Leauge_Auto_Accept
                 "Instalock bans/picks",
                 "Lock/ban delay",
                 "Disable update check",
-                "Automatically trade pick order"
+                "Automatically trade pick order",
+                "Instantly hover pick"
             };
             string[] optionValue = {
                 Settings.saveSettings ? "Yes" : "No",
@@ -216,7 +217,8 @@ namespace Leauge_Auto_Accept
                 Settings.instaLock ? "Yes" : "No",
                 Settings.lockDelay.ToString(),
                 Settings.disableUpdateCheck ? "Yes" : "No",
-                Settings.autoPickOrderTrade ? "Yes" : "No"
+                Settings.autoPickOrderTrade ? "Yes" : "No",
+                Settings.instantHover ? "Yes" : "No"
             };
 
             // Print options
@@ -238,28 +240,32 @@ namespace Leauge_Auto_Accept
             switch (item)
             {
                 case 0:
-                    Print.printCentered("Save settings for the next time you open the app.", topPad + 7);
-                    Print.printCentered("This will create a settings file in the %AppData% folder.", topPad + 8);
+                    Print.printCentered("Save settings for the next time you open the app.", topPad + maxPos + 2);
+                    Print.printCentered("This will create a settings file in the %AppData% folder.");
                     break;
                 case 1:
-                    Print.printCentered("Preload all data the app will need on launch.", topPad + 7);
-                    Print.printCentered("This includes champions list, summoner spells list and more.", topPad + 8);
+                    Print.printCentered("Preload all data the app will need on launch.", topPad + maxPos + 2);
+                    Print.printCentered("This includes champions list, summoner spells list and more.");
                     break;
                 case 2:
-                    Print.printCentered("Instanly lock in picks/bans when it's your turn.", topPad + 7);
-                    Print.printCentered("", topPad + 8);
+                    Print.printCentered("Instanly lock in picks/bans when it's your turn.", topPad + maxPos + 2);
+                    Print.printCentered("");
                     break;
                 case 3:
-                    Print.printCentered("Lock in/ban delay before your turn to do so is over.", topPad + 7);
-                    Print.printCentered("Value is in milliseconds. There's a 500 minimum.", topPad + 8);
+                    Print.printCentered("Lock in/ban delay before your turn to do so is over.", topPad + maxPos + 2);
+                    Print.printCentered("Value is in milliseconds. There's a 500 minimum.");
                     break;
                 case 4:
-                    Print.printCentered("Disable update check on startup.", topPad + 7);
-                    Print.printCentered("", topPad + 8);
+                    Print.printCentered("Disable update check on startup.", topPad + maxPos + 2);
+                    Print.printCentered("");
                     break;
                 case 5:
-                    Print.printCentered("Automatically trade pick order when someone requests to.", topPad + 7);
-                    Print.printCentered("", topPad + 8);
+                    Print.printCentered("Automatically trade pick order when someone requests to.", topPad + maxPos + 2);
+                    Print.printCentered("");
+                    break;
+                case 6:
+                    Print.printCentered("Instantly hover champion as soon as joining champ select.", topPad + maxPos + 2);
+                    Print.printCentered("In draft pick, it will hover before you are normally able to.");
                     break;
             }
         }
@@ -276,6 +282,7 @@ namespace Leauge_Auto_Accept
                 3 => (" " + Settings.lockDelayString).PadLeft(9, '.'),
                 4 => Settings.disableUpdateCheck ? " Yes" : ". No",
                 5 => Settings.autoPickOrderTrade ? " Yes" : ". No",
+                6 => Settings.instantHover ? " Yes" : ". No",
                 _ => ""
             };
             Print.printWhenPossible(outputText, item + topPad, SizeHandler.WidthCenter + 22 - outputText.Length);
