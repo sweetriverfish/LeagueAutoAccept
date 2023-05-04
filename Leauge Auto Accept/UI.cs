@@ -575,6 +575,8 @@ namespace Leauge_Auto_Accept
                 Console.SetCursorPosition(position[0], position[1]++);
                 Console.WriteLine(line);
             }
+
+            updateCursorPosition();
         }
 
         private static string addDotsInBetween(string firstString, string secondString, int totalLength = 44)
