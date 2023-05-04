@@ -389,6 +389,7 @@ namespace Leauge_Auto_Accept
 
         public static void handlePointerMovementPrint()
         {
+            Console.CursorVisible = false;
             while (!Print.canMovePos)
             {
                 Thread.Sleep(2);
@@ -502,6 +503,11 @@ namespace Leauge_Auto_Accept
                     positionTop = consolePos[0];
                 }
                 Print.printWhenPossible("->", positionTop, positionLeft, false);
+            }
+            if (UI.showCursor)
+            {
+                Console.CursorVisible = true;
+                UI.updateCursorPosition();
             }
         }
 

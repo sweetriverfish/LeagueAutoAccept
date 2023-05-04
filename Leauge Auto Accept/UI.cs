@@ -16,7 +16,7 @@ namespace Leauge_Auto_Accept
         public static int totalChamps = 0;
         public static int totalSpells = 0;
 
-                                        // normal/grid/pages/nocursor/messageEdit
+                                        // normal/+grid/pages/nocursor/messageEdit
         public static string windowType = "";
         public static int messageIndex = 0; //index for the message currently being edit
 
@@ -28,13 +28,39 @@ namespace Leauge_Auto_Accept
         public static int currentPage = 0;
         public static int totalPages = 0;
 
+        private static int[] cursorPositionValue = { 0, 0 };
+        public static int[] cursorPosition
+        {
+            get { return cursorPositionValue; }
+            set
+            {
+                cursorPositionValue = value;
+                Console.SetCursorPosition(value[0], value[1]);
+            }
+        }
+
+        private static bool showCursorValue = false;
+        public static bool showCursor
+        {
+            get { return showCursorValue; }
+            set
+            {
+                if (showCursorValue != value)
+                {
+                    Console.CursorVisible = value;
+                }
+                showCursorValue = value;
+            }
+        }
+
         public static void initializingWindow()
         {
             Print.canMovePos = false;
             currentWindow = "initializing";
             windowType = "nocursor";
+            showCursor = false;
 
-            Print.printCentered("Initializing...", SizeHandler.HeightCenter);
+        Print.printCentered("Initializing...", SizeHandler.HeightCenter);
         }
 
         public static void leagueClientIsClosedMessage()
@@ -42,6 +68,7 @@ namespace Leauge_Auto_Accept
             Print.canMovePos = false;
             currentWindow = "leagueClientIsClosedMessage";
             windowType = "nocursor";
+            showCursor = false;
 
             Console.Clear();
 
@@ -58,6 +85,7 @@ namespace Leauge_Auto_Accept
 
             currentWindow = "consoleTooSmallMessage";
             windowType = "nocursor";
+            showCursor = false;
 
             Console.Clear();
 
@@ -121,6 +149,7 @@ namespace Leauge_Auto_Accept
 
             currentWindow = "mainScreen";
             windowType = "normal";
+            showCursor = false;
             topPad = SizeHandler.HeightCenter - 1;
             leftPad = SizeHandler.WidthCenter - 25;
             maxPos = 8;
@@ -195,6 +224,7 @@ namespace Leauge_Auto_Accept
 
             currentWindow = "settingsMenu";
             windowType = "normal";
+            showCursor = false;
             topPad = SizeHandler.HeightCenter - 3;
             leftPad = SizeHandler.WidthCenter - 25;
             maxPos = 7;
@@ -296,6 +326,7 @@ namespace Leauge_Auto_Accept
 
             currentWindow = "infoMenu";
             windowType = "nocursor";
+            showCursor = false;
 
             Console.Clear();
 
@@ -314,6 +345,7 @@ namespace Leauge_Auto_Accept
 
             currentWindow = "exitMenu";
             windowType = "sideways";
+            showCursor = false;
             topPad = SizeHandler.HeightCenter + 1;
             leftPad = SizeHandler.WidthCenter - 19;
             maxPos = 2;
@@ -337,6 +369,7 @@ namespace Leauge_Auto_Accept
 
             currentWindow = "champSelector";
             windowType = "grid";
+            showCursor = false;
 
             Navigation.currentInput = "";
 
@@ -344,12 +377,13 @@ namespace Leauge_Auto_Accept
 
             Data.loadChampionsList();
 
-            updateCurrentFilter();
             displayChamps();
+            updateCurrentFilter();
         }
 
         private static void displayChamps()
         {
+            Console.CursorVisible = false;
             Navigation.currentPos = 0;
             Navigation.consolePosLast = 0;
 
@@ -411,6 +445,7 @@ namespace Leauge_Auto_Accept
             }
             Navigation.handlePointerMovementPrint();
             Print.canMovePos = true;
+            displayCursorIfNeeded();
         }
 
         public static void spellSelector()
@@ -421,6 +456,7 @@ namespace Leauge_Auto_Accept
 
             currentWindow = "spellSelector";
             windowType = "grid";
+            showCursor = false;
 
             Navigation.currentInput = "";
 
@@ -428,12 +464,13 @@ namespace Leauge_Auto_Accept
 
             Data.loadSpellsList();
 
-            updateCurrentFilter();
             displaySpells();
+            updateCurrentFilter();
         }
 
         private static void displaySpells()
         {
+            Console.CursorVisible = false;
             Navigation.currentPos = 0;
             Navigation.consolePosLast = 0;
 
@@ -491,10 +528,12 @@ namespace Leauge_Auto_Accept
             }
             Navigation.handlePointerMovementPrint();
             Print.canMovePos = true;
+            displayCursorIfNeeded();
         }
 
         public static void updateCurrentFilter()
         {
+            showCursor = true;
             if (currentWindow == "champSelector")
             {
                 displayChamps();
@@ -503,10 +542,15 @@ namespace Leauge_Auto_Accept
             {
                 displaySpells();
             }
+
             Navigation.currentPos = 0;
+            Console.CursorVisible = false;
             string consoleLine = "Search: " + Navigation.currentInput;
-            Print.printCentered(consoleLine, Console.WindowHeight - 1, false);
+            Print.printCentered(consoleLine, Console.WindowHeight - 1, false, true);
+
             Console.SetCursorPosition(0, 0);
+            Console.CursorVisible = true;
+            updateCursorPosition();
         }
 
         public static void printHeart()
@@ -551,6 +595,7 @@ namespace Leauge_Auto_Accept
 
             currentWindow = "chatMessagesWindow";
             windowType = "pages";
+            showCursor = false;
             topPad = 1;
             leftPad = 2;
             maxPos = Settings.chatMessages.Count + 1; // +1 for "new message" row
@@ -600,7 +645,7 @@ namespace Leauge_Auto_Accept
             // Print pages count, if needed
             if (totalPages > 1)
             {
-                string pagesPrint = Print.centerString("Current page: " + (pageToLoad + 1) + " / " + totalPages);
+                string pagesPrint = Print.centerString("Current page: " + (pageToLoad + 1) + " / " + totalPages)[0];
                 pagesPrint = Print.replaceAt(pagesPrint, "<- previous page", leftPad + 3);
                 pagesPrint = Print.replaceAt(pagesPrint, "next page ->", SizeHandler.WindowWidth - 17);
                 Print.printWhenPossible(pagesPrint, SizeHandler.WindowHeight - 2, 0, false);
@@ -619,6 +664,7 @@ namespace Leauge_Auto_Accept
 
             currentWindow = "chatMessagesEdit";
             windowType = "messageEdit";
+            showCursor = true;
             topPad = SizeHandler.HeightCenter - 2;
             leftPad = SizeHandler.WidthCenter;
             maxPos = 3;
@@ -634,10 +680,12 @@ namespace Leauge_Auto_Accept
 
             updateMessageEdit();
 
-            Print.printCentered("Save          Delete         Cancel", topPad + 3);
+            Print.printCentered("Save          Delete         Cancel", topPad + 3, false);
+
 
             Print.canMovePos = true;
             Navigation.handlePointerMovementPrint();
+            updateCursorPosition();
         }
 
         public static void updateMessageEdit()
@@ -657,15 +705,36 @@ namespace Leauge_Auto_Accept
             string chunk1 = chunks.Count > 0 ? chunks[0] : "";
             string chunk2 = chunks.Count > 1 ? chunks[1] : "";
 
-            // Pad the chunks with spaces, centered
-            int totalPadding = (chunkLength - chunk1.Length) / 2;
-            chunk1 = chunk1.PadLeft(chunk1.Length + totalPadding, ' ').PadRight(chunkLength, ' ');
+            Console.CursorVisible = false;
 
-            totalPadding = (chunkLength - chunk2.Length) / 2;
-            chunk2 = chunk2.PadLeft(chunk2.Length + totalPadding, ' ').PadRight(chunkLength, ' ');
+            // make sure the second line is wiped if it has something
+            if (chunk2.Length == 0)
+            {
+                Print.printCentered(chunk2, topPad + 1, false, true);
+            }
 
-            Print.printCentered(chunk1, topPad);
-            Print.printCentered(chunk2);
+            // print first line
+            Print.printCentered(chunk1, topPad, false, true);
+
+            // only print second line if needed
+            if (chunk2.Length > 0 )
+            {
+                Print.printCentered(chunk2, topPad + 1, false, true);
+            }
+            displayCursorIfNeeded();
+        }
+
+        public static void updateCursorPosition()
+        {
+            Console.SetCursorPosition(cursorPosition[0], cursorPosition[1]);
+        }
+
+        public static void displayCursorIfNeeded()
+        {
+            if (showCursor)
+            {
+                Console.CursorVisible = true;
+            }
         }
     }
 }
