@@ -193,20 +193,26 @@ namespace Leauge_Auto_Accept
             }
         }
 
-        public static void updateChatMessage()
+       public static void updateChatMessage()
         {
             if (chatMessages.Count > UI.messageIndex)
             {
-                chatMessages[UI.messageIndex] = Navigation.currentInput;
-            }
-            else
-            {
-                chatMessages.Add(Navigation.currentInput);
-            }
-            updateChatMessagesToggle();
-            if (saveSettings)
-            {
-                settingsSave();
+                Console.WriteLine("How many times do you want to send the message?");
+                int sendCount = Int32.Parse(Console.ReadLine());
+
+                if (sendCount > 0)
+                {
+                    for (int i = 0; i < sendCount; i++)
+                    {
+                        chatMessages.Add(Navigation.currentInput); // Agregar el mensaje a la lista
+                    }
+
+                    updateChatMessagesToggle();
+                    if (saveSettings)
+                    {
+                        settingsSave();
+                    }
+                }
             }
         }
 
