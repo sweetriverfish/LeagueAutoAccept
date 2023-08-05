@@ -27,7 +27,7 @@ namespace Leauge_Auto_Accept
         {
             Console.Clear();
             Print.printCentered("Checking for an update...", SizeHandler.HeightCenter);
-            string[] latestRelease = webRequest("https://api.github.com/repos/sweetriverfish/LeagueAutoAccept/releases/latest");
+            string[] latestRelease = webRequest("https://api.github.com/repos/Gasferr/LolMultiAccept/releases/latest");
             if (latestRelease[0] != "200")
             {
                 // Network error
