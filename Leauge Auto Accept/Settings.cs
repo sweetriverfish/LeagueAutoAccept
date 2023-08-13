@@ -18,6 +18,7 @@ namespace Leauge_Auto_Accept
         public static bool saveSettings = false;
         public static bool preloadData = false;
         public static bool instaLock = false;
+        public static bool instaBan = false;
         public static int lockDelay = 1500;
         public static string lockDelayString = "1500";
         public static bool disableUpdateCheck = false;
@@ -54,6 +55,9 @@ namespace Leauge_Auto_Accept
                     instaLock = !instaLock;
                     break;
                 case 3:
+                    instaBan = !instaBan;
+                    break;
+                case 4:
                     if (lockDelayString.Length == 0)
                     {
                         lockDelayString = "0";
@@ -68,7 +72,7 @@ namespace Leauge_Auto_Accept
                         lockDelay = 500;
                     }
                     break;
-                case 4:
+                case 5:
                     if (!disableUpdateCheck && !saveSettings)
                     {
                         saveSettings = !saveSettings;
@@ -76,10 +80,10 @@ namespace Leauge_Auto_Accept
                     }
                     disableUpdateCheck = !disableUpdateCheck;
                     break;
-                case 5:
+                case 6:
                     autoPickOrderTrade = !autoPickOrderTrade;
                     break;
-                case 6:
+                case 7:
                     instantHover = !instantHover;
                     break;
             }
@@ -266,6 +270,7 @@ namespace Leauge_Auto_Accept
                 ",autoAcceptOn:" + shouldAutoAcceptbeOn +
                 ",preloadData:" + preloadData +
                 ",instaLock:" + instaLock +
+                ",instaBan:" + instaBan +
                 ",lockDelay:" + lockDelay +
                 ",autoPickOrderTrade:" + autoPickOrderTrade +
                 ",instantHover:" + instantHover +
@@ -351,6 +356,9 @@ namespace Leauge_Auto_Accept
                             break;
                         case "instaLock":
                             instaLock = Boolean.Parse(columns[1]);
+                            break;
+                        case "instaBan":
+                            instaBan = Boolean.Parse(columns[1]);
                             break;
                         case "disableUpdateCheck":
                             disableUpdateCheck = Boolean.Parse(columns[1]);

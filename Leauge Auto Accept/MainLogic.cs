@@ -279,8 +279,8 @@ namespace Leauge_Auto_Accept
 
                 if (!lockedBan)
                 {
-                    // Check the instalock setting
-                    if (!Settings.instaLock)
+                    // Check the instaBan setting
+                    if (!Settings.instaBan)
                     {
                         checkLockDelay(actId, championId, currentChampSelect, "ban");
                     }
@@ -343,7 +343,7 @@ namespace Leauge_Auto_Accept
                 lockChampion(actId, championId, actType);
             }
         }
-        
+
         private static void handlePickOrderSwap()
         {
             // Return if we already locked in or if the settings is off
