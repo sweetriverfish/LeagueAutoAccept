@@ -337,7 +337,7 @@ namespace Leauge_Auto_Accept
             }
             else if (UI.currentWindow == "settingsMenu")
             {
-                if (currentPos == 3)
+                if (currentPos == 4)
                 {
                     if (Settings.lockDelayString.Length > 0)
                     {
@@ -372,7 +372,7 @@ namespace Leauge_Auto_Accept
             }
             else if (UI.currentWindow == "settingsMenu")
             {
-                if (currentPos == 3)
+                if (currentPos == 4)
                 {
                     if (Functions.IsNumeric(key))
                     {
