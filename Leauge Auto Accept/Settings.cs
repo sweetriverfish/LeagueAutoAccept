@@ -25,6 +25,8 @@ namespace Leauge_Auto_Accept
         public static bool autoPickOrderTrade = false;
         public static bool instantHover = false;
         public static bool shouldAutoAcceptbeOn = false;
+        public static int queueMaxTime = 10000;
+        public static bool autoRestartQueue = false;
 
         public static void settingsModify(int item)
         {

@@ -22,6 +22,9 @@ namespace Leauge_Auto_Accept
         private static string lastActId = "";
         private static string lastChatRoom = "";
 
+        private static long queueStartTime;
+        private static string lastPhase = "";
+
         public static void acceptQueue()
         {
             while (true)
@@ -33,6 +36,11 @@ namespace Leauge_Auto_Accept
                     if (gameSession[0] == "200")
                     {
                         string phase = gameSession[1].Split("phase").Last().Split('"')[2];
+
+                        if (Settings.autoRestartQueue)
+                        {
+                            handleQueueRestart(phase);
+                        }
 
                         switch (phase)
                         {
@@ -88,6 +96,25 @@ namespace Leauge_Auto_Accept
                     Thread.Sleep(1000);
                 }
             }
+        }
+
+        private static void handleQueueRestart(string phase)
+        {
+            if (phase == "Matchmaking" && phase != lastPhase)
+            {
+                queueStartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            }
+            else if (phase == "Matchmaking")
+            {
+                long currentTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                if ((currentTime - Settings.queueMaxTime) > queueStartTime)
+                {
+                    LCU.clientRequest("DELETE", "lol-lobby/v2/lobby/matchmaking/search");
+                    LCU.clientRequest("POST", "lol-lobby/v2/lobby/matchmaking/search");
+                    queueStartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                }
+            }
+            lastPhase = phase;
         }
 
         private static void handleChampSelect()
