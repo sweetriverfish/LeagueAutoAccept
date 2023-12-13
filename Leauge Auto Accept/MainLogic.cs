@@ -379,7 +379,12 @@ namespace Leauge_Auto_Accept
             string timer = currentChampSelect[1].Split("totalTimeInPhase\":")[1].Split("}")[0];
             long timerInt = Convert.ToInt64(timer);
             long currentTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            if (currentTime >= lastActStartTime + timerInt - Settings.lockDelay)
+
+            // Action Times
+            long endOfPhaseTime = currentTime + timerInt;
+            long nextActionTime = lastActStartTime + Settings.lockDelay;
+
+            if (currentTime >= nextActionTime)
             {
                 lockChampion(actId, championId, actType);
             }
