@@ -81,6 +81,9 @@ namespace Leauge_Auto_Accept
                     instantHover = !instantHover;
                     break;
                 case 7:
+                    autoRestartQueue = !autoRestartQueue;
+                    break;
+                case 8:
                     UI.delayMenu();
                     break;
             }
@@ -134,6 +137,12 @@ namespace Leauge_Auto_Accept
                     {
                         int newNum = delayCalculateNewValue(banEndlockDelay, number);
                         banEndlockDelay = newNum;
+                    }
+                    break;
+                case 6:
+                    {
+                        int newNum = delayCalculateNewValue(queueMaxTime, number);
+                        queueMaxTime = newNum;
                     }
                     break;
             }

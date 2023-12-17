@@ -231,7 +231,7 @@ namespace Leauge_Auto_Accept
             showCursor = false;
             topPad = SizeHandler.HeightCenter - 3;
             leftPad = SizeHandler.WidthCenter - 25;
-            maxPos = 8;
+            maxPos = 9;
 
             Console.Clear();
 
@@ -244,6 +244,7 @@ namespace Leauge_Auto_Accept
                 "Disable update check",
                 "Automatically trade pick order",
                 "Instantly hover pick",
+                "Automatically restart queue",
                 "Delay settings"
             };
 
@@ -257,6 +258,7 @@ namespace Leauge_Auto_Accept
                 Settings.disableUpdateCheck ? "Yes" : "No",
                 Settings.autoPickOrderTrade ? "Yes" : "No",
                 Settings.instantHover ? "Yes" : "No",
+                Settings.autoRestartQueue ? "Yes" : "No",
                 ""
             };
 
@@ -294,10 +296,6 @@ namespace Leauge_Auto_Accept
                     Print.printCentered("Instanly lock in when it's your turn to ban.", topPad + maxPos + 2);
                     Print.printCentered("This will bypass the lock in delay setting.");
                     break;
-                /*case 4:
-                    Print.printCentered("Lock in/ban delay before your turn to do so is over.", topPad + maxPos + 2);
-                    Print.printCentered("Value is in milliseconds. There's a 500 minimum.");
-                    break;*/
                 case 4:
                     Print.printCentered("Disable update check on startup.", topPad + maxPos + 2);
                     Print.printCentered("");
@@ -311,6 +309,10 @@ namespace Leauge_Auto_Accept
                     Print.printCentered("In draft pick, it will hover before you are normally able to.");
                     break;
                 case 7:
+                    Print.printCentered("Automatically restart queue every few minutes.", topPad + maxPos + 2);
+                    Print.printCentered("Default is 5 mintues, can be configured in the delays settings.");
+                    break;
+                case 8:
                     Print.printCentered("Adjust different delays.", topPad + maxPos + 2);
                     Print.printCentered("");
                     break;
@@ -332,6 +334,7 @@ namespace Leauge_Auto_Accept
                 4 => Settings.disableUpdateCheck ? " Yes" : ". No",
                 5 => Settings.autoPickOrderTrade ? " Yes" : ". No",
                 6 => Settings.instantHover ? " Yes" : ". No",
+                7=> Settings.autoRestartQueue ? " Yes" : ". No",
                 _ => ""
             };
             Print.printWhenPossible(outputText, item + topPad, SizeHandler.WidthCenter + 22 - outputText.Length);
