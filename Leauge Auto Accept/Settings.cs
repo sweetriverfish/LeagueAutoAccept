@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 
@@ -19,14 +20,20 @@ namespace Leauge_Auto_Accept
         public static bool preloadData = false;
         public static bool instaLock = false;
         public static bool instaBan = false;
-        public static int lockDelay = 1500;
-        public static string lockDelayString = "1500";
         public static bool disableUpdateCheck = false;
         public static bool autoPickOrderTrade = false;
         public static bool instantHover = false;
         public static bool shouldAutoAcceptbeOn = false;
-        public static int queueMaxTime = 10000;
         public static bool autoRestartQueue = false;
+
+        //public static string lockDelayString = "1500";
+        public static int pickStartHoverDelay = 10000;
+        public static int pickStartlockDelay = 999999999;
+        public static int pickEndlockDelay = 1000;
+        public static int banStartHoverDelay = 1500;
+        public static int banStartlockDelay = 999999999;
+        public static int banEndlockDelay = 1000;
+        public static int queueMaxTime = 300000;
 
         public static void settingsModify(int item)
         {
@@ -59,21 +66,6 @@ namespace Leauge_Auto_Accept
                 case 3:
                     instaBan = !instaBan;
                     break;
-                /*case 4:
-                    if (lockDelayString.Length == 0)
-                    {
-                        lockDelayString = "0";
-                    }
-                    else
-                    {
-                        lockDelayString = lockDelayString.TrimStart('0');
-                    }
-                    lockDelay = Int32.Parse(lockDelayString);
-                    if (lockDelay < 500)
-                    {
-                        lockDelay = 500;
-                    }
-                    break;*/
                 case 4:
                     if (!disableUpdateCheck && !saveSettings)
                     {
@@ -103,23 +95,45 @@ namespace Leauge_Auto_Accept
             }
         }
 
-        public static void delayModify(int item)
+        public static void delayModify(int item, int number)
         {
+            Debug.WriteLine(number);
             switch (item)
             {
                 case 0:
-                    if (lockDelayString.Length == 0)
                     {
-                        lockDelayString = "0";
+                        int newNum = delayCalculateNewValue(pickStartHoverDelay, number);
+                        pickStartHoverDelay = newNum;
                     }
-                    else
+                    break;
+                case 1:
                     {
-                        lockDelayString = lockDelayString.TrimStart('0');
+                        int newNum = delayCalculateNewValue(pickStartlockDelay, number);
+                        pickStartlockDelay = newNum;
                     }
-                    lockDelay = Int32.Parse(lockDelayString);
-                    if (lockDelay < 500)
+                    break;
+                case 2:
                     {
-                        lockDelay = 500;
+                        int newNum = delayCalculateNewValue(pickEndlockDelay, number);
+                        pickEndlockDelay = newNum;
+                    }
+                    break;
+                case 3:
+                    {
+                        int newNum = delayCalculateNewValue(banStartHoverDelay, number);
+                        banStartHoverDelay = newNum;
+                    }
+                    break;
+                case 4:
+                    {
+                        int newNum = delayCalculateNewValue(banStartlockDelay, number);
+                        banStartlockDelay = newNum;
+                    }
+                    break;
+                case 5:
+                    {
+                        int newNum = delayCalculateNewValue(banEndlockDelay, number);
+                        banEndlockDelay = newNum;
                     }
                     break;
             }
@@ -128,6 +142,33 @@ namespace Leauge_Auto_Accept
             {
                 settingsSave();
             }
+        }
+
+        public static int delayCalculateNewValue(int oldValue, int modifier)
+        {
+            string newNumString = oldValue.ToString();
+
+            if (modifier >= 0) {
+                Debug.WriteLine (newNumString);
+                Debug.WriteLine (modifier.ToString());
+                newNumString = newNumString + modifier.ToString();
+                if (newNumString.Length > 9)
+                {
+                    newNumString = "999999999";
+                }
+            }
+            else
+            {
+                newNumString = newNumString.Substring(0, newNumString.Length - 1);
+                if (newNumString.Length == 0)
+                {
+                    newNumString = "0";
+                }
+            }
+
+            int newNum = Int32.Parse(newNumString);
+
+            return newNum;
         }
 
         public static void saveSelectedChamp()
@@ -303,7 +344,12 @@ namespace Leauge_Auto_Accept
                 ",preloadData:" + preloadData +
                 ",instaLock:" + instaLock +
                 ",instaBan:" + instaBan +
-                ",lockDelay:" + lockDelay +
+                ",pickStartHoverDelay:" + pickStartHoverDelay +
+                ",pickStartlockDelay:" + pickStartlockDelay +
+                ",pickEndlockDelay:" + pickEndlockDelay +
+                ",banStartHoverDelay:" + banStartHoverDelay +
+                ",banStartlockDelay:" + banStartlockDelay +
+                ",banEndlockDelay:" + banEndlockDelay +
                 ",autoPickOrderTrade:" + autoPickOrderTrade +
                 ",instantHover:" + instantHover +
                 ",disableUpdateCheck:" + disableUpdateCheck +
@@ -376,9 +422,23 @@ namespace Leauge_Auto_Accept
                         case "spell2Id":
                             currentSpell2[1] = columns[1];
                             break;
-                        case "lockDelay":
-                            lockDelay = Int32.Parse(columns[1]);
-                            lockDelayString = columns[1];
+                        case "pickStartHoverDelay":
+                            pickStartHoverDelay = Int32.Parse(columns[1]);
+                            break;
+                        case "pickStartlockDelay":
+                            pickStartlockDelay = Int32.Parse(columns[1]);
+                            break;
+                        case "pickEndlockDelay":
+                            pickEndlockDelay = Int32.Parse(columns[1]);
+                            break;
+                        case "banStartHoverDelay":
+                            banStartHoverDelay = Int32.Parse(columns[1]);
+                            break;
+                        case "banStartlockDelay":
+                            banStartlockDelay = Int32.Parse(columns[1]);
+                            break;
+                        case "banEndlockDelay":
+                            banEndlockDelay = Int32.Parse(columns[1]);
                             break;
                         case "autoAcceptOn":
                             shouldAutoAcceptbeOn = Boolean.Parse(columns[1]);

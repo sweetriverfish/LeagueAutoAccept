@@ -288,11 +288,11 @@ namespace Leauge_Auto_Accept
                     break;
                 case 2:
                     Print.printCentered("Instanly lock in when it's your turn to pick.", topPad + maxPos + 2);
-                    Print.printCentered("");
+                    Print.printCentered("This will bypass the lock in delay setting.");
                     break;
                 case 3:
                     Print.printCentered("Instanly lock in when it's your turn to ban.", topPad + maxPos + 2);
-                    Print.printCentered("");
+                    Print.printCentered("This will bypass the lock in delay setting.");
                     break;
                 /*case 4:
                     Print.printCentered("Lock in/ban delay before your turn to do so is over.", topPad + maxPos + 2);
@@ -350,24 +350,33 @@ namespace Leauge_Auto_Accept
             showCursor = false;
             topPad = SizeHandler.HeightCenter - 3;
             leftPad = SizeHandler.WidthCenter - 25;
-            maxPos = 1;
+            maxPos = 7;
 
             Console.Clear();
 
             // Define options
             string[] optionName = {
-                "Lock/ban delay"
+                "Pick hover delay upon phase start",
+                "Pick lock delay upon phase start",
+                "Pick lock delay before phase end",
+                "Ban hover delay upon phase start",
+                "Ban lock delay upon phase start",
+                "Ban lock delay before phase end",
+                "Max queue time before restart"
             };
             string[] optionValue = {
-                Settings.lockDelay.ToString(),
+                Settings.pickStartHoverDelay.ToString(),
+                Settings.pickStartlockDelay.ToString(),
+                Settings.pickEndlockDelay.ToString(),
+                Settings.banStartHoverDelay.ToString(),
+                Settings.banStartlockDelay.ToString(),
+                Settings.banEndlockDelay.ToString(),
+                Settings.queueMaxTime.ToString(),
             };
-
-            Debug.WriteLine(Settings.lockDelay.ToString());
 
             // Print options
             for (int i = 0; i < optionName.Length; i++)
             {
-                Debug.WriteLine(optionValue[i]);
                 Print.printCentered(addDotsInBetween(optionName[i], optionValue[i]), topPad + i);
             }
 
@@ -384,8 +393,32 @@ namespace Leauge_Auto_Accept
             switch (item)
             {
                 case 0:
-                    Print.printCentered("Lock in/ban delay before your turn to do so is over.", topPad + maxPos + 2);
-                    Print.printCentered("Value is in milliseconds. There's a 500 minimum.");
+                    Print.printCentered("Delay after which to hover your pick.", topPad + maxPos + 2);
+                    Print.printCentered("Default is 10000.");
+                    break;
+                case 1:
+                    Print.printCentered("Delay after which to lock in your pick, after you are able to.", topPad + maxPos + 2);
+                    Print.printCentered("Default is 999999999.");
+                    break;
+                case 2:
+                    Print.printCentered("Time to lock in before your time runs out.", topPad + maxPos + 2);
+                    Print.printCentered("Do not set too low (<300), it will cause you to dodge. Default is 1000.");
+                    break;
+                case 3:
+                    Print.printCentered("Delay after which to hover your ban.", topPad + maxPos + 2);
+                    Print.printCentered("Default is 1500.");
+                    break;
+                case 4:
+                    Print.printCentered("Delay after which to lock in your pick, after you are able to.", topPad + maxPos + 2);
+                    Print.printCentered("Default is 999999999.");
+                    break;
+                case 5:
+                    Print.printCentered("Time to lock in before your time runs out", topPad + maxPos + 2);
+                    Print.printCentered("Default is 1000.");
+                    break;
+                case 6:
+                    Print.printCentered("How long should the queue be before cancelling and restarting it?", topPad + maxPos + 2);
+                    Print.printCentered("Default is 300000.");
                     break;
             }
         }
@@ -396,7 +429,13 @@ namespace Leauge_Auto_Accept
 
             string outputText = item switch
             {
-                0 => (" " + Settings.lockDelayString).PadLeft(9, '.'),
+                0 => (" " + Settings.pickStartHoverDelay).PadLeft(10, '.'),
+                1 => (" " + Settings.pickStartlockDelay).PadLeft(10, '.'),
+                2 => (" " + Settings.pickEndlockDelay).PadLeft(10, '.'),
+                3 => (" " + Settings.banStartHoverDelay).PadLeft(10, '.'),
+                4 => (" " + Settings.banStartlockDelay).PadLeft(10, '.'),
+                5 => (" " + Settings.banEndlockDelay).PadLeft(10, '.'),
+                6 => (" " + Settings.queueMaxTime).PadLeft(10, '.'),
                 _ => ""
             };
             Print.printWhenPossible(outputText, item + topPad, SizeHandler.WidthCenter + 22 - outputText.Length);

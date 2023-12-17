@@ -277,7 +277,7 @@ namespace Leauge_Auto_Accept
                 string champSelectPhase = currentChampSelect[1].Split("\"phase\":\"")[1].Split('"')[0];
                 long currentTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 
-                if ((currentTime - 10000) > champSelectStart // Check if enough time has passed since planning phase has started
+                if ((currentTime - Settings.pickStartHoverDelay) > champSelectStart // Check if enough time has passed since planning phase has started
                     || champSelectPhase != "PLANNING" // Check if it's even planning phase at all
                     || Settings.instantHover) // Check if instahover setting is on
                 {
@@ -315,7 +315,13 @@ namespace Leauge_Auto_Accept
 
                 if (!pickedBan)
                 {
-                    hoverChampion(actId, Settings.currentBan[1], "ban");
+                    // Hover champion when champ select starts
+                    long currentTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+
+                    if ((currentTime - Settings.banStartHoverDelay) > champSelectStart) // Check if enough time has passed since planning phase has started
+                    {
+                        hoverChampion(actId, Settings.currentBan[1], "ban");
+                    }
                 }
 
                 if (!lockedBan)
@@ -379,7 +385,33 @@ namespace Leauge_Auto_Accept
             string timer = currentChampSelect[1].Split("totalTimeInPhase\":")[1].Split("}")[0];
             long timerInt = Convert.ToInt64(timer);
             long currentTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            if (currentTime >= lastActStartTime + timerInt - Settings.lockDelay)
+
+            int delayPreEnd = 0;
+            if (actType == "pick")
+            {
+                delayPreEnd = Settings.pickEndlockDelay;
+            }
+            else if (actType == "ban")
+            {
+                delayPreEnd = Settings.banEndlockDelay;
+            }
+            if (currentTime >= lastActStartTime + timerInt - delayPreEnd)
+            {
+                lockChampion(actId, championId, actType);
+                return;
+            }
+
+            int delayAfterStart = 0;
+            if (actType == "pick")
+            {
+                delayAfterStart = Settings.pickStartlockDelay;
+            }
+            else if (actType == "ban")
+            {
+                delayAfterStart = Settings.banStartlockDelay;
+            }
+
+            if (currentTime >= lastActStartTime + delayAfterStart)
             {
                 lockChampion(actId, championId, actType);
             }

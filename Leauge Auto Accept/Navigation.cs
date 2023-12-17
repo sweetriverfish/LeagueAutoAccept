@@ -353,13 +353,15 @@ namespace Leauge_Auto_Accept
             {
                 //if (currentPos == 4)
                 //{
-                    if (Settings.lockDelayString.Length > 0)
+                Settings.delayModify(currentPos, -1);
+                UI.delayMenuUpdateUI(currentPos);
+                /*if (Settings.lockDelayString.Length > 0)
                     {
                         Settings.lockDelayString = Settings.lockDelayString.Remove(Settings.lockDelayString.Length - 1);
                         Settings.delayModify(currentPos);
                         UI.delayMenuUpdateUI(currentPos);
                     }
-                //}
+                //}*/
             }
         }
 
@@ -390,12 +392,16 @@ namespace Leauge_Auto_Accept
                 //{
                     if (Functions.IsNumeric(key))
                     {
-                        if (Settings.lockDelayString.Length < 5)
+                    Settings.delayModify(currentPos, Int32.Parse(key.ToString()));
+                        UI.delayMenuUpdateUI(currentPos);
+                        /*if (Settings.pickStartHoverDelay < 10000000)
                         {
-                            Settings.lockDelayString += key;
+                            string newNumString = Settings.pickStartHoverDelay.ToString() + key;
+                            int newNum = Int32.Parse(newNumString);
+                            //Settings.pickStartHoverDelay += key;
                             Settings.delayModify(currentPos);
                             UI.delayMenuUpdateUI(currentPos);
-                        }
+                        }*/
                     }
                 //}
             }
