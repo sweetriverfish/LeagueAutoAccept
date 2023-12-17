@@ -59,7 +59,55 @@ namespace Leauge_Auto_Accept
                 case 3:
                     instaBan = !instaBan;
                     break;
+                /*case 4:
+                    if (lockDelayString.Length == 0)
+                    {
+                        lockDelayString = "0";
+                    }
+                    else
+                    {
+                        lockDelayString = lockDelayString.TrimStart('0');
+                    }
+                    lockDelay = Int32.Parse(lockDelayString);
+                    if (lockDelay < 500)
+                    {
+                        lockDelay = 500;
+                    }
+                    break;*/
                 case 4:
+                    if (!disableUpdateCheck && !saveSettings)
+                    {
+                        saveSettings = !saveSettings;
+                        UI.settingsMenuUpdateUI(0);
+                    }
+                    disableUpdateCheck = !disableUpdateCheck;
+                    break;
+                case 5:
+                    autoPickOrderTrade = !autoPickOrderTrade;
+                    break;
+                case 6:
+                    instantHover = !instantHover;
+                    break;
+                case 7:
+                    UI.delayMenu();
+                    break;
+            }
+
+            if (saveSettings)
+            {
+                settingsSave();
+            }
+            else if (item == 0)
+            {
+                deleteSettings();
+            }
+        }
+
+        public static void delayModify(int item)
+        {
+            switch (item)
+            {
+                case 0:
                     if (lockDelayString.Length == 0)
                     {
                         lockDelayString = "0";
@@ -74,29 +122,11 @@ namespace Leauge_Auto_Accept
                         lockDelay = 500;
                     }
                     break;
-                case 5:
-                    if (!disableUpdateCheck && !saveSettings)
-                    {
-                        saveSettings = !saveSettings;
-                        UI.settingsMenuUpdateUI(0);
-                    }
-                    disableUpdateCheck = !disableUpdateCheck;
-                    break;
-                case 6:
-                    autoPickOrderTrade = !autoPickOrderTrade;
-                    break;
-                case 7:
-                    instantHover = !instantHover;
-                    break;
             }
 
             if (saveSettings)
             {
                 settingsSave();
-            }
-            else if (item == 0)
-            {
-                deleteSettings();
             }
         }
 

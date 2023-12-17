@@ -68,6 +68,10 @@ namespace Leauge_Auto_Accept
                     {
                         UI.settingsMenuDesc(currentPos);
                     }
+                    else if (UI.currentWindow == "delayMenu")
+                    {
+                        UI.delayMenuDesc(currentPos);
+                    }
                     Print.isMovingPos = false;
                 }
             }
@@ -246,6 +250,9 @@ namespace Leauge_Auto_Accept
         {
             switch (UI.currentWindow)
             {
+                case "delayMenu":
+                    UI.settingsMenu();
+                    break;
                 case "mainScreen":
                     UI.exitMenu();
                     break;
@@ -287,7 +294,14 @@ namespace Leauge_Auto_Accept
                     break;
                 case "settingsMenu":
                     Settings.settingsModify(currentPos);
-                    UI.settingsMenuUpdateUI(currentPos);
+                    if (UI.currentWindow == "settingsMenu")
+                    {
+                        UI.settingsMenuUpdateUI(currentPos);
+                    }
+                    break;
+                case "delayMenu":
+                    //Settings.delayModify(currentPos);
+                    //UI.delayMenuUpdateUI(currentPos);
                     break;
                 case "exitMenu":
                     exitMenuNav();
@@ -335,17 +349,17 @@ namespace Leauge_Auto_Accept
                     UI.updateMessageEdit();
                 }
             }
-            else if (UI.currentWindow == "settingsMenu")
+            else if (UI.currentWindow == "delayMenu")
             {
-                if (currentPos == 4)
-                {
+                //if (currentPos == 4)
+                //{
                     if (Settings.lockDelayString.Length > 0)
                     {
                         Settings.lockDelayString = Settings.lockDelayString.Remove(Settings.lockDelayString.Length - 1);
-                        Settings.settingsModify(currentPos);
-                        UI.settingsMenuUpdateUI(currentPos);
+                        Settings.delayModify(currentPos);
+                        UI.delayMenuUpdateUI(currentPos);
                     }
-                }
+                //}
             }
         }
 
@@ -370,20 +384,20 @@ namespace Leauge_Auto_Accept
                     UI.updateMessageEdit();
                 }
             }
-            else if (UI.currentWindow == "settingsMenu")
+            else if (UI.currentWindow == "delayMenu")
             {
-                if (currentPos == 4)
-                {
+                //if (currentPos == 4)
+                //{
                     if (Functions.IsNumeric(key))
                     {
                         if (Settings.lockDelayString.Length < 5)
                         {
                             Settings.lockDelayString += key;
-                            Settings.settingsModify(currentPos);
-                            UI.settingsMenuUpdateUI(currentPos);
+                            Settings.delayModify(currentPos);
+                            UI.delayMenuUpdateUI(currentPos);
                         }
                     }
-                }
+                //}
             }
         }
 

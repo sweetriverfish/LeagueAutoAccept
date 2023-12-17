@@ -119,6 +119,9 @@ namespace Leauge_Auto_Accept
                 case "settingsMenu":
                     settingsMenu();
                     break;
+                case "delayMenu":
+                    delayMenu();
+                    break;
                 case "leagueClientIsClosedMessage":
                     leagueClientIsClosedMessage();
                     break;
@@ -238,20 +241,23 @@ namespace Leauge_Auto_Accept
                 "Preload data",
                 "Instalock pick",
                 "Instalock ban",
-                "Lock/ban delay",
                 "Disable update check",
                 "Automatically trade pick order",
-                "Instantly hover pick"
+                "Instantly hover pick",
+                "Delay settings"
             };
+
+            //  Settings.lockDelay.ToString(),
+
             string[] optionValue = {
                 Settings.saveSettings ? "Yes" : "No",
                 Settings.preloadData ? "Yes" : "No",
                 Settings.instaLock ? "Yes" : "No",
                 Settings.instaBan ? "Yes" : "No",
-                Settings.lockDelay.ToString(),
                 Settings.disableUpdateCheck ? "Yes" : "No",
                 Settings.autoPickOrderTrade ? "Yes" : "No",
-                Settings.instantHover ? "Yes" : "No"
+                Settings.instantHover ? "Yes" : "No",
+                ""
             };
 
             // Print options
@@ -288,21 +294,25 @@ namespace Leauge_Auto_Accept
                     Print.printCentered("Instanly lock in when it's your turn to ban.", topPad + maxPos + 2);
                     Print.printCentered("");
                     break;
-                case 4:
+                /*case 4:
                     Print.printCentered("Lock in/ban delay before your turn to do so is over.", topPad + maxPos + 2);
                     Print.printCentered("Value is in milliseconds. There's a 500 minimum.");
-                    break;
-                case 5:
+                    break;*/
+                case 4:
                     Print.printCentered("Disable update check on startup.", topPad + maxPos + 2);
                     Print.printCentered("");
                     break;
-                case 6:
+                case 5:
                     Print.printCentered("Automatically trade pick order when someone requests to.", topPad + maxPos + 2);
                     Print.printCentered("");
                     break;
-                case 7:
+                case 6:
                     Print.printCentered("Instantly hover champion as soon as joining champ select.", topPad + maxPos + 2);
                     Print.printCentered("In draft pick, it will hover before you are normally able to.");
+                    break;
+                case 7:
+                    Print.printCentered("Adjust different delays.", topPad + maxPos + 2);
+                    Print.printCentered("");
                     break;
             }
         }
@@ -311,16 +321,82 @@ namespace Leauge_Auto_Accept
         {
             // Select item to toggle from settings
 
+            //4 => (" " + Settings.lockDelayString).PadLeft(9, '.'),
+
             string outputText = item switch
             {
                 0 => Settings.saveSettings ? " Yes" : ". No",
                 1 => Settings.preloadData ? " Yes" : ". No",
                 2 => Settings.instaLock ? " Yes" : ". No",
                 3 => Settings.instaBan ? " Yes" : ". No",
-                4 => (" " + Settings.lockDelayString).PadLeft(9, '.'),
-                5 => Settings.disableUpdateCheck ? " Yes" : ". No",
-                6 => Settings.autoPickOrderTrade ? " Yes" : ". No",
-                7 => Settings.instantHover ? " Yes" : ". No",
+                4 => Settings.disableUpdateCheck ? " Yes" : ". No",
+                5 => Settings.autoPickOrderTrade ? " Yes" : ". No",
+                6 => Settings.instantHover ? " Yes" : ". No",
+                _ => ""
+            };
+            Print.printWhenPossible(outputText, item + topPad, SizeHandler.WidthCenter + 22 - outputText.Length);
+        }
+
+
+
+        public static void delayMenu()
+        {
+            Print.canMovePos = false;
+            Navigation.currentPos = 0;
+            Navigation.consolePosLast = 0;
+
+            currentWindow = "delayMenu";
+            windowType = "normal";
+            showCursor = false;
+            topPad = SizeHandler.HeightCenter - 3;
+            leftPad = SizeHandler.WidthCenter - 25;
+            maxPos = 1;
+
+            Console.Clear();
+
+            // Define options
+            string[] optionName = {
+                "Lock/ban delay"
+            };
+            string[] optionValue = {
+                Settings.lockDelay.ToString(),
+            };
+
+            Debug.WriteLine(Settings.lockDelay.ToString());
+
+            // Print options
+            for (int i = 0; i < optionName.Length; i++)
+            {
+                Debug.WriteLine(optionValue[i]);
+                Print.printCentered(addDotsInBetween(optionName[i], optionValue[i]), topPad + i);
+            }
+
+            Navigation.handlePointerMovementPrint();
+
+            Print.canMovePos = true;
+
+            delayMenuDesc(0);
+        }
+
+        public static void delayMenuDesc(int item)
+        {
+            // settings descrptions
+            switch (item)
+            {
+                case 0:
+                    Print.printCentered("Lock in/ban delay before your turn to do so is over.", topPad + maxPos + 2);
+                    Print.printCentered("Value is in milliseconds. There's a 500 minimum.");
+                    break;
+            }
+        }
+
+        public static void delayMenuUpdateUI(int item)
+        {
+            // Select item to toggle from settings
+
+            string outputText = item switch
+            {
+                0 => (" " + Settings.lockDelayString).PadLeft(9, '.'),
                 _ => ""
             };
             Print.printWhenPossible(outputText, item + topPad, SizeHandler.WidthCenter + 22 - outputText.Length);
