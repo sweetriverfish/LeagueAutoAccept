@@ -520,9 +520,9 @@ namespace Leauge_Auto_Accept
             Console.SetCursorPosition(0, 0);
 
             List<itemList> champsFiltered = new List<itemList>();
-            if ("none".Contains(Navigation.currentInput.ToLower()))
+            if ("unselected".Contains(Navigation.currentInput.ToLower()))
             {
-                champsFiltered.Add(new itemList() { name = "None", id = "0" });
+                champsFiltered.Add(new itemList() { name = "Unselected", id = "0" });
             }
             foreach (var champ in Data.champsSorterd)
             {
@@ -607,9 +607,9 @@ namespace Leauge_Auto_Accept
             Console.SetCursorPosition(0, 0);
 
             List<itemList> spellsFiltered = new List<itemList>();
-            if ("none".Contains(Navigation.currentInput.ToLower()))
+            if ("unselected".Contains(Navigation.currentInput.ToLower()))
             {
-                spellsFiltered.Add(new itemList() { name = "None", id = "0" });
+                spellsFiltered.Add(new itemList() { name = "Unselected", id = "0" });
             }
             foreach (var spell in Data.spellsSorted)
             {

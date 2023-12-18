@@ -9,10 +9,10 @@ namespace Leauge_Auto_Accept
 {
     internal class Settings
     {
-        public static string[] currentChamp = { "None", "0" };
-        public static string[] currentBan = { "None", "0" };
-        public static string[] currentSpell1 = { "None", "0" };
-        public static string[] currentSpell2 = { "None", "0" };
+        public static string[] currentChamp = { "Unselected", "0" };
+        public static string[] currentBan = { "Unselected", "0" };
+        public static string[] currentSpell1 = { "Unselected", "0" };
+        public static string[] currentSpell2 = { "Unselected", "0" };
         public static bool chatMessagesEnabled = false;
         public static List<string> chatMessages = new List<string>();
 
@@ -183,9 +183,9 @@ namespace Leauge_Auto_Accept
         public static void saveSelectedChamp()
         {
             List<itemList> champsFiltered = new List<itemList>();
-            if ("none".Contains(Navigation.currentInput.ToLower()))
+            if ("Unselected".Contains(Navigation.currentInput.ToLower()))
             {
-                champsFiltered.Add(new itemList() { name = "None", id = "0" });
+                champsFiltered.Add(new itemList() { name = "Unselected", id = "0" });
             }
             foreach (var champ in Data.champsSorterd)
             {
@@ -208,7 +208,7 @@ namespace Leauge_Auto_Accept
                 string id;
                 if (Navigation.currentPos < 0)
                 {
-                    name = "None";
+                    name = "Unselected";
                     id = "0";
                 }
                 else
@@ -236,9 +236,9 @@ namespace Leauge_Auto_Accept
         public static void saveSelectedSpell()
         {
             List<itemList> spellsFiltered = new List<itemList>();
-            if ("none".Contains(Navigation.currentInput.ToLower()))
+            if ("Unselected".Contains(Navigation.currentInput.ToLower()))
             {
-                spellsFiltered.Add(new itemList() { name = "None", id = "0" });
+                spellsFiltered.Add(new itemList() { name = "Unselected", id = "0" });
             }
             foreach (var spell in Data.spellsSorted)
             {
@@ -254,7 +254,7 @@ namespace Leauge_Auto_Accept
                 string id;
                 if (Navigation.currentPos < 0)
                 {
-                    name = "None";
+                    name = "Unselected";
                     id = "0";
                 }
                 else
