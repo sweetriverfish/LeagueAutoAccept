@@ -79,11 +79,13 @@ namespace Leauge_Auto_Accept
             int totalRows = minHeight - 2;
             int totalItems = totalRows * minWidth / 20; // 20 is the current column size for a champion name
 
+            int totalOptions = Data.champsSorterd.Count + 2; // 2 calulcates "Unselected" and "None"
+
             // Check if the minimum console size too small
-            if (totalItems < Data.champsSorterd.Count)
+            if (totalItems < totalOptions)
             {
                 // Figure out the needed size
-                double neededHeight = Data.champsSorterd.Count / 6; // 6 is the current amount of columns in a champions list
+                double neededHeight = totalOptions / 6; // 6 is the current amount of columns in a champions list
                 int newHeight = (int)Math.Ceiling(neededHeight) + 3;
 
                 // Set the new minimum console size
