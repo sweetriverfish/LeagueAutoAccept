@@ -369,13 +369,10 @@ namespace Leauge_Auto_Accept
         {
             if (UI.currentWindow == "champSelector" || UI.currentWindow == "spellSelector")
             {
-                if (Functions.IsEnglishLetter(key) || key == '\'' || key == '.')
+                if (currentInput.Length < 100)
                 {
-                    if (currentInput.Length < 100)
-                    {
-                        currentInput += key;
-                        UI.updateCurrentFilter();
-                    }
+                    currentInput += key;
+                    UI.updateCurrentFilter();
                 }
             }
             if (UI.currentWindow == "chatMessagesEdit")
