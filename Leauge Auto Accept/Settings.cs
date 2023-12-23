@@ -183,9 +183,16 @@ namespace Leauge_Auto_Accept
         public static void saveSelectedChamp()
         {
             List<itemList> champsFiltered = new List<itemList>();
-            if ("Unselected".Contains(Navigation.currentInput.ToLower()))
+            if ("unselected".Contains(Navigation.currentInput.ToLower()))
             {
                 champsFiltered.Add(new itemList() { name = "Unselected", id = "0" });
+            }
+            if (UI.currentChampPicker == 1)
+            {
+                if ("none".Contains(Navigation.currentInput.ToLower()))
+                {
+                    champsFiltered.Add(new itemList() { name = "None", id = "-1" });
+                }
             }
             foreach (var champ in Data.champsSorterd)
             {
@@ -236,7 +243,7 @@ namespace Leauge_Auto_Accept
         public static void saveSelectedSpell()
         {
             List<itemList> spellsFiltered = new List<itemList>();
-            if ("Unselected".Contains(Navigation.currentInput.ToLower()))
+            if ("unselected".Contains(Navigation.currentInput.ToLower()))
             {
                 spellsFiltered.Add(new itemList() { name = "Unselected", id = "0" });
             }

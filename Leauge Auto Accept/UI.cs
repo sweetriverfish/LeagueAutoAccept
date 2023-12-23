@@ -524,6 +524,13 @@ namespace Leauge_Auto_Accept
             {
                 champsFiltered.Add(new itemList() { name = "Unselected", id = "0" });
             }
+            if (currentChampPicker == 1)
+            {
+                if ("none".Contains(Navigation.currentInput.ToLower()))
+                {
+                    champsFiltered.Add(new itemList() { name = "None", id = "-1" });
+                }
+            }
             foreach (var champ in Data.champsSorterd)
             {
                 if (champ.name.ToLower().Contains(Navigation.currentInput.ToLower()))
