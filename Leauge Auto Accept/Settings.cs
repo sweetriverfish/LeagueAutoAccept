@@ -366,8 +366,10 @@ namespace Leauge_Auto_Accept
                 ",banStartHoverDelay:" + banStartHoverDelay +
                 ",banStartlockDelay:" + banStartlockDelay +
                 ",banEndlockDelay:" + banEndlockDelay +
+                ",queueMaxTime:" + queueMaxTime +
                 ",autoPickOrderTrade:" + autoPickOrderTrade +
                 ",instantHover:" + instantHover +
+                ",autoRestartQueue:" + autoRestartQueue +
                 ",disableUpdateCheck:" + disableUpdateCheck +
                 ",chatMessages:" + encodeMessagesIntoBase64();
 
@@ -456,6 +458,9 @@ namespace Leauge_Auto_Accept
                         case "banEndlockDelay":
                             banEndlockDelay = Int32.Parse(columns[1]);
                             break;
+                        case "queueMaxTime":
+                            queueMaxTime = Int32.Parse(columns[1]);
+                            break;
                         case "autoAcceptOn":
                             shouldAutoAcceptbeOn = Boolean.Parse(columns[1]);
                             break;
@@ -476,6 +481,9 @@ namespace Leauge_Auto_Accept
                             break;
                         case "instantHover":
                             instantHover = Boolean.Parse(columns[1]);
+                            break;
+                        case "autoRestartQueue":
+                            autoRestartQueue = Boolean.Parse(columns[1]);
                             break;
                         case "chatMessages":
                             decodeMessagesFromBase64(columns[1]);
