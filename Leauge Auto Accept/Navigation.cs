@@ -183,7 +183,7 @@ namespace Leauge_Auto_Accept
                     return true;
 
                 case ConsoleKey.RightArrow:
-                    if (currentPos + 1 == UI.maxPos)
+                    if (currentPos + UI.totalRows >= UI.maxPos)
                     {
                         return false;
                     }
