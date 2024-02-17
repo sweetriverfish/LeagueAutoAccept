@@ -353,7 +353,7 @@ namespace Leauge_Auto_Accept
             showCursor = false;
             topPad = SizeHandler.HeightCenter - 3;
             leftPad = SizeHandler.WidthCenter - 25;
-            maxPos = 7;
+            maxPos = 8;
 
             Console.Clear();
 
@@ -365,7 +365,8 @@ namespace Leauge_Auto_Accept
                 "Ban hover delay upon phase start",
                 "Ban lock delay upon phase start",
                 "Ban lock delay before phase end",
-                "Max queue time before restart"
+                "Max queue time before restart",
+                "Chat Messages Delay"
             };
             string[] optionValue = {
                 Settings.pickStartHoverDelay.ToString(),
@@ -375,6 +376,7 @@ namespace Leauge_Auto_Accept
                 Settings.banStartlockDelay.ToString(),
                 Settings.banEndlockDelay.ToString(),
                 Settings.queueMaxTime.ToString(),
+                Settings.chatMessagesDelay.ToString()
             };
 
             // Print options
@@ -423,6 +425,10 @@ namespace Leauge_Auto_Accept
                     Print.printCentered("How long should the queue be before cancelling and restarting it?", topPad + maxPos + 2);
                     Print.printCentered("Default is 300000.");
                     break;
+                case 7:
+                    Print.printCentered("Delay after which the chat messages will be sent", topPad + maxPos + 2);
+                    Print.printCentered("Default is 100.");
+                    break;
             }
         }
 
@@ -439,6 +445,7 @@ namespace Leauge_Auto_Accept
                 4 => (" " + Settings.banStartlockDelay).PadLeft(10, '.'),
                 5 => (" " + Settings.banEndlockDelay).PadLeft(10, '.'),
                 6 => (" " + Settings.queueMaxTime).PadLeft(10, '.'),
+                7 => (" " + Settings.chatMessagesDelay).PadLeft(10, '.'),
                 _ => ""
             };
             Print.printWhenPossible(outputText, item + topPad, SizeHandler.WidthCenter + 22 - outputText.Length);

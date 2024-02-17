@@ -34,6 +34,7 @@ namespace Leauge_Auto_Accept
         public static int banStartlockDelay = 999999999;
         public static int banEndlockDelay = 1000;
         public static int queueMaxTime = 300000;
+        public static int chatMessagesDelay = 100;
 
         public static void settingsModify(int item)
         {
@@ -143,6 +144,12 @@ namespace Leauge_Auto_Accept
                     {
                         int newNum = delayCalculateNewValue(queueMaxTime, number);
                         queueMaxTime = newNum;
+                    }
+                    break;
+                case 7:
+                    {
+                        int newNum = delayCalculateNewValue(chatMessagesDelay, number);
+                        chatMessagesDelay = newNum;
                     }
                     break;
             }
@@ -367,6 +374,7 @@ namespace Leauge_Auto_Accept
                 ",banStartlockDelay:" + banStartlockDelay +
                 ",banEndlockDelay:" + banEndlockDelay +
                 ",queueMaxTime:" + queueMaxTime +
+                ",chatMessagesDelay:" + chatMessagesDelay +
                 ",autoPickOrderTrade:" + autoPickOrderTrade +
                 ",instantHover:" + instantHover +
                 ",autoRestartQueue:" + autoRestartQueue +
@@ -460,6 +468,9 @@ namespace Leauge_Auto_Accept
                             break;
                         case "queueMaxTime":
                             queueMaxTime = Int32.Parse(columns[1]);
+                            break;
+                        case "chatMessagesDelay":
+                            chatMessagesDelay = Int32.Parse(columns[1]);
                             break;
                         case "autoAcceptOn":
                             shouldAutoAcceptbeOn = Boolean.Parse(columns[1]);
