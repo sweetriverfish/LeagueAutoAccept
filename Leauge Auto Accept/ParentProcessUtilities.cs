@@ -1,8 +1,7 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-
-using System;
 
 /// <summary>
 /// A utility class to determine a process parent.

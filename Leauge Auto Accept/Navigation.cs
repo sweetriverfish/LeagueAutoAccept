@@ -105,7 +105,7 @@ namespace Leauge_Auto_Accept
             switch (key)
             {
                 case ConsoleKey.UpArrow:
-                    if (currentPos == 0 )
+                    if (currentPos == 0)
                     {
                         return false;
                     }
@@ -352,17 +352,8 @@ namespace Leauge_Auto_Accept
             }
             else if (UI.currentWindow == "delayMenu")
             {
-                //if (currentPos == 4)
-                //{
                 Settings.delayModify(currentPos, -1);
                 UI.delayMenuUpdateUI(currentPos);
-                /*if (Settings.lockDelayString.Length > 0)
-                    {
-                        Settings.lockDelayString = Settings.lockDelayString.Remove(Settings.lockDelayString.Length - 1);
-                        Settings.delayModify(currentPos);
-                        UI.delayMenuUpdateUI(currentPos);
-                    }
-                //}*/
             }
         }
 
@@ -386,22 +377,11 @@ namespace Leauge_Auto_Accept
             }
             else if (UI.currentWindow == "delayMenu")
             {
-                //if (currentPos == 4)
-                //{
-                    if (Functions.IsNumeric(key))
-                    {
+                if (Functions.IsNumeric(key))
+                {
                     Settings.delayModify(currentPos, Int32.Parse(key.ToString()));
-                        UI.delayMenuUpdateUI(currentPos);
-                        /*if (Settings.pickStartHoverDelay < 10000000)
-                        {
-                            string newNumString = Settings.pickStartHoverDelay.ToString() + key;
-                            int newNum = Int32.Parse(newNumString);
-                            //Settings.pickStartHoverDelay += key;
-                            Settings.delayModify(currentPos);
-                            UI.delayMenuUpdateUI(currentPos);
-                        }*/
-                    }
-                //}
+                    UI.delayMenuUpdateUI(currentPos);
+                }
             }
         }
 
@@ -421,13 +401,11 @@ namespace Leauge_Auto_Accept
                     // Handles the weird main menu navigation
                     if (consolePosLast == 6)
                     {
-                        //Console.SetCursorPosition(UI.leftPad, SizeHandler.HeightCenter + 6);
                         positionLeft = UI.leftPad;
                         positionTop = SizeHandler.HeightCenter + 6;
                     }
                     else if (consolePosLast == 7)
                     {
-                        //Console.SetCursorPosition(UI.leftPad + 40, SizeHandler.HeightCenter + 6);
                         positionLeft = UI.leftPad + 40;
                         positionTop = SizeHandler.HeightCenter + 6;
                     }
@@ -435,7 +413,6 @@ namespace Leauge_Auto_Accept
                 else if (UI.currentWindow == "exitMenu" && consolePosLast == 1)
                 {
                     // Handles the weird exit menu navigation
-                    //Console.SetCursorPosition(UI.leftPad + 30, UI.topPad);
                     positionLeft = UI.leftPad + 30;
                     positionTop = UI.topPad;
                 }
@@ -458,7 +435,6 @@ namespace Leauge_Auto_Accept
                 else
                 {
                     int[] consolePos = getPositionOnConsole(consolePosLast);
-                    //Console.SetCursorPosition(consolePosOld[1], consolePosOld[0]);
                     positionLeft = consolePos[1];
                     positionTop = consolePos[0];
                 }
@@ -479,13 +455,11 @@ namespace Leauge_Auto_Accept
                     // Handles the weird main menu navigation
                     if (currentPos == 6)
                     {
-                        //Console.SetCursorPosition(UI.leftPad, SizeHandler.HeightCenter + 6);
                         positionLeft = UI.leftPad;
                         positionTop = SizeHandler.HeightCenter + 6;
                     }
                     else if (currentPos == 7)
                     {
-                        //Console.SetCursorPosition(UI.leftPad + 40, SizeHandler.HeightCenter + 6);
                         positionLeft = UI.leftPad + 40;
                         positionTop = SizeHandler.HeightCenter + 6;
                     }
@@ -493,7 +467,6 @@ namespace Leauge_Auto_Accept
                 else if (UI.currentWindow == "exitMenu" && currentPos == 1)
                 {
                     // Handles the weird exit menu navigation
-                    //Console.SetCursorPosition(UI.leftPad + 30, UI.topPad);
                     positionLeft = UI.leftPad + 30;
                     positionTop = UI.topPad;
                 }
@@ -516,7 +489,6 @@ namespace Leauge_Auto_Accept
                 else
                 {
                     int[] consolePos = getPositionOnConsole(currentPos);
-                    //Console.SetCursorPosition(consolePos[1], consolePos[0]);
                     positionLeft = consolePos[1];
                     positionTop = consolePos[0];
                 }

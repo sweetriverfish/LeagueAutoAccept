@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
@@ -217,7 +216,8 @@ namespace Leauge_Auto_Accept
 
                 long currentTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 
-                if ((currentTime - Settings.chatMessagesDelay) > champSelectStart) {
+                if ((currentTime - Settings.chatMessagesDelay) > champSelectStart)
+                {
                     handleChampSelectChatSendMsg(chatId);
                 }
 

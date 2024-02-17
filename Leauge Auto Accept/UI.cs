@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Xml.Linq;
 
 namespace Leauge_Auto_Accept
 {
@@ -145,8 +143,6 @@ namespace Leauge_Auto_Accept
 
         public static void mainScreen()
         {
-            //chatMessagesWindow();
-            //return;
             Print.canMovePos = false;
             Navigation.currentPos = Navigation.lastPosMainNav;
             Navigation.consolePosLast = Navigation.lastPosMainNav;
@@ -248,8 +244,6 @@ namespace Leauge_Auto_Accept
                 "Delay settings"
             };
 
-            //  Settings.lockDelay.ToString(),
-
             string[] optionValue = {
                 Settings.saveSettings ? "Yes" : "No",
                 Settings.preloadData ? "Yes" : "No",
@@ -323,8 +317,6 @@ namespace Leauge_Auto_Accept
         {
             // Select item to toggle from settings
 
-            //4 => (" " + Settings.lockDelayString).PadLeft(9, '.'),
-
             string outputText = item switch
             {
                 0 => Settings.saveSettings ? " Yes" : ". No",
@@ -334,7 +326,7 @@ namespace Leauge_Auto_Accept
                 4 => Settings.disableUpdateCheck ? " Yes" : ". No",
                 5 => Settings.autoPickOrderTrade ? " Yes" : ". No",
                 6 => Settings.instantHover ? " Yes" : ". No",
-                7=> Settings.autoRestartQueue ? " Yes" : ". No",
+                7 => Settings.autoRestartQueue ? " Yes" : ". No",
                 _ => ""
             };
             Print.printWhenPossible(outputText, item + topPad, SizeHandler.WidthCenter + 22 - outputText.Length);

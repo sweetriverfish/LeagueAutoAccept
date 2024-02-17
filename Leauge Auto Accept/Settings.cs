@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Text;
 
@@ -26,7 +24,6 @@ namespace Leauge_Auto_Accept
         public static bool shouldAutoAcceptbeOn = false;
         public static bool autoRestartQueue = false;
 
-        //public static string lockDelayString = "1500";
         public static int pickStartHoverDelay = 10000;
         public static int pickStartlockDelay = 999999999;
         public static int pickEndlockDelay = 1000;
@@ -101,7 +98,6 @@ namespace Leauge_Auto_Accept
 
         public static void delayModify(int item, int number)
         {
-            Debug.WriteLine(number);
             switch (item)
             {
                 case 0:
@@ -164,9 +160,8 @@ namespace Leauge_Auto_Accept
         {
             string newNumString = oldValue.ToString();
 
-            if (modifier >= 0) {
-                Debug.WriteLine (newNumString);
-                Debug.WriteLine (modifier.ToString());
+            if (modifier >= 0)
+            {
                 newNumString = newNumString + modifier.ToString();
                 if (newNumString.Length > 9)
                 {

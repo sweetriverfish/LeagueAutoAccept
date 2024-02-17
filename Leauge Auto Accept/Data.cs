@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Leauge_Auto_Accept
 {
@@ -54,6 +52,7 @@ namespace Leauge_Auto_Accept
                 string[] ownedChamps = LCU.clientRequestUntilSuccess("GET", "lol-champions/v1/inventories/" + currentSummonerId + "/champions-minimal");
                 Console.Clear();
                 string[] champsSplit = ownedChamps[1].Split("},{");
+                Debug.WriteLine(ownedChamps[1]);
 
                 foreach (var champ in champsSplit)
                 {
