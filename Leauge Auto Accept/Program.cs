@@ -18,6 +18,21 @@ namespace Leauge_Auto_Accept
     {
         private static void Main()
         {
+            // Start application using conhost (Windows Terminal do not support resize)
+            // Ref: https://github.com/microsoft/terminal/issues/5094
+            var parentProc = ParentProcessUtilities.GetParentProcess();
+            var isDebug = Debugger.IsAttached;
+            if (!isDebug && parentProc.ProcessName != "conhost")
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = "conhost",
+                    WorkingDirectory = Directory.GetCurrentDirectory(),
+                    Arguments = Process.GetCurrentProcess().MainModule.FileName,
+                });
+                return;
+            }
+
             // Show initializing message
             UI.initializingWindow();
 
