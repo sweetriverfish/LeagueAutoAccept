@@ -191,8 +191,9 @@ namespace Leauge_Auto_Accept
                     return true;
 
                 case ConsoleKey.LeftArrow:
-                    if (currentPos == 0)
+                    if (currentPos <= 0)
                     {
+                        currentPos = 0;
                         return false;
                     }
                     currentPos -= UI.totalRows;
