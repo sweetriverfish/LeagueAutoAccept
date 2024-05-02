@@ -4,6 +4,11 @@ Ever wanted to go pee or grab something but you're already 10 minutes into the q
 ## Screenshot
 ![LeagueAutoAccept Screenshot](screenshot.png?raw=true)
 
+## Warnings/Disclaimer
+- Be aware that the use of the LCU API is not allowed on the Korean server (which this application does)
+- This application is not endorsed nor approved by Riot
+- It's basically a gray area but should be fine to use on servers other than Korea
+
 ## Features
 - Automatically accept queue
 - Pick a champion
