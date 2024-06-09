@@ -49,11 +49,12 @@ namespace Leauge_Auto_Accept
                 }
                 showCursorValue = value;
             }
-        }
+        }   
 
         public static void initializingWindow()
         {
             Print.canMovePos = false;
+            Console.Clear();
             currentWindow = "initializing";
             windowType = "nocursor";
             showCursor = false;
@@ -137,6 +138,9 @@ namespace Leauge_Auto_Accept
                     break;
                 case "chatMessagesWindow":
                     chatMessagesWindow();
+                    break;
+                case "initializing":
+                    initializingWindow();
                     break;
             }
         }
