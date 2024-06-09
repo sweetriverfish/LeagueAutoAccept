@@ -21,7 +21,8 @@ namespace Leauge_Auto_Accept
             {
                 if (UI.currentWindow == "consoleTooSmallMessage")
                 {
-                    return;
+                    Thread.Sleep(1000);
+                    break;
                 }
 
                 bool movePointer = false;
