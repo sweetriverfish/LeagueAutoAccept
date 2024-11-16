@@ -357,6 +357,8 @@ namespace Leauge_Auto_Accept
             string config =
                 "champName:" + currentChamp[0] +
                 ",champId:" + currentChamp[1] +
+                ",secondaryChampName:" + secondaryChamp[0] + 
+                ",secondaryChampId:" + secondaryChamp[1] +  
                 ",banName:" + currentBan[0] +
                 ",banId:" + currentBan[1] +
                 ",spell1Name:" + currentSpell1[0] +
@@ -430,6 +432,12 @@ namespace Leauge_Auto_Accept
                         case "champId":
                             currentChamp[1] = columns[1];
                             break;
+                        case "secondaryChampName":
+                            secondaryChamp[0] = columns[1];
+                            break;   
+                        case "secondaryChampId":
+                            secondaryChamp[1] = columns[1];
+                            break;    
                         case "banName":
                             currentBan[0] = columns[1];
                             break;
