@@ -156,7 +156,7 @@ namespace Leauge_Auto_Accept
             showCursor = false;
             topPad = SizeHandler.HeightCenter - 1;
             leftPad = SizeHandler.WidthCenter - 25;
-            maxPos = 8;
+            maxPos = 9;
 
             Console.Clear();
 
@@ -182,6 +182,7 @@ namespace Leauge_Auto_Accept
             // Define options
             string[] optionName = {
                 "Select a champion",
+                "Select secondary champion",
                 "Select a ban",
                 "Select summoner spell 1",
                 "Select summoner spell 2",
@@ -190,6 +191,7 @@ namespace Leauge_Auto_Accept
             };
             string[] optionValue = {
                 Settings.currentChamp[0],
+                Settings.secondaryChamp[0],
                 Settings.currentBan[0],
                 Settings.currentSpell1[0],
                 Settings.currentSpell2[0],

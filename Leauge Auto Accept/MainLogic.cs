@@ -281,7 +281,14 @@ namespace Leauge_Auto_Accept
                     || champSelectPhase != "PLANNING" // Check if it's even planning phase at all
                     || Settings.instantHover) // Check if instahover setting is on
                 {
+                    // Try first choice
                     hoverChampion(actId, Settings.currentChamp[1], "pick");
+
+                    // If first choice didn't work (pickedChamp is still false), try second choice
+                    if (!pickedChamp)
+                    {
+                        hoverChampion(actId, Settings.secondaryChamp[1], "pick");
+                    }
                 }
             }
 
