@@ -281,7 +281,19 @@ namespace Leauge_Auto_Accept
                     || champSelectPhase != "PLANNING" // Check if it's even planning phase at all
                     || Settings.instantHover) // Check if instahover setting is on
                 {
-                    hoverChampion(actId, Settings.currentChamp[1], "pick");
+                    // Try to hover first choice
+                    string[] champSelectAction = LCU.clientRequest("PATCH", "lol-champ-select/v1/session/actions/" + actId, "{\"championId\":" + Settings.currentChamp[1] + "}");
+
+                    // If first choice fails (returns error), try second choice
+                    if (champSelectAction[0] != "204")
+                    {
+                        champSelectAction = LCU.clientRequest("PATCH", "lol-champ-select/v1/session/actions/" + actId, "{\"championId\":" + Settings.secondaryChamp[1] + "}");
+                    }
+
+                    if (champSelectAction[0] == "204")
+                    {
+                        pickedChamp = true;
+                    }
                 }
             }
 

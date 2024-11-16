@@ -13,7 +13,7 @@ namespace Leauge_Auto_Accept
         public static string[] currentSpell2 = { "Unselected", "0" };
         public static bool chatMessagesEnabled = false;
         public static List<string> chatMessages = new List<string>();
-
+        public static string[] secondaryChamp = { "Unselected", "0" };
         public static bool saveSettings = false;
         public static bool preloadData = false;
         public static bool instaLock = false;
@@ -229,6 +229,11 @@ namespace Leauge_Auto_Accept
                 {
                     currentChamp[0] = name;
                     currentChamp[1] = id;
+                }
+                else if (UI.currentChampPicker == 2)  
+                {
+                    secondaryChamp[0] = name;
+                    secondaryChamp[1] = id;
                 }
                 else
                 {
