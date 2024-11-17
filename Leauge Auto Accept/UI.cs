@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 
 namespace Leauge_Auto_Accept
@@ -206,8 +206,8 @@ namespace Leauge_Auto_Accept
             }
 
             // Print the two bottom buttons that are not actaul settings
-            Print.printWhenPossible("Info", SizeHandler.HeightCenter + 6, leftPad + 43);
-            Print.printWhenPossible("Settings", SizeHandler.HeightCenter + 6, leftPad + 3);
+            Print.printWhenPossible("Info", SizeHandler.HeightCenter + 7, leftPad + 43);
+            Print.printWhenPossible("Settings", SizeHandler.HeightCenter + 7, leftPad + 3);
 
 
             Print.printWhenPossible("v" + Updater.appVersion, SizeHandler.WindowHeight - 1, 0, false);
@@ -219,7 +219,7 @@ namespace Leauge_Auto_Accept
 
         public static void toggleAutoAcceptSettingUI()
         {
-            Print.printWhenPossible(MainLogic.isAutoAcceptOn ? ". Enabled" : " Disabled", topPad + 5, leftPad + 38);
+            Print.printWhenPossible(MainLogic.isAutoAcceptOn ? ". Enabled" : " Disabled", topPad + 6, leftPad + 38);
         }
 
         public static void settingsMenu()

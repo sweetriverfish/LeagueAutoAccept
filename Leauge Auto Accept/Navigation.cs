@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
@@ -397,18 +397,18 @@ namespace Leauge_Auto_Accept
             {
                 int positionLeft = 0;
                 int positionTop = 0;
-                if (UI.currentWindow == "mainScreen" && consolePosLast > 5)
+                if (UI.currentWindow == "mainScreen" && consolePosLast > 6)
                 {
                     // Handles the weird main menu navigation
-                    if (consolePosLast == 6)
+                    if (consolePosLast == 7)
                     {
                         positionLeft = UI.leftPad;
-                        positionTop = SizeHandler.HeightCenter + 6;
+                        positionTop = SizeHandler.HeightCenter + 7;
                     }
-                    else if (consolePosLast == 7)
+                    else if (consolePosLast == 8)
                     {
                         positionLeft = UI.leftPad + 40;
-                        positionTop = SizeHandler.HeightCenter + 6;
+                        positionTop = SizeHandler.HeightCenter + 7;
                     }
                 }
                 else if (UI.currentWindow == "exitMenu" && consolePosLast == 1)
@@ -451,18 +451,18 @@ namespace Leauge_Auto_Accept
                     lastPosMainNav = currentPos;
                 }
 
-                if (UI.currentWindow == "mainScreen" && currentPos > 5)
+                if (UI.currentWindow == "mainScreen" && currentPos > 6)
                 {
                     // Handles the weird main menu navigation
-                    if (currentPos == 6)
+                    if (currentPos == 7)
                     {
                         positionLeft = UI.leftPad;
-                        positionTop = SizeHandler.HeightCenter + 6;
+                        positionTop = SizeHandler.HeightCenter + 7;
                     }
-                    else if (currentPos == 7)
+                    else if (currentPos == 8)
                     {
                         positionLeft = UI.leftPad + 40;
-                        positionTop = SizeHandler.HeightCenter + 6;
+                        positionTop = SizeHandler.HeightCenter + 7;
                     }
                 }
                 else if (UI.currentWindow == "exitMenu" && currentPos == 1)
