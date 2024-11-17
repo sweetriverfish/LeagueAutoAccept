@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Linq;
 using System.Threading;
 
@@ -47,10 +47,11 @@ namespace Leauge_Auto_Accept
                                 Thread.Sleep(5000);
                                 break;
                             case "Matchmaking":
+                                handleMatchmakingCancel();
                                 Thread.Sleep(2000);
                                 break;
                             case "ReadyCheck":
-                                LCU.clientRequest("POST", "lol-matchmaking/v1/ready-check/accept");
+                                handleMatchmakingAccept();
                                 break;
                             case "ChampSelect":
                                 handleChampSelect();
@@ -93,6 +94,40 @@ namespace Leauge_Auto_Accept
                 else
                 {
                     Thread.Sleep(1000);
+                }
+            }
+        }
+
+        private static void handleMatchmakingCancel()
+        {
+            if (!Settings.cancelQueueAfterDodge)
+            {
+                return;
+            }
+            if (lastChatRoom != "")
+            {
+                LCU.clientRequest("DELETE", "lol-lobby/v2/lobby/matchmaking/search");
+                lastChatRoom = "";
+            }
+        }
+
+        private static void handleMatchmakingAccept()
+        {
+            if (!Settings.cancelQueueAfterDodge)
+            {
+                LCU.clientRequest("POST", "lol-matchmaking/v1/ready-check/accept");
+                return;
+            }
+            else
+            {
+                if (lastChatRoom != "")
+                {
+                    LCU.clientRequest("POST", "lol-matchmaking/v1/ready-check/decline");
+                    lastChatRoom = "";
+                }
+                else
+                {
+                    LCU.clientRequest("POST", "lol-matchmaking/v1/ready-check/accept");
                 }
             }
         }

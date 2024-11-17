@@ -231,9 +231,9 @@ namespace Leauge_Auto_Accept
             currentWindow = "settingsMenu";
             windowType = "normal";
             showCursor = false;
-            topPad = SizeHandler.HeightCenter - 3;
+            topPad = SizeHandler.HeightCenter - 4;
             leftPad = SizeHandler.WidthCenter - 25;
-            maxPos = 9;
+            maxPos = 10;
 
             Console.Clear();
 
@@ -247,6 +247,7 @@ namespace Leauge_Auto_Accept
                 "Automatically trade pick order",
                 "Instantly hover pick",
                 "Automatically restart queue",
+                "Cancel queue after dodge",
                 "Delay settings"
             };
 
@@ -259,6 +260,7 @@ namespace Leauge_Auto_Accept
                 Settings.autoPickOrderTrade ? "Yes" : "No",
                 Settings.instantHover ? "Yes" : "No",
                 Settings.autoRestartQueue ? "Yes" : "No",
+                Settings.cancelQueueAfterDodge ? "Yes" : "No",
                 ""
             };
 
@@ -313,6 +315,10 @@ namespace Leauge_Auto_Accept
                     Print.printCentered("Default is 5 mintues, can be configured in the delays settings.");
                     break;
                 case 8:
+                    Print.printCentered("Automatically cancel the queue after someone dodges the lobby.", topPad + maxPos + 2);
+                    Print.printCentered("");
+                    break;
+                case 9:
                     Print.printCentered("Adjust different delays.", topPad + maxPos + 2);
                     Print.printCentered("");
                     break;
@@ -333,6 +339,7 @@ namespace Leauge_Auto_Accept
                 5 => Settings.autoPickOrderTrade ? " Yes" : ". No",
                 6 => Settings.instantHover ? " Yes" : ". No",
                 7 => Settings.autoRestartQueue ? " Yes" : ". No",
+                8 => Settings.cancelQueueAfterDodge ? " Yes" : ". No",
                 _ => ""
             };
             Print.printWhenPossible(outputText, item + topPad, SizeHandler.WidthCenter + 22 - outputText.Length);

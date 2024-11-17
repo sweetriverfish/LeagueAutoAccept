@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -23,6 +23,7 @@ namespace Leauge_Auto_Accept
         public static bool instantHover = false;
         public static bool shouldAutoAcceptbeOn = false;
         public static bool autoRestartQueue = false;
+        public static bool cancelQueueAfterDodge = false;
 
         public static int pickStartHoverDelay = 10000;
         public static int pickStartlockDelay = 999999999;
@@ -82,6 +83,9 @@ namespace Leauge_Auto_Accept
                     autoRestartQueue = !autoRestartQueue;
                     break;
                 case 8:
+                    cancelQueueAfterDodge = !cancelQueueAfterDodge;
+                    break;
+                case 9:
                     UI.delayMenu();
                     break;
             }
@@ -380,6 +384,7 @@ namespace Leauge_Auto_Accept
                 ",autoPickOrderTrade:" + autoPickOrderTrade +
                 ",instantHover:" + instantHover +
                 ",autoRestartQueue:" + autoRestartQueue +
+                ",cancelQueueAfterDodge:" + cancelQueueAfterDodge +
                 ",disableUpdateCheck:" + disableUpdateCheck +
                 ",chatMessages:" + encodeMessagesIntoBase64();
 
@@ -503,6 +508,9 @@ namespace Leauge_Auto_Accept
                             break;
                         case "autoRestartQueue":
                             autoRestartQueue = Boolean.Parse(columns[1]);
+                            break;
+                        case "cancelQueueAfterDodge":
+                            cancelQueueAfterDodge = Boolean.Parse(columns[1]);
                             break;
                         case "chatMessages":
                             decodeMessagesFromBase64(columns[1]);
