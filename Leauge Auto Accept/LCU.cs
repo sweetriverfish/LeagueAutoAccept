@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http.Headers;
@@ -74,20 +74,22 @@ namespace Leauge_Auto_Accept
 
         private static string[] getLeagueAuth(Process client)
         {
-            string command = "wmic process where 'Processid=" + client.Id + "' get Commandline";
-            ProcessStartInfo psi = new ProcessStartInfo("cmd.exe", "/c " + command);
-            psi.RedirectStandardOutput = true;
+            string query = $"SELECT CommandLine FROM Win32_Process where ProcessId = {client.Id}";
+            string commandLine = string.Empty;
 
-            Process cmd = new Process();
-            cmd.StartInfo = psi;
-            cmd.Start();
-
-            string output = cmd.StandardOutput.ReadToEnd();
-            cmd.WaitForExit();
+            using (var searcher = new System.Management.ManagementObjectSearcher(query))
+            using (var results = searcher.Get())
+            {
+                foreach (var result in results)
+                {
+                    commandLine = result["CommandLine"]?.ToString();
+                    break;
+                }
+            }
 
             // Parse the port and auth token into variables
-            string port = Regex.Match(output, @"--app-port=""?(\d+)""?").Groups[1].Value;
-            string authToken = Regex.Match(output, @"--remoting-auth-token=([a-zA-Z0-9_-]+)").Groups[1].Value;
+            string port = Regex.Match(commandLine, @"--app-port=""?(\d+)""?").Groups[1].Value;
+            string authToken = Regex.Match(commandLine, @"--remoting-auth-token=([a-zA-Z0-9_-]+)").Groups[1].Value;
 
             // Compute the encoded key
             string auth = "riot:" + authToken;
