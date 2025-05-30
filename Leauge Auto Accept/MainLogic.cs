@@ -1,4 +1,5 @@
-﻿﻿using System;
+﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
@@ -151,6 +152,7 @@ namespace Leauge_Auto_Accept
             lastPhase = phase;
         }
 
+
         private static void handleChampSelect()
         {
             // Get data for the current ongoing champ select
@@ -158,7 +160,7 @@ namespace Leauge_Auto_Accept
 
             if (currentChampSelect[0] == "200")
             {
-                // Get needed data from the current champ select
+                // Get needed data from the current champ select 
                 string currentChatRoom = currentChampSelect[1].Split("multiUserChatId\":\"")[1].Split('"')[0];
                 if (lastChatRoom != currentChatRoom || lastChatRoom == "")
                 {
@@ -242,6 +244,73 @@ namespace Leauge_Auto_Accept
             }
         }
 
+
+        // Check player's assigned position and adjust champion pick to primary (true) or secondary (false)
+        private static bool handleChampPositionPreferences(string[] currentChampSelect, string localPlayerCellId)
+        {
+            string[] lobbySelections = LCU.clientRequest("GET", "lol-lobby/v2/lobby");
+            string firstPositionPreference = lobbySelections[1].Split("firstPositionPreference\":")[1].Split(',')[0].Trim('"');
+            string secondPositionPreference = lobbySelections[1].Split("secondPositionPreference\":")[1].Split(',')[0].Trim('"');
+            // Debug.WriteLine("Primary position pref: " + firstPositionPreference);
+            // Debug.WriteLine("Second position pref: " + secondPositionPreference);
+
+            // Step 1: Locate the "myTeam":[{ ... }] block
+            string myTeamStartKey = "\"myTeam\":[";
+            int startIndex = currentChampSelect[1].IndexOf(myTeamStartKey);
+            if (startIndex == -1)
+            {
+                // Debug.WriteLine("myTeam not found.");
+                return true;
+            }
+
+            int teamDataStart = currentChampSelect[1].IndexOf("[{", startIndex);
+            int teamDataEnd = currentChampSelect[1].IndexOf("}]", teamDataStart);
+            if (teamDataStart == -1 || teamDataEnd == -1)
+            {
+                // Debug.WriteLine("Invalid myTeam block.");
+                return true;
+            }
+            
+            string myTeamBlock = currentChampSelect[1].Substring(teamDataStart + 1, teamDataEnd - teamDataStart); // Include inner objects only
+
+            // Step 2: Split objects (players) using '{' as a separator
+            string[] players = myTeamBlock.Split(new string[] { "{" }, StringSplitOptions.RemoveEmptyEntries);
+
+            string assignedPosition = "";
+            foreach (var player in players)
+            {
+                string cleanPlayer = player.Replace("}", ""); // Remove trailing }
+
+                if (cleanPlayer.Contains("\"cellId\":" + localPlayerCellId + ","))
+                {
+                    string[] lines = cleanPlayer.Split(',');
+                    foreach (var line in lines)
+                    {
+                        if (line.Contains("\"assignedPosition\""))
+                        {
+                            string[] parts = line.Split(':');
+                            assignedPosition = parts[1].Trim('"');
+                        }
+                    }
+                }
+            }
+            // Debug.WriteLine("**Assigned Position = " + assignedPosition);
+
+            if (string.Equals(firstPositionPreference, assignedPosition, StringComparison.OrdinalIgnoreCase))
+            {
+                // Debug.WriteLine("Primary " + assignedPosition + " position detected, assigning " + Settings.currentChamp[0]);
+                return true;
+            }
+            if (string.Equals(secondPositionPreference, assignedPosition, StringComparison.OrdinalIgnoreCase))
+            {
+                // Debug.WriteLine("Secondary " + assignedPosition + " position detected, assigning " + Settings.secondaryChamp[0]);
+                return false;
+            }
+            // Debug.WriteLine("Position doesn't match with primary or secondary role\n - Defaulting main champ: " + Settings.currentChamp[0]);
+            return true;
+        }
+
+
         private static void handleChampSelectChat(string chatId)
         {
             string[] chats = LCU.clientRequest("GET", "lol-chat/v1/conversations", "");
@@ -295,7 +364,8 @@ namespace Leauge_Auto_Accept
 
                 if (ActCctorCellId == localPlayerCellId && ActCompleted == "false" && ActType == "pick")
                 {
-                    handlePickAction(actId, championId, ActIsInProgress, currentChampSelect);
+                    bool usePrimaryChamp = handleChampPositionPreferences(currentChampSelect, localPlayerCellId);
+                    handlePickAction(actId, championId, ActIsInProgress, currentChampSelect, usePrimaryChamp);
                 }
                 else if (ActCctorCellId == localPlayerCellId && ActCompleted == "false" && ActType == "ban")
                 {
@@ -304,7 +374,7 @@ namespace Leauge_Auto_Accept
             }
         }
 
-        private static void handlePickAction(string actId, string championId, string ActIsInProgress, string[] currentChampSelect)
+        private static void handlePickAction(string actId, string championId, string ActIsInProgress, string[] currentChampSelect, bool usingPrimaryChamp)
         {
             if (!pickedChamp)
             {
@@ -316,14 +386,7 @@ namespace Leauge_Auto_Accept
                     || champSelectPhase != "PLANNING" // Check if it's even planning phase at all
                     || Settings.instantHover) // Check if instahover setting is on
                 {
-                    // Try first choice
-                    hoverChampion(actId, Settings.currentChamp[1], "pick");
-
-                    // If first choice didn't work (pickedChamp is still false), try second choice
-                    if (!pickedChamp)
-                    {
-                        hoverChampion(actId, Settings.secondaryChamp[1], "pick");
-                    }
+                    hoverChampion(actId, usingPrimaryChamp ? Settings.currentChamp[1] : Settings.secondaryChamp[1], "pick");
                 }
             }
 
@@ -458,7 +521,7 @@ namespace Leauge_Auto_Accept
                 lockChampion(actId, championId, actType);
             }
         }
-        
+
         private static void handlePickOrderSwap()
         {
             // Return if we already locked in or if the settings is off

@@ -204,7 +204,7 @@ namespace Leauge_Auto_Accept
             {
                 if (champ.name.ToLower().Contains(Navigation.currentInput.ToLower()))
                 {
-                    if (UI.currentChampPicker == 0)
+                    if (UI.currentChampPicker == 0 || UI.currentChampPicker == 2)
                     {
                         if (!champ.free)
                         {

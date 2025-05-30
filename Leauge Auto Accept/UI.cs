@@ -181,7 +181,7 @@ namespace Leauge_Auto_Accept
 
             // Define options
             string[] optionName = {
-                "Select a champion",
+                "Select primary champion",
                 "Select secondary champion",
                 "Select a ban",
                 "Select summoner spell 1",
