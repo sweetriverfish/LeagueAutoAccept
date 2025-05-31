@@ -156,7 +156,7 @@ namespace Leauge_Auto_Accept
             showCursor = false;
             topPad = SizeHandler.HeightCenter - 1;
             leftPad = SizeHandler.WidthCenter - 25;
-            maxPos = 9;
+            maxPos = 11;
 
             Console.Clear();
 
@@ -181,8 +181,10 @@ namespace Leauge_Auto_Accept
 
             // Define options
             string[] optionName = {
-                "Select a champion",
+                "Select primary champion",
+                " Primary backup champion",
                 "Select secondary champion",
+                " Secondary backup champion",
                 "Select a ban",
                 "Select summoner spell 1",
                 "Select summoner spell 2",
@@ -191,7 +193,9 @@ namespace Leauge_Auto_Accept
             };
             string[] optionValue = {
                 Settings.currentChamp[0],
+                Settings.currentBackupChamp[0],
                 Settings.secondaryChamp[0],
+                Settings.secondaryBackupChamp[0],
                 Settings.currentBan[0],
                 Settings.currentSpell1[0],
                 Settings.currentSpell2[0],
@@ -206,8 +210,8 @@ namespace Leauge_Auto_Accept
             }
 
             // Print the two bottom buttons that are not actaul settings
-            Print.printWhenPossible("Info", SizeHandler.HeightCenter + 7, leftPad + 43);
-            Print.printWhenPossible("Settings", SizeHandler.HeightCenter + 7, leftPad + 3);
+            Print.printWhenPossible("Info", SizeHandler.HeightCenter + 9, leftPad + 43);
+            Print.printWhenPossible("Settings", SizeHandler.HeightCenter + 9, leftPad + 3);
 
 
             Print.printWhenPossible("v" + Updater.appVersion, SizeHandler.WindowHeight - 1, 0, false);
@@ -219,7 +223,7 @@ namespace Leauge_Auto_Accept
 
         public static void toggleAutoAcceptSettingUI()
         {
-            Print.printWhenPossible(MainLogic.isAutoAcceptOn ? ". Enabled" : " Disabled", topPad + 6, leftPad + 38);
+            Print.printWhenPossible(MainLogic.isAutoAcceptOn ? ". Enabled" : " Disabled", topPad + 8, leftPad + 38);
         }
 
         public static void settingsMenu()
@@ -536,7 +540,7 @@ namespace Leauge_Auto_Accept
             {
                 champsFiltered.Add(new itemList() { name = "Unselected", id = "0" });
             }
-            if (currentChampPicker == 1)
+            if (currentChampPicker == 4)
             {
                 if ("none".Contains(Navigation.currentInput.ToLower()))
                 {
@@ -548,7 +552,7 @@ namespace Leauge_Auto_Accept
                 if (champ.name.ToLower().Contains(Navigation.currentInput.ToLower()))
                 {
                     // Make sure the champ is free or if it's for a ban before adding it to the list
-                    if (champ.free || currentChampPicker == 1)
+                    if (champ.free || currentChampPicker == 4)
                     {
                         champsFiltered.Add(new itemList() { name = champ.name, id = champ.id });
                     }

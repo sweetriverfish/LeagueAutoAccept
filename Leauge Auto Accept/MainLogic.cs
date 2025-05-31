@@ -1,4 +1,5 @@
-﻿﻿using System;
+﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
@@ -151,6 +152,7 @@ namespace Leauge_Auto_Accept
             lastPhase = phase;
         }
 
+
         private static void handleChampSelect()
         {
             // Get data for the current ongoing champ select
@@ -158,7 +160,7 @@ namespace Leauge_Auto_Accept
 
             if (currentChampSelect[0] == "200")
             {
-                // Get needed data from the current champ select
+                // Get needed data from the current champ select 
                 string currentChatRoom = currentChampSelect[1].Split("multiUserChatId\":\"")[1].Split('"')[0];
                 if (lastChatRoom != currentChatRoom || lastChatRoom == "")
                 {
@@ -242,6 +244,53 @@ namespace Leauge_Auto_Accept
             }
         }
 
+
+        // Check player's assigned position and adjust champion pick to primary (true) or secondary (false)
+        private static bool handleChampPositionPreferences(string[] currentChampSelect, string localPlayerCellId)
+        {
+            string[] lobbySession = LCU.clientRequest("GET", "lol-lobby/v2/lobby");
+            string firstPositionPreference = lobbySession[1].Split("firstPositionPreference\":")[1].Split(',')[0].Trim('"').ToLower();
+            string secondPositionPreference = lobbySession[1].Split("secondPositionPreference\":")[1].Split(',')[0].Trim('"').ToLower();
+
+            // Locate the "myTeam":[{ ... }] block
+            int startIndex = currentChampSelect[1].IndexOf("\"myTeam\":[");
+            if (startIndex == -1) return true;
+
+            int teamDataStart = currentChampSelect[1].IndexOf("[{", startIndex);
+            int teamDataEnd = currentChampSelect[1].IndexOf("}]", teamDataStart);
+            if (teamDataStart == -1 || teamDataEnd == -1) return true;
+            
+            string myTeam = currentChampSelect[1].Substring(teamDataStart + 1, teamDataEnd - teamDataStart);
+
+            // Split objects (players) using '{' as a separator
+            string[] players = myTeam.Split(new string[] { "{" }, StringSplitOptions.RemoveEmptyEntries);
+
+            string assignedPosition = "";
+            foreach (var player in players)
+            {
+                // Match the cell IDs
+                if (player.Contains("\"cellId\":" + localPlayerCellId + ","))
+                {
+                    string[] lines = player.Split(',');
+                    foreach (var line in lines)
+                    {
+                        // Extract the assigned position
+                        if (line.Contains("\"assignedPosition\""))
+                        {
+                            string[] parts = line.Split(':');
+                            assignedPosition = parts[1].Trim('"');
+                        }
+                    }
+                }
+            }
+            
+            if (firstPositionPreference == assignedPosition) return true;
+            if (secondPositionPreference == assignedPosition) return false;
+            
+            return true;
+        }
+
+
         private static void handleChampSelectChat(string chatId)
         {
             string[] chats = LCU.clientRequest("GET", "lol-chat/v1/conversations", "");
@@ -280,6 +329,9 @@ namespace Leauge_Auto_Accept
 
         private static void handleChampSelectActions(string[] currentChampSelect, string localPlayerCellId)
         {
+            // This logic skips modes that aren't draft
+            if (!currentChampSelect[1].Contains("actions\":[[{")) return;
+
             string csActs = currentChampSelect[1].Split("actions\":[[{")[1].Split("}]],")[0];
             csActs = csActs.Replace("}],[{", "},{");
             string[] csActsArr = csActs.Split("},{");
@@ -295,7 +347,8 @@ namespace Leauge_Auto_Accept
 
                 if (ActCctorCellId == localPlayerCellId && ActCompleted == "false" && ActType == "pick")
                 {
-                    handlePickAction(actId, championId, ActIsInProgress, currentChampSelect);
+                    bool usePrimaryChamp = handleChampPositionPreferences(currentChampSelect, localPlayerCellId);
+                    handlePickAction(actId, championId, ActIsInProgress, currentChampSelect, usePrimaryChamp);
                 }
                 else if (ActCctorCellId == localPlayerCellId && ActCompleted == "false" && ActType == "ban")
                 {
@@ -304,7 +357,7 @@ namespace Leauge_Auto_Accept
             }
         }
 
-        private static void handlePickAction(string actId, string championId, string ActIsInProgress, string[] currentChampSelect)
+        private static void handlePickAction(string actId, string championId, string ActIsInProgress, string[] currentChampSelect, bool usePrimaryChamp)
         {
             if (!pickedChamp)
             {
@@ -316,15 +369,16 @@ namespace Leauge_Auto_Accept
                     || champSelectPhase != "PLANNING" // Check if it's even planning phase at all
                     || Settings.instantHover) // Check if instahover setting is on
                 {
-                    // Try first choice
-                    hoverChampion(actId, Settings.currentChamp[1], "pick");
+                    // Try first choice based on player is assigned primary or secondary role
+                    hoverChampion(actId, usePrimaryChamp ? Settings.currentChamp[1] : Settings.secondaryChamp[1], "pick");
 
                     // If first choice didn't work (pickedChamp is still false), try second choice
                     if (!pickedChamp)
                     {
-                        hoverChampion(actId, Settings.secondaryChamp[1], "pick");
+                        hoverChampion(actId, usePrimaryChamp ? Settings.currentBackupChamp[1] : Settings.secondaryBackupChamp[1], "pick");
                     }
                 }
+
             }
 
             if (ActIsInProgress == "true")
@@ -458,7 +512,7 @@ namespace Leauge_Auto_Accept
                 lockChampion(actId, championId, actType);
             }
         }
-        
+
         private static void handlePickOrderSwap()
         {
             // Return if we already locked in or if the settings is off

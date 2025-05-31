@@ -397,18 +397,18 @@ namespace Leauge_Auto_Accept
             {
                 int positionLeft = 0;
                 int positionTop = 0;
-                if (UI.currentWindow == "mainScreen" && consolePosLast > 6)
+                if (UI.currentWindow == "mainScreen" && consolePosLast > 8)
                 {
                     // Handles the weird main menu navigation
-                    if (consolePosLast == 7)
+                    if (consolePosLast == 9)
                     {
                         positionLeft = UI.leftPad;
-                        positionTop = SizeHandler.HeightCenter + 7;
+                        positionTop = SizeHandler.HeightCenter + 9;
                     }
-                    else if (consolePosLast == 8)
+                    else if (consolePosLast == 10)
                     {
                         positionLeft = UI.leftPad + 40;
-                        positionTop = SizeHandler.HeightCenter + 7;
+                        positionTop = SizeHandler.HeightCenter + 9;
                     }
                 }
                 else if (UI.currentWindow == "exitMenu" && consolePosLast == 1)
@@ -451,18 +451,18 @@ namespace Leauge_Auto_Accept
                     lastPosMainNav = currentPos;
                 }
 
-                if (UI.currentWindow == "mainScreen" && currentPos > 6)
+                if (UI.currentWindow == "mainScreen" && currentPos > 8)
                 {
                     // Handles the weird main menu navigation
-                    if (currentPos == 7)
+                    if (currentPos == 9)
                     {
                         positionLeft = UI.leftPad;
-                        positionTop = SizeHandler.HeightCenter + 7;
+                        positionTop = SizeHandler.HeightCenter + 9;
                     }
-                    else if (currentPos == 8)
+                    else if (currentPos == 10)
                     {
                         positionLeft = UI.leftPad + 40;
-                        positionTop = SizeHandler.HeightCenter + 7;
+                        positionTop = SizeHandler.HeightCenter + 9;
                     }
                 }
                 else if (UI.currentWindow == "exitMenu" && currentPos == 1)
@@ -581,32 +581,40 @@ namespace Leauge_Auto_Accept
                     UI.champSelector();
                     break;
                 case 1:
-                    UI.currentChampPicker = 2;  // New value for secondary champ
-                    UI.champSelector();
-                    break;
-                case 2:
                     UI.currentChampPicker = 1;
                     UI.champSelector();
                     break;
+                case 2:
+                    UI.currentChampPicker = 2;
+                    UI.champSelector();
+                    break;
                 case 3:
+                    UI.currentChampPicker = 3;
+                    UI.champSelector();
+                    break;
+                case 4:
+                    UI.currentChampPicker = 4;
+                    UI.champSelector();
+                    break;
+                case 5:
                     UI.currentSpellSlot = 0;
                     UI.spellSelector();
                     break;
-                case 4:
+                case 6:
                     UI.currentSpellSlot = 1;
                     UI.spellSelector();
                     break;
-                case 5:
+                case 7:
                     UI.chatMessagesWindow();
                     break;
-                case 6:
+                case 8:
                     Settings.toggleAutoAcceptSetting();
                     UI.toggleAutoAcceptSettingUI();
                     break;
-                case 7:
+                case 9:
                     UI.settingsMenu();
                     break;
-                case 8:
+                case 10:
                     UI.infoMenu();
                     break;
             }
