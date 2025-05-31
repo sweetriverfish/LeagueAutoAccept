@@ -17,9 +17,13 @@ namespace Leauge_Auto_Accept
         {
             Version appVersionTmp = Assembly.GetExecutingAssembly().GetName().Version;
             appVersion = appVersionTmp.Major + "." + appVersionTmp.Minor;
-            if (!Settings.disableUpdateCheck)
+            
+            if (!Debugger.IsAttached)
             {
-                versionCheck();
+                if (!Settings.disableUpdateCheck)
+                {
+                    versionCheck();
+                }
             }
         }
 
