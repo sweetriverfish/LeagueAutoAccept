@@ -8,12 +8,14 @@ namespace Leauge_Auto_Accept
     internal class Settings
     {
         public static string[] currentChamp = { "Unselected", "0" };
+        public static string[] currentBackupChamp = { "Unselected", "0" };
+        public static string[] secondaryChamp = { "Unselected", "0" };
+        public static string[] secondaryBackupChamp = { "Unselected", "0" };
         public static string[] currentBan = { "Unselected", "0" };
         public static string[] currentSpell1 = { "Unselected", "0" };
         public static string[] currentSpell2 = { "Unselected", "0" };
         public static bool chatMessagesEnabled = false;
         public static List<string> chatMessages = new List<string>();
-        public static string[] secondaryChamp = { "Unselected", "0" };
         public static bool saveSettings = false;
         public static bool preloadData = false;
         public static bool instaLock = false;
@@ -193,7 +195,7 @@ namespace Leauge_Auto_Accept
             {
                 champsFiltered.Add(new itemList() { name = "Unselected", id = "0" });
             }
-            if (UI.currentChampPicker == 1)
+            if (UI.currentChampPicker == 4)
             {
                 if ("none".Contains(Navigation.currentInput.ToLower()))
                 {
@@ -204,7 +206,7 @@ namespace Leauge_Auto_Accept
             {
                 if (champ.name.ToLower().Contains(Navigation.currentInput.ToLower()))
                 {
-                    if (UI.currentChampPicker == 0 || UI.currentChampPicker == 2)
+                    if (UI.currentChampPicker != 4)
                     {
                         if (!champ.free)
                         {
@@ -229,21 +231,30 @@ namespace Leauge_Auto_Accept
                     name = champsFiltered[Navigation.currentPos].name;
                     id = champsFiltered[Navigation.currentPos].id;
                 }
-                if (UI.currentChampPicker == 0)
+                switch (UI.currentChampPicker)
                 {
-                    currentChamp[0] = name;
-                    currentChamp[1] = id;
+                    case 0:
+                        currentChamp[0] = name;
+                        currentChamp[1] = id;
+                        break;
+                    case 1:
+                        currentBackupChamp[0] = name;
+                        currentBackupChamp[1] = id;
+                        break;
+                    case 2:
+                        secondaryChamp[0] = name;
+                        secondaryChamp[1] = id;
+                        break;
+                    case 3:
+                        secondaryBackupChamp[0] = name;
+                        secondaryBackupChamp[1] = id;
+                        break;
+                    case 4:
+                        currentBan[0] = name;
+                        currentBan[1] = id;
+                        break;
                 }
-                else if (UI.currentChampPicker == 2)  
-                {
-                    secondaryChamp[0] = name;
-                    secondaryChamp[1] = id;
-                }
-                else
-                {
-                    currentBan[0] = name;
-                    currentBan[1] = id;
-                }
+
                 if (saveSettings)
                 {
                     settingsSave();
@@ -361,8 +372,12 @@ namespace Leauge_Auto_Accept
             string config =
                 "champName:" + currentChamp[0] +
                 ",champId:" + currentChamp[1] +
+                ",champBackupName:" + currentBackupChamp[0] +
+                ",champBackupId:" + currentBackupChamp[1] +
                 ",secondaryChampName:" + secondaryChamp[0] + 
-                ",secondaryChampId:" + secondaryChamp[1] +  
+                ",secondaryChampId:" + secondaryChamp[1] +
+                ",secondaryBackupChampName:" + secondaryBackupChamp[0] +
+                ",secondaryBackupChampId:" + secondaryBackupChamp[1] +
                 ",banName:" + currentBan[0] +
                 ",banId:" + currentBan[1] +
                 ",spell1Name:" + currentSpell1[0] +
@@ -437,12 +452,24 @@ namespace Leauge_Auto_Accept
                         case "champId":
                             currentChamp[1] = columns[1];
                             break;
+                        case "champBackupName":
+                            currentBackupChamp[0] = columns[1];
+                            break;
+                        case "champBackupId":
+                            currentBackupChamp[1] = columns[1];
+                            break;
                         case "secondaryChampName":
                             secondaryChamp[0] = columns[1];
                             break;   
                         case "secondaryChampId":
                             secondaryChamp[1] = columns[1];
-                            break;    
+                            break;
+                        case "secondaryBackupChampName":
+                            secondaryBackupChamp[0] = columns[1];
+                            break;
+                        case "secondaryBackupChampId":
+                            secondaryBackupChamp[1] = columns[1];
+                            break;
                         case "banName":
                             currentBan[0] = columns[1];
                             break;
