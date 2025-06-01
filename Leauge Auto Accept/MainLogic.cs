@@ -248,7 +248,10 @@ namespace Leauge_Auto_Accept
         // Check player's assigned position and adjust champion pick to primary (true) or secondary (false)
         private static bool handleChampPositionPreferences(string[] currentChampSelect, string localPlayerCellId)
         {
+            // Check lobby endpoint for position preferences
             string[] lobbySession = LCU.clientRequest("GET", "lol-lobby/v2/lobby");
+            if (!lobbySession[1].Contains("firstPositionPreference\":") || !lobbySession[1].Contains("secondPositionPreference\":")) return true;
+
             string firstPositionPreference = lobbySession[1].Split("firstPositionPreference\":")[1].Split(',')[0].Trim('"').ToLower();
             string secondPositionPreference = lobbySession[1].Split("secondPositionPreference\":")[1].Split(',')[0].Trim('"').ToLower();
 
@@ -359,6 +362,9 @@ namespace Leauge_Auto_Accept
 
         private static void handlePickAction(string actId, string championId, string ActIsInProgress, string[] currentChampSelect, bool usePrimaryChamp)
         {
+            // Check if the hover gets cleared (by either a ban or teammate taking it)
+            if (championId == "0") pickedChamp = false;
+
             if (!pickedChamp)
             {
                 // Hover champion when champ select starts
