@@ -8,7 +8,6 @@ namespace Leauge_Auto_Accept
 {
     internal class Navigation
     {
-        public static int numOptions = 13;
         public static int currentPos = 0;
         public static int consolePosLast = 0;
         public static int searchPos = 0;
@@ -403,18 +402,18 @@ namespace Leauge_Auto_Accept
             {
                 int positionLeft = 0;
                 int positionTop = 0;
-                if (UI.currentWindow == "mainScreen" && consolePosLast >= numOptions)
+                if (UI.currentWindow == "mainScreen" && consolePosLast >= UI.numOptions)
                 {
                     // Handles the weird main menu navigation
-                    if (consolePosLast == numOptions)
+                    if (consolePosLast == UI.numOptions)
                     {
                         positionLeft = UI.leftPad;
-                        positionTop = SizeHandler.HeightCenter + numOptions;
+                        positionTop = SizeHandler.HeightCenter + UI.numOptions;
                     }
-                    else if (consolePosLast == 10)
+                    else if (consolePosLast == UI.maxPos - 1)
                     {
                         positionLeft = UI.leftPad + 40;
-                        positionTop = SizeHandler.HeightCenter + numOptions;
+                        positionTop = SizeHandler.HeightCenter + UI.numOptions;
                     }
                 }
                 else if (UI.currentWindow == "exitMenu" && consolePosLast == 1)
@@ -457,18 +456,18 @@ namespace Leauge_Auto_Accept
                     lastPosMainNav = currentPos;
                 }
 
-                if (UI.currentWindow == "mainScreen" && currentPos >= numOptions)
+                if (UI.currentWindow == "mainScreen" && currentPos >= UI.numOptions)
                 {
                     // Handles the weird main menu navigation
-                    if (currentPos == numOptions)
+                    if (currentPos == UI.numOptions)
                     {
                         positionLeft = UI.leftPad;
-                        positionTop = SizeHandler.HeightCenter + numOptions;
+                        positionTop = SizeHandler.HeightCenter + UI.numOptions;
                     }
-                    else if (currentPos == numOptions + 1)
+                    else if (currentPos == UI.numOptions + 1)
                     {
                         positionLeft = UI.leftPad + 40;
-                        positionTop = SizeHandler.HeightCenter + numOptions;
+                        positionTop = SizeHandler.HeightCenter + UI.numOptions;
                     }
                 }
                 else if (UI.currentWindow == "exitMenu" && currentPos == 1)
@@ -631,7 +630,7 @@ namespace Leauge_Auto_Accept
                     break;
                 case 12:
                     Settings.toggleAutoAcceptSetting();
-                    UI.toggleAutoAcceptSettingUI();
+                    UI.toggleAutoAcceptSettingUI(currentPos);
                     break;
                 case 13:
                     UI.settingsMenu();

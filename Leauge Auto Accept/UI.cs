@@ -7,8 +7,6 @@ namespace Leauge_Auto_Accept
     {
         public static string currentWindow = "";
         public static string previousWindow = "";
-        public static int numOptions = 13;
-
         public static int currentChampPicker = 0;
         public static int currentSpellSlot = 0;
 
@@ -24,6 +22,7 @@ namespace Leauge_Auto_Accept
         public static int columnSize = 20;
         public static int topPad = 0;
         public static int leftPad = 0;
+        public static int numOptions = 0;
         public static int maxPos = 0;
         public static int currentPage = 0;
         public static int totalPages = 0;
@@ -161,7 +160,6 @@ namespace Leauge_Auto_Accept
             showCursor = false;
             topPad = SizeHandler.HeightCenter - 1;
             leftPad = SizeHandler.WidthCenter - 25;
-            maxPos = 11;
 
             Console.Clear();
 
@@ -216,6 +214,9 @@ namespace Leauge_Auto_Accept
                 MainLogic.isAutoAcceptOn ? "Enabled" : "Disabled"
             };
 
+            numOptions = optionName.Length;
+            maxPos = numOptions + 2; //Settings + Info
+
             // Print options
             for (int i = 0; i < optionName.Length; i++)
             {
@@ -234,9 +235,9 @@ namespace Leauge_Auto_Accept
             Print.canMovePos = true;
         }
 
-        public static void toggleAutoAcceptSettingUI()
+        public static void toggleAutoAcceptSettingUI(int pos)
         {
-            Print.printWhenPossible(MainLogic.isAutoAcceptOn ? ". Enabled" : " Disabled", topPad + 8, leftPad + 38);
+            Print.printWhenPossible(MainLogic.isAutoAcceptOn ? ". Enabled" : " Disabled", topPad + pos, leftPad + 38);
         }
 
         public static void settingsMenu()
