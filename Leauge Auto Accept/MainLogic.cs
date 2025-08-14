@@ -13,6 +13,7 @@ namespace Leauge_Auto_Accept
         private static bool lockedChamp = false;
         private static bool pickedBan = false;
         private static bool lockedBan = false;
+        private static bool pickedRunes = false;
         private static bool pickedSpell1 = false;
         private static bool pickedSpell2 = false;
         private static bool sentChatMessages = false;
@@ -169,6 +170,7 @@ namespace Leauge_Auto_Accept
                     lockedChamp = false;
                     pickedBan = false;
                     lockedBan = false;
+                    pickedRunes = false;
                     pickedSpell1 = false;
                     pickedSpell2 = false;
                     sentChatMessages = false;
@@ -195,6 +197,10 @@ namespace Leauge_Auto_Accept
                     {
                         pickedBan = true;
                         lockedBan = true;
+                    }
+                    if (Settings.currentChampRunes[1] == "0")
+                    {
+                        pickedRunes = true;
                     }
                     if (Settings.currentSpell1[1] == "0")
                     {
@@ -377,11 +383,13 @@ namespace Leauge_Auto_Accept
                 {
                     // Try first choice based on player is assigned primary or secondary role
                     hoverChampion(actId, usePrimaryChamp ? Settings.currentChamp[1] : Settings.secondaryChamp[1], "pick");
+                    handleRunes(usePrimaryChamp ? Settings.currentChampRunes[1] : Settings.secondaryChampRunes[1]);
 
                     // If first choice didn't work (pickedChamp is still false), try second choice
                     if (!pickedChamp)
                     {
                         hoverChampion(actId, usePrimaryChamp ? Settings.currentBackupChamp[1] : Settings.secondaryBackupChamp[1], "pick");
+                        handleRunes(usePrimaryChamp ? Settings.currentBackupChampRunes[1] : Settings.secondaryBackupChampRunes[1]);
                     }
                 }
 
@@ -463,6 +471,15 @@ namespace Leauge_Auto_Accept
                 {
                     pickedBan = true;
                 }
+            }
+        }
+
+        private static void handleRunes(string currentRunes)
+        {
+            string[] runeSelectAction = LCU.clientRequest("PUT", "lol-perks/v1/currentpage", currentRunes);
+            if (runeSelectAction[0] == "201")
+            {
+                pickedRunes = true;
             }
         }
 

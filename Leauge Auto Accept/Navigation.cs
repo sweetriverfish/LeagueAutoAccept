@@ -8,6 +8,7 @@ namespace Leauge_Auto_Accept
 {
     internal class Navigation
     {
+        public static int numOptions = 13;
         public static int currentPos = 0;
         public static int consolePosLast = 0;
         public static int searchPos = 0;
@@ -310,6 +311,7 @@ namespace Leauge_Auto_Accept
                     break;
                 case "champSelector":
                 case "spellSelector":
+                case "runeSelector":
                     if (currentInput != "Lochel")
                     {
                         if (UI.currentWindow == "champSelector")
@@ -319,6 +321,10 @@ namespace Leauge_Auto_Accept
                         else if (UI.currentWindow == "spellSelector")
                         {
                             Settings.saveSelectedSpell();
+                        }
+                        else if (UI.currentWindow == "runeSelector")
+                        {
+                            Settings.saveSelectedRune();
                         }
                         UI.mainScreen();
                     }
@@ -335,7 +341,7 @@ namespace Leauge_Auto_Accept
 
         private static void handleInputBackspace()
         {
-            if (UI.currentWindow == "champSelector" || UI.currentWindow == "spellSelector")
+            if (UI.currentWindow == "champSelector" || UI.currentWindow == "spellSelector" || UI.currentWindow == "runeSelector")
             {
                 if (currentInput.Length > 0)
                 {
@@ -360,7 +366,7 @@ namespace Leauge_Auto_Accept
 
         private static void handleInput(char key)
         {
-            if (UI.currentWindow == "champSelector" || UI.currentWindow == "spellSelector")
+            if (UI.currentWindow == "champSelector" || UI.currentWindow == "spellSelector"|| UI.currentWindow == "runeSelector")
             {
                 if (currentInput.Length < 100)
                 {
@@ -397,18 +403,18 @@ namespace Leauge_Auto_Accept
             {
                 int positionLeft = 0;
                 int positionTop = 0;
-                if (UI.currentWindow == "mainScreen" && consolePosLast > 8)
+                if (UI.currentWindow == "mainScreen" && consolePosLast >= numOptions)
                 {
                     // Handles the weird main menu navigation
-                    if (consolePosLast == 9)
+                    if (consolePosLast == numOptions)
                     {
                         positionLeft = UI.leftPad;
-                        positionTop = SizeHandler.HeightCenter + 9;
+                        positionTop = SizeHandler.HeightCenter + numOptions;
                     }
                     else if (consolePosLast == 10)
                     {
                         positionLeft = UI.leftPad + 40;
-                        positionTop = SizeHandler.HeightCenter + 9;
+                        positionTop = SizeHandler.HeightCenter + numOptions;
                     }
                 }
                 else if (UI.currentWindow == "exitMenu" && consolePosLast == 1)
@@ -451,18 +457,18 @@ namespace Leauge_Auto_Accept
                     lastPosMainNav = currentPos;
                 }
 
-                if (UI.currentWindow == "mainScreen" && currentPos > 8)
+                if (UI.currentWindow == "mainScreen" && currentPos >= numOptions)
                 {
                     // Handles the weird main menu navigation
-                    if (currentPos == 9)
+                    if (currentPos == numOptions)
                     {
                         positionLeft = UI.leftPad;
-                        positionTop = SizeHandler.HeightCenter + 9;
+                        positionTop = SizeHandler.HeightCenter + numOptions;
                     }
-                    else if (currentPos == 10)
+                    else if (currentPos == numOptions + 1)
                     {
                         positionLeft = UI.leftPad + 40;
-                        positionTop = SizeHandler.HeightCenter + 9;
+                        positionTop = SizeHandler.HeightCenter + numOptions;
                     }
                 }
                 else if (UI.currentWindow == "exitMenu" && currentPos == 1)
@@ -581,40 +587,56 @@ namespace Leauge_Auto_Accept
                     UI.champSelector();
                     break;
                 case 1:
+                    UI.currentChampPicker = 0;
+                    UI.runeSelector();
+                    break;
+                case 2:
                     UI.currentChampPicker = 1;
                     UI.champSelector();
                     break;
-                case 2:
+                case 3:
+                    UI.currentChampPicker = 1;
+                    UI.runeSelector();
+                    break;
+                case 4:
                     UI.currentChampPicker = 2;
                     UI.champSelector();
                     break;
-                case 3:
+                case 5:
+                    UI.currentChampPicker = 2;
+                    UI.runeSelector();
+                    break;
+                case 6:
                     UI.currentChampPicker = 3;
                     UI.champSelector();
                     break;
-                case 4:
+                case 7:
+                    UI.currentChampPicker = 3;
+                    UI.runeSelector();
+                    break;
+                case 8:
                     UI.currentChampPicker = 4;
                     UI.champSelector();
                     break;
-                case 5:
+                case 9:
                     UI.currentSpellSlot = 0;
                     UI.spellSelector();
                     break;
-                case 6:
+                case 10:
                     UI.currentSpellSlot = 1;
                     UI.spellSelector();
                     break;
-                case 7:
+                case 11:
                     UI.chatMessagesWindow();
                     break;
-                case 8:
+                case 12:
                     Settings.toggleAutoAcceptSetting();
                     UI.toggleAutoAcceptSettingUI();
                     break;
-                case 9:
+                case 13:
                     UI.settingsMenu();
                     break;
-                case 10:
+                case 14:
                     UI.infoMenu();
                     break;
             }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text.Json;
 
 namespace Leauge_Auto_Accept
 {
@@ -14,7 +15,8 @@ namespace Leauge_Auto_Accept
 
     internal class Data
     {
-        public static List<itemList> champsSorterd = new List<itemList>();
+        public static List<itemList> champsSorted = new List<itemList>();
+        public static List<itemList> runesList = new List<itemList>();
         public static List<itemList> spellsSorted = new List<itemList>();
 
         public static string currentSummonerId = "";
@@ -42,7 +44,7 @@ namespace Leauge_Auto_Accept
         {
             Console.Clear();
 
-            if (!champsSorterd.Any())
+            if (!champsSorted.Any())
             {
                 loadSummonerId();
 
@@ -88,10 +90,42 @@ namespace Leauge_Auto_Accept
                 }
 
                 // Sort alphabetically
-                champsSorterd = champs.OrderBy(o => o.name).ToList();
+                champsSorted = champs.OrderBy(o => o.name).ToList();
             }
 
             SizeHandler.resizeBasedOnChampsCount();
+            Console.Clear();
+        }
+
+        public static void loadRunesList()
+        {
+            Console.Clear();
+
+            if (!runesList.Any())
+            {
+                loadSummonerId();
+
+                List<itemList> list = new List<itemList>();
+
+                Print.printCentered("Getting runes list...", 15);
+                string[] runesResponse = LCU.clientRequestUntilSuccess("GET", "lol-perks/v1/pages");
+                Console.Clear();
+                using JsonDocument runesJSON = JsonDocument.Parse(runesResponse[1]);
+                Debug.WriteLine(runesJSON);
+
+                foreach (JsonElement rune in runesJSON.RootElement.EnumerateArray())
+                {
+                    string runeName = rune.GetProperty("name").GetString();
+                    string runeId = rune.GetProperty("id").GetInt32().ToString();
+
+                    
+                    list.Add(new itemList() { name = runeName, id = runeId, free = true });
+                }
+
+                // Sort alphabetically
+                runesList = list;
+            }
+
             Console.Clear();
         }
 
