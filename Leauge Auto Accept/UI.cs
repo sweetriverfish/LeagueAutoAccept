@@ -545,7 +545,6 @@ namespace Leauge_Auto_Accept
 
             topPad = 0;
             leftPad = 0;
-            maxPos = totalChamps;
 
             Console.SetCursorPosition(0, 0);
 
@@ -574,6 +573,7 @@ namespace Leauge_Auto_Accept
             }
 
             totalChamps = champsFiltered.Count;
+            maxPos = totalChamps;
 
             int currentRow = 0;
             string[] champsOutput = new string[totalRows];
@@ -639,7 +639,6 @@ namespace Leauge_Auto_Accept
 
             topPad = 0;
             leftPad = 0;
-            maxPos = totalRunes;
 
             Console.SetCursorPosition(0, 0);
 
@@ -657,6 +656,7 @@ namespace Leauge_Auto_Accept
             }
 
             totalRunes = runesFiltered.Count;
+            maxPos = totalRunes;
 
             int currentRow = 0;
             string[] runeoutput = new string[totalRows];
@@ -722,7 +722,6 @@ namespace Leauge_Auto_Accept
 
             topPad = 0;
             leftPad = 0;
-            maxPos = totalSpells;
 
             Console.SetCursorPosition(0, 0);
 
@@ -740,6 +739,7 @@ namespace Leauge_Auto_Accept
             }
 
             totalSpells = spellsFiltered.Count;
+            maxPos = totalSpells;
 
             int currentRow = 0;
             string[] spelloutput = new string[totalRows];
