@@ -7,11 +7,11 @@ namespace Leauge_Auto_Accept
     {
         public static string currentWindow = "";
         public static string previousWindow = "";
-
         public static int currentChampPicker = 0;
         public static int currentSpellSlot = 0;
 
         public static int totalChamps = 0;
+        public static int totalRunes = 0;
         public static int totalSpells = 0;
 
         // normal/+grid/pages/nocursor/messageEdit
@@ -22,6 +22,7 @@ namespace Leauge_Auto_Accept
         public static int columnSize = 20;
         public static int topPad = 0;
         public static int leftPad = 0;
+        public static int numOptions = 0;
         public static int maxPos = 0;
         public static int currentPage = 0;
         public static int totalPages = 0;
@@ -133,6 +134,9 @@ namespace Leauge_Auto_Accept
                 case "champSelector":
                     champSelector();
                     break;
+                case "runeSelector":
+                    runeSelector();
+                    break;
                 case "spellSelector":
                     spellSelector();
                     break;
@@ -156,7 +160,6 @@ namespace Leauge_Auto_Accept
             showCursor = false;
             topPad = SizeHandler.HeightCenter - 1;
             leftPad = SizeHandler.WidthCenter - 25;
-            maxPos = 11;
 
             Console.Clear();
 
@@ -182,9 +185,13 @@ namespace Leauge_Auto_Accept
             // Define options
             string[] optionName = {
                 "Select primary champion",
-                " Primary backup champion",
+                " Runes",
+                "Primary backup champion",
+                " Runes",
                 "Select secondary champion",
-                " Secondary backup champion",
+                " Runes",
+                "Secondary backup champion",
+                " Runes",
                 "Select a ban",
                 "Select summoner spell 1",
                 "Select summoner spell 2",
@@ -193,15 +200,22 @@ namespace Leauge_Auto_Accept
             };
             string[] optionValue = {
                 Settings.currentChamp[0],
+                Settings.currentChampRunes[0],
                 Settings.currentBackupChamp[0],
+                Settings.currentBackupChampRunes[0],
                 Settings.secondaryChamp[0],
+                Settings.secondaryChampRunes[0],
                 Settings.secondaryBackupChamp[0],
+                Settings.secondaryBackupChampRunes[0],
                 Settings.currentBan[0],
                 Settings.currentSpell1[0],
                 Settings.currentSpell2[0],
                 Settings.chatMessagesEnabled ? "Enabled, " + Settings.chatMessages.Count : "Disabled",
                 MainLogic.isAutoAcceptOn ? "Enabled" : "Disabled"
             };
+
+            numOptions = optionName.Length;
+            maxPos = numOptions + 2; //Settings + Info
 
             // Print options
             for (int i = 0; i < optionName.Length; i++)
@@ -210,8 +224,8 @@ namespace Leauge_Auto_Accept
             }
 
             // Print the two bottom buttons that are not actaul settings
-            Print.printWhenPossible("Info", SizeHandler.HeightCenter + 9, leftPad + 43);
-            Print.printWhenPossible("Settings", SizeHandler.HeightCenter + 9, leftPad + 3);
+            Print.printWhenPossible("Info", SizeHandler.HeightCenter + numOptions, leftPad + 43);
+            Print.printWhenPossible("Settings", SizeHandler.HeightCenter + numOptions, leftPad + 3);
 
 
             Print.printWhenPossible("v" + Updater.appVersion, SizeHandler.WindowHeight - 1, 0, false);
@@ -221,9 +235,9 @@ namespace Leauge_Auto_Accept
             Print.canMovePos = true;
         }
 
-        public static void toggleAutoAcceptSettingUI()
+        public static void toggleAutoAcceptSettingUI(int pos)
         {
-            Print.printWhenPossible(MainLogic.isAutoAcceptOn ? ". Enabled" : " Disabled", topPad + 8, leftPad + 38);
+            Print.printWhenPossible(MainLogic.isAutoAcceptOn ? ". Enabled" : " Disabled", topPad + pos, leftPad + 38);
         }
 
         public static void settingsMenu()
@@ -531,7 +545,6 @@ namespace Leauge_Auto_Accept
 
             topPad = 0;
             leftPad = 0;
-            maxPos = totalChamps;
 
             Console.SetCursorPosition(0, 0);
 
@@ -547,7 +560,7 @@ namespace Leauge_Auto_Accept
                     champsFiltered.Add(new itemList() { name = "None", id = "-1" });
                 }
             }
-            foreach (var champ in Data.champsSorterd)
+            foreach (var champ in Data.champsSorted)
             {
                 if (champ.name.ToLower().Contains(Navigation.currentInput.ToLower()))
                 {
@@ -560,6 +573,7 @@ namespace Leauge_Auto_Accept
             }
 
             totalChamps = champsFiltered.Count;
+            maxPos = totalChamps;
 
             int currentRow = 0;
             string[] champsOutput = new string[totalRows];
@@ -579,6 +593,89 @@ namespace Leauge_Auto_Accept
             }
 
             foreach (var line in champsOutput)
+            {
+                string lineNew;
+                if (line != null)
+                {
+                    lineNew = line.Remove(line.Length - 1);
+                    lineNew = lineNew.PadRight(119, ' ');
+                }
+                else
+                {
+                    lineNew = "".PadRight(119, ' ');
+                }
+                Print.printWhenPossible(lineNew);
+            }
+            Navigation.handlePointerMovementPrint();
+            Print.canMovePos = true;
+            displayCursorIfNeeded();
+        }
+
+        public static void runeSelector()
+        {
+            Print.canMovePos = false;
+
+            totalRows = SizeHandler.WindowHeight - 2;
+
+            currentWindow = "runeSelector";
+            windowType = "grid";
+            showCursor = false;
+
+            Navigation.currentInput = "";
+
+            Console.Clear();
+
+            Data.loadRunesList();
+
+            displayRunes();
+            updateCurrentFilter();
+        }
+
+        private static void displayRunes()
+        {
+            Console.CursorVisible = false;
+            Navigation.currentPos = 0;
+            Navigation.consolePosLast = 0;
+
+            topPad = 0;
+            leftPad = 0;
+
+            Console.SetCursorPosition(0, 0);
+
+            List<itemList> runesFiltered = new List<itemList>();
+            if ("unselected".Contains(Navigation.currentInput.ToLower()))
+            {
+                runesFiltered.Add(new itemList() { name = "Unselected", id = "0" });
+            }
+            foreach (var rune in Data.runesList)
+            {
+                if (rune.name.ToLower().Contains(Navigation.currentInput.ToLower()))
+                {
+                    runesFiltered.Add(new itemList() { name = rune.name, id = rune.id });
+                }
+            }
+
+            totalRunes = runesFiltered.Count;
+            maxPos = totalRunes;
+
+            int currentRow = 0;
+            string[] runeoutput = new string[totalRows];
+
+            foreach (var rune in runesFiltered)
+            {
+                string line = "   " + rune.name;
+                line = line.PadRight(columnSize, ' ');
+
+                runeoutput[currentRow] += line;
+
+                currentRow++;
+                if (currentRow >= totalRows)
+                {
+                    currentRow = 0;
+                }
+            }
+
+            foreach (var line in runeoutput)
             {
                 string lineNew;
                 if (line != null)
@@ -625,7 +722,6 @@ namespace Leauge_Auto_Accept
 
             topPad = 0;
             leftPad = 0;
-            maxPos = totalSpells;
 
             Console.SetCursorPosition(0, 0);
 
@@ -643,6 +739,7 @@ namespace Leauge_Auto_Accept
             }
 
             totalSpells = spellsFiltered.Count;
+            maxPos = totalSpells;
 
             int currentRow = 0;
             string[] spelloutput = new string[totalRows];
@@ -691,6 +788,10 @@ namespace Leauge_Auto_Accept
             {
                 displaySpells();
             }
+             else if (currentWindow == "runeSelector")
+            {
+                displayRunes();
+            }
 
             Navigation.currentPos = 0;
             Console.CursorVisible = false;
@@ -733,6 +834,24 @@ namespace Leauge_Auto_Accept
             int firstStringLength = firstString.Length + 1;
             int secondStringLength = secondString.Length + 1;
             int dotsCount = totalLength - firstStringLength - secondStringLength;
+
+            // Make sure there's a minimum of 2 dots
+            if (dotsCount < 2)
+            {
+                int allowedLength = totalLength - firstStringLength - 3;
+
+                if (allowedLength < 0)
+                {
+                    allowedLength = 0; // avoid negative substring length
+                }
+
+                if (secondString.Length > allowedLength)
+                {
+                    secondString = secondString.Substring(0, allowedLength) + "~";
+                }
+
+                dotsCount = 2;
+            }
 
             return firstString + " " + new string('.', dotsCount) + " " + secondString;
         }
