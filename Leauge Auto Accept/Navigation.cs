@@ -421,23 +421,23 @@ namespace Leauge_Auto_Accept
             {
                 int positionLeft = 0;
                 int positionTop = 0;
-// Handle consolePosLast (previous position)
+                // Handle consolePosLast (previous position)
                 if (UI.currentWindow == "mainScreen" && consolePosLast >= UI.numOptions)
                 {
                     // Handles the weird main menu navigation
                     if (consolePosLast == UI.numOptions) // Settings
                     {
-                        positionLeft = UI.leftPad + 1;
+                        positionLeft = UI.leftPad;
                         positionTop = SizeHandler.HeightCenter + UI.numOptions;
                     }
                     else if (consolePosLast == UI.numOptions + 1) // Arena
                     {
-                        positionLeft = UI.leftPad + 20;
+                        positionLeft = UI.leftPad + 19;
                         positionTop = SizeHandler.HeightCenter + UI.numOptions;
                     }
                     else if (consolePosLast == UI.maxPos - 1) // Info
                     {
-                        positionLeft = UI.leftPad + 41;
+                        positionLeft = UI.leftPad + 40;
                         positionTop = SizeHandler.HeightCenter + UI.numOptions;
                     }
                 }
@@ -485,17 +485,17 @@ namespace Leauge_Auto_Accept
                 {
                     if (currentPos == UI.numOptions) // Settings
                     {
-                        positionLeft = UI.leftPad + 1;
+                        positionLeft = UI.leftPad;
                         positionTop = SizeHandler.HeightCenter + UI.numOptions;
                     }
                     else if (currentPos == UI.numOptions + 1) // Arena
                     {
-                        positionLeft = UI.leftPad + 20;
+                        positionLeft = UI.leftPad + 19;
                         positionTop = SizeHandler.HeightCenter + UI.numOptions;
                     }
                     else if (currentPos == UI.maxPos - 1) // Info
                     {
-                        positionLeft = UI.leftPad + 41;
+                        positionLeft = UI.leftPad + 40;
                         positionTop = SizeHandler.HeightCenter + UI.numOptions;
                     }
                 }
@@ -705,3 +705,4 @@ namespace Leauge_Auto_Accept
         }
     }
 }
+
