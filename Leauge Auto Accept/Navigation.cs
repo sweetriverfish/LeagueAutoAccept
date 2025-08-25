@@ -338,6 +338,7 @@ namespace Leauge_Auto_Accept
                         }
                         if (UI.previousWindow == "arenaMenu")
                         {
+                            UI.previousWindow = "";
                             UI.arenaMenu();
                         }
                         else
