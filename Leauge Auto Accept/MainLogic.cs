@@ -184,7 +184,7 @@ namespace Leauge_Auto_Accept
                     sentChatMessages = false;
                     champSelectStart = DateTimeOffset.Now.ToUnixTimeMilliseconds();
                     
-                    isArena = currentChampSelect[1].Contains("\"gameMode\":\"CHERRY\"");
+                    isArena = currentChampSelect[1].Contains("\"queueId\":1700");
                     crowdFavorite1ChampId = "";
                     crowdFavorite2ChampId = "";
                     crowdFavorite3ChampId = "";
@@ -259,6 +259,12 @@ namespace Leauge_Auto_Accept
                             if (arenaCrowdFavoritesSplit.Length > 2) crowdFavorite3ChampId = arenaCrowdFavoritesSplit[2];
                             if (arenaCrowdFavoritesSplit.Length > 3) crowdFavorite4ChampId = arenaCrowdFavoritesSplit[3];
                             if (arenaCrowdFavoritesSplit.Length > 4) crowdFavorite5ChampId = arenaCrowdFavoritesSplit[4];
+
+                            if (Settings.bravery || Settings.crowdFavouraiteChamp1[1] != "0" || Settings.crowdFavouraiteChamp2[1] != "0" || Settings.crowdFavouraiteChamp3[1] != "0" || Settings.crowdFavouraiteChamp4[1] != "0" || Settings.crowdFavouraiteChamp5[1] != "0")
+                            {
+                                pickedChamp = false;
+                                lockedChamp = false;
+                            }
                         }
                     }
                     
@@ -422,7 +428,7 @@ namespace Leauge_Auto_Accept
             if (championId == "0") pickedChamp = false;
 
             // If the mode is Arena
-            if (isArena && !pickedChamp && !lockedChamp)
+            if (isArena && !pickedChamp)
             {
                 // If the player picked one of the crowd favorite champs, use that champ. Otherwise, if bravery is enabled, use that.
                 if (Settings.crowdFavouraiteChamp1[1] == crowdFavorite1ChampId)
