@@ -578,11 +578,38 @@ namespace Leauge_Auto_Accept
 
             Console.Clear();
 
-            Print.printCentered(addDotsInBetween("Made by", "Artem"), SizeHandler.HeightCenter - 2);
-            Print.printCentered(addDotsInBetween("Version", Updater.appVersion), SizeHandler.HeightCenter - 1);
+            Print.printCentered(addDotsInBetween("Made by", "sweetriverfish"), SizeHandler.HeightCenter - 5);
+            Print.printCentered(addDotsInBetween("Version", Updater.appVersion));
 
-            Print.printCentered("Source code:", SizeHandler.HeightCenter + 1);
-            Print.printCentered(" github.com/sweetriverfish/LeagueAutoAccept", SizeHandler.HeightCenter + 2);
+            Print.printCentered("Source code:", SizeHandler.HeightCenter -2);
+            Print.printCentered(" github.com/sweetriverfish/LeagueAutoAccept");
+
+            Print.printCentered("Contributors:", SizeHandler.HeightCenter + 1);
+
+            string[] ContributorsList = {
+                "IxPrumxI",
+                "ivelmiskin3",
+                "mrmark1998",
+                "mrcyclo",
+                "considerate-mouth",
+                "DanielBiondi"
+            };
+
+            Random rng = new Random();
+            int n = ContributorsList.Length;
+            while (n > 1)
+            {
+                n--;
+                int k = rng.Next(n + 1);
+                string value = ContributorsList[k];
+                ContributorsList[k] = ContributorsList[n];
+                ContributorsList[n] = value;
+            }
+
+            for (int i = 0; i < ContributorsList.Length; i++)
+            {
+                Print.printCentered(ContributorsList[i]);
+            }
         }
 
         public static void exitMenu()
@@ -1100,3 +1127,4 @@ namespace Leauge_Auto_Accept
         }
     }
 }
+
