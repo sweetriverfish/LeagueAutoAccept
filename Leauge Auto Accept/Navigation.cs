@@ -69,6 +69,10 @@ namespace Leauge_Auto_Accept
                     {
                         UI.settingsMenuDesc(currentPos);
                     }
+                    else if (UI.currentWindow == "arenaMenu")
+                    {
+                        UI.arenaMenuDesc(currentPos);
+                    }
                     else if (UI.currentWindow == "delayMenu")
                     {
                         UI.delayMenuDesc(currentPos);
@@ -294,6 +298,13 @@ namespace Leauge_Auto_Accept
                 case "mainScreen":
                     mainMenuNav();
                     break;
+                case "arenaMenu":
+                    arenaMenuNav();
+                    if (UI.currentWindow == "arenaMenu")
+                    {
+                        UI.arenaMenuUpdateUI(currentPos);
+                    }
+                    break;
                 case "settingsMenu":
                     Settings.settingsModify(currentPos);
                     if (UI.currentWindow == "settingsMenu")
@@ -325,7 +336,14 @@ namespace Leauge_Auto_Accept
                         {
                             Settings.saveSelectedRune();
                         }
-                        UI.mainScreen();
+                        if (UI.previousWindow == "arenaMenu")
+                        {
+                            UI.arenaMenu();
+                        }
+                        else
+                        {
+                            UI.mainScreen();
+                        }
                     }
                     break;
                 case "chatMessagesWindow":
@@ -402,17 +420,23 @@ namespace Leauge_Auto_Accept
             {
                 int positionLeft = 0;
                 int positionTop = 0;
+// Handle consolePosLast (previous position)
                 if (UI.currentWindow == "mainScreen" && consolePosLast >= UI.numOptions)
                 {
                     // Handles the weird main menu navigation
-                    if (consolePosLast == UI.numOptions)
+                    if (consolePosLast == UI.numOptions) // Settings
                     {
-                        positionLeft = UI.leftPad;
+                        positionLeft = UI.leftPad + 1;
                         positionTop = SizeHandler.HeightCenter + UI.numOptions;
                     }
-                    else if (consolePosLast == UI.maxPos - 1)
+                    else if (consolePosLast == UI.numOptions + 1) // Arena
                     {
-                        positionLeft = UI.leftPad + 40;
+                        positionLeft = UI.leftPad + 20;
+                        positionTop = SizeHandler.HeightCenter + UI.numOptions;
+                    }
+                    else if (consolePosLast == UI.maxPos - 1) // Info
+                    {
+                        positionLeft = UI.leftPad + 41;
                         positionTop = SizeHandler.HeightCenter + UI.numOptions;
                     }
                 }
@@ -458,15 +482,19 @@ namespace Leauge_Auto_Accept
 
                 if (UI.currentWindow == "mainScreen" && currentPos >= UI.numOptions)
                 {
-                    // Handles the weird main menu navigation
-                    if (currentPos == UI.numOptions)
+                    if (currentPos == UI.numOptions) // Settings
                     {
-                        positionLeft = UI.leftPad;
+                        positionLeft = UI.leftPad + 1;
                         positionTop = SizeHandler.HeightCenter + UI.numOptions;
                     }
-                    else if (currentPos == UI.numOptions + 1)
+                    else if (currentPos == UI.numOptions + 1) // Arena
                     {
-                        positionLeft = UI.leftPad + 40;
+                        positionLeft = UI.leftPad + 20;
+                        positionTop = SizeHandler.HeightCenter + UI.numOptions;
+                    }
+                    else if (currentPos == UI.maxPos - 1) // Info
+                    {
+                        positionLeft = UI.leftPad + 41;
                         positionTop = SizeHandler.HeightCenter + UI.numOptions;
                     }
                 }
@@ -636,9 +664,43 @@ namespace Leauge_Auto_Accept
                     UI.settingsMenu();
                     break;
                 case 14:
+                    UI.arenaMenu();
+                    break;
+                case 15:
                     UI.infoMenu();
                     break;
             }
+        }
+
+        private static void arenaMenuNav()
+        {
+            switch (currentPos)
+            {
+                case 0:
+                    Settings.toggleBraverySetting();
+                    return;
+                case 1:
+                    UI.currentChampPicker = 5;
+                    UI.champSelector();
+                    break;
+                case 2:
+                    UI.currentChampPicker = 6;
+                    UI.champSelector();
+                    break;
+                case 3:
+                    UI.currentChampPicker = 7;
+                    UI.champSelector();
+                    break;
+                case 4:
+                    UI.currentChampPicker = 8;
+                    UI.champSelector();
+                    break;
+                case 5:
+                    UI.currentChampPicker = 9;
+                    UI.champSelector();
+                    break;
+            }
+            UI.previousWindow = "arenaMenu";
         }
     }
 }

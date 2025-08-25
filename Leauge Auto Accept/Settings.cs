@@ -18,6 +18,12 @@ namespace Leauge_Auto_Accept
         public static string[] currentBan = { "Unselected", "0" };
         public static string[] currentSpell1 = { "Unselected", "0" };
         public static string[] currentSpell2 = { "Unselected", "0" };
+        public static bool bravery = false;
+        public static string[] crowdFavouraiteChamp1 = { "Unselected", "0" };
+        public static string[] crowdFavouraiteChamp2 = { "Unselected", "0" };
+        public static string[] crowdFavouraiteChamp3 = { "Unselected", "0" };
+        public static string[] crowdFavouraiteChamp4 = { "Unselected", "0" };
+        public static string[] crowdFavouraiteChamp5 = { "Unselected", "0" };
         public static bool chatMessagesEnabled = false;
         public static List<string> chatMessages = new List<string>();
         public static bool saveSettings = false;
@@ -257,6 +263,26 @@ namespace Leauge_Auto_Accept
                         currentBan[0] = name;
                         currentBan[1] = id;
                         break;
+                    case 5:
+                        crowdFavouraiteChamp1[0] = name;
+                        crowdFavouraiteChamp1[1] = id;
+                        break;
+                    case 6:
+                        crowdFavouraiteChamp2[0] = name;
+                        crowdFavouraiteChamp2[1] = id;
+                        break;                        
+                    case 7:
+                        crowdFavouraiteChamp3[0] = name;
+                        crowdFavouraiteChamp3[1] = id;
+                        break;
+                    case 8:
+                        crowdFavouraiteChamp4[0] = name;
+                        crowdFavouraiteChamp4[1] = id;
+                        break;
+                    case 9:
+                        crowdFavouraiteChamp5[0] = name;
+                        crowdFavouraiteChamp5[1] = id;
+                        break;
                 }
 
                 if (saveSettings)
@@ -447,6 +473,17 @@ namespace Leauge_Auto_Accept
                 ",secondaryBackupChampId:" + secondaryBackupChamp[1] +
                 ",secondaryBackupChampRuneName:" + secondaryBackupChampRunes[0] +
                 ",secondaryBackupChampRuneId:" + secondaryBackupChampRunes[1] +
+                ",arenaBravery:" + bravery +
+                ",arenaCrowdFavourite1Name:" + crowdFavouraiteChamp1[0] +
+                ",arenaCrowdFavourite1ChampId:" + crowdFavouraiteChamp1[1] +
+                ",arenaCrowdFavourite2Name:" + crowdFavouraiteChamp2[0] +
+                ",arenaCrowdFavourite2ChampId:" + crowdFavouraiteChamp2[1] +
+                ",arenaCrowdFavourite3Name:" + crowdFavouraiteChamp3[0] +
+                ",arenaCrowdFavourite3ChampId:" + crowdFavouraiteChamp3[1] +
+                ",arenaCrowdFavourite4Name:" + crowdFavouraiteChamp4[0] +
+                ",arenaCrowdFavourite4ChampId:" + crowdFavouraiteChamp4[1] +
+                ",arenaCrowdFavourite5Name:" + crowdFavouraiteChamp5[0] +
+                ",arenaCrowdFavourite5ChampId:" + crowdFavouraiteChamp5[1] +
                 ",banName:" + currentBan[0] +
                 ",banId:" + currentBan[1] +
                 ",spell1Name:" + currentSpell1[0] +
@@ -479,6 +516,15 @@ namespace Leauge_Auto_Accept
             }
         }
 
+        public static void toggleBraverySetting()
+        {
+            bravery = !bravery;
+            if (saveSettings)
+            {
+                settingsSave();
+            }
+        }
+        
         public static void toggleAutoAcceptSetting()
         {
             if (MainLogic.isAutoAcceptOn)
@@ -562,6 +608,39 @@ namespace Leauge_Auto_Accept
                             break;
                         case "secondaryBackupChampRuneId":
                             secondaryBackupChampRunes[1] = columns[1];
+                            break;
+                        case "arenaBravery":
+                            bravery = Boolean.Parse(columns[1]);
+                            break;
+                        case "arenaCrowdFavourite1Name":
+                            crowdFavouraiteChamp1[0] = columns[1];
+                            break;
+                        case "arenaCrowdFavourite1ChampId":
+                            crowdFavouraiteChamp1[1] = columns[1];
+                            break;
+                        case "arenaCrowdFavourite2Name":
+                            crowdFavouraiteChamp2[0] = columns[1];
+                            break;
+                        case "arenaCrowdFavourite2ChampId":
+                            crowdFavouraiteChamp2[1] = columns[1];
+                            break;
+                        case "arenaCrowdFavourite3Name":
+                            crowdFavouraiteChamp3[0] = columns[1];
+                            break;
+                        case "arenaCrowdFavourite3ChampId":
+                            crowdFavouraiteChamp3[1] = columns[1];
+                            break;
+                        case "arenaCrowdFavourite4Name":
+                            crowdFavouraiteChamp4[0] = columns[1];
+                            break;
+                        case "arenaCrowdFavourite4ChampId":
+                            crowdFavouraiteChamp4[1] = columns[1];
+                            break;
+                        case "arenaCrowdFavourite5Name":
+                            crowdFavouraiteChamp5[0] = columns[1];
+                            break;
+                        case "arenaCrowdFavourite5ChampId":
+                            crowdFavouraiteChamp5[1] = columns[1];
                             break;
                         case "banName":
                             currentBan[0] = columns[1];

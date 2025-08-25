@@ -18,6 +18,14 @@ namespace Leauge_Auto_Accept
         private static bool pickedSpell2 = false;
         private static bool sentChatMessages = false;
 
+        // Arena
+        private static bool isArena = false;
+        private static string crowdFavorite1ChampId = "";
+        private static string crowdFavorite2ChampId = "";
+        private static string crowdFavorite3ChampId = "";
+        private static string crowdFavorite4ChampId = "";
+        private static string crowdFavorite5ChampId = "";
+
         private static long lastActStartTime;
         private static long champSelectStart;
         private static string lastActId = "";
@@ -175,6 +183,13 @@ namespace Leauge_Auto_Accept
                     pickedSpell2 = false;
                     sentChatMessages = false;
                     champSelectStart = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                    
+                    isArena = currentChampSelect[1].Contains("\"gameMode\":\"CHERRY\"");
+                    crowdFavorite1ChampId = "";
+                    crowdFavorite2ChampId = "";
+                    crowdFavorite3ChampId = "";
+                    crowdFavorite4ChampId = "";
+                    crowdFavorite5ChampId = "";
                 }
                 lastChatRoom = currentChatRoom;
 
@@ -222,6 +237,31 @@ namespace Leauge_Auto_Accept
                         }
                     }
 
+                    if (isArena)
+                    {
+                        // Output example:
+                        //[
+                        // 51,
+                        // 23,
+                        // 120,
+                        // 555,
+                        // 111
+                        //]
+                        string[] arenaCrowdFavorites = LCU.clientRequest("GET", "lol-lobby-team-builder/champ-select/v1/crowd-favorite-champion-list");
+                        if (arenaCrowdFavorites[0] == "200")
+                        {
+                            string arenaCrowdFavoritesData = arenaCrowdFavorites[1].Replace("[", "").Replace("]", "").Replace("\n", "").Replace(" ", "");
+                            string[] arenaCrowdFavoritesSplit = arenaCrowdFavoritesData.Split(',');
+
+                            // Might be less than 5 champs if the player doesn't own that many champs
+                            if (arenaCrowdFavoritesSplit.Length > 0) crowdFavorite1ChampId = arenaCrowdFavoritesSplit[0];
+                            if (arenaCrowdFavoritesSplit.Length > 1) crowdFavorite2ChampId = arenaCrowdFavoritesSplit[1];
+                            if (arenaCrowdFavoritesSplit.Length > 2) crowdFavorite3ChampId = arenaCrowdFavoritesSplit[2];
+                            if (arenaCrowdFavoritesSplit.Length > 3) crowdFavorite4ChampId = arenaCrowdFavoritesSplit[3];
+                            if (arenaCrowdFavoritesSplit.Length > 4) crowdFavorite5ChampId = arenaCrowdFavoritesSplit[4];
+                        }
+                    }
+                    
                     if (!pickedChamp || !lockedChamp || !pickedBan || !lockedBan)
                     {
                         handleChampSelectActions(currentChampSelect, localPlayerCellId);
@@ -366,21 +406,50 @@ namespace Leauge_Auto_Accept
             }
         }
 
+        private static bool ShouldHoverChampion(string[] currentChampSelect)
+        {
+            // Hover champion when champ select starts
+            string champSelectPhase = currentChampSelect[1].Split("\"phase\":\"")[1].Split('"')[0];
+            long currentTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            return (currentTime - Settings.pickStartHoverDelay) > champSelectStart
+                   || champSelectPhase != "PLANNING"
+                   || Settings.instantHover;
+        }
+
         private static void handlePickAction(string actId, string championId, string ActIsInProgress, string[] currentChampSelect, bool usePrimaryChamp)
         {
             // Check if the hover gets cleared (by either a ban or teammate taking it)
             if (championId == "0") pickedChamp = false;
 
+            // If the mode is Arena
+            if (isArena && !pickedChamp && !lockedChamp)
+            {
+                // If the player picked one of the crowd favorite champs, use that champ. Otherwise, if bravery is enabled, use that.
+                if (Settings.crowdFavouraiteChamp1[1] == crowdFavorite1ChampId)
+                    championId = crowdFavorite1ChampId;
+                else if (Settings.crowdFavouraiteChamp2[1] == crowdFavorite2ChampId)
+                    championId = crowdFavorite2ChampId;
+                else if (Settings.crowdFavouraiteChamp3[1] == crowdFavorite3ChampId)
+                    championId = crowdFavorite3ChampId;
+                else if (Settings.crowdFavouraiteChamp4[1] == crowdFavorite4ChampId)
+                    championId = crowdFavorite4ChampId;
+                else if (Settings.crowdFavouraiteChamp5[1] == crowdFavorite5ChampId)
+                    championId = crowdFavorite5ChampId;
+                else if (Settings.bravery) championId = "-3";
+
+                if (ShouldHoverChampion(currentChampSelect)) {
+                    hoverChampion(actId, championId, "pick");
+                    
+                    // In arena mode runes and spells are disabled, so mark them as picked
+                    pickedRunes = true;
+                    pickedSpell1 = true;
+                    pickedSpell2 = true;
+                }
+            }
+
             if (!pickedChamp)
             {
-                // Hover champion when champ select starts
-                string champSelectPhase = currentChampSelect[1].Split("\"phase\":\"")[1].Split('"')[0];
-                long currentTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-
-                if ((currentTime - Settings.pickStartHoverDelay) > champSelectStart // Check if enough time has passed since planning phase has started
-                    || champSelectPhase != "PLANNING" // Check if it's even planning phase at all
-                    || Settings.instantHover) // Check if instahover setting is on
-                {
+                if (ShouldHoverChampion(currentChampSelect)) {
                     // Try first choice based on player is assigned primary or secondary role
                     hoverChampion(actId, usePrimaryChamp ? Settings.currentChamp[1] : Settings.secondaryChamp[1], "pick");
                     handleRunes(usePrimaryChamp ? Settings.currentChampRunes[1] : Settings.secondaryChampRunes[1]);

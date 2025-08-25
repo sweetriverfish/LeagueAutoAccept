@@ -215,7 +215,7 @@ namespace Leauge_Auto_Accept
             };
 
             numOptions = optionName.Length;
-            maxPos = numOptions + 2; //Settings + Info
+            maxPos = numOptions + 3; //Settings + Arena + Info
 
             // Print options
             for (int i = 0; i < optionName.Length; i++)
@@ -224,8 +224,9 @@ namespace Leauge_Auto_Accept
             }
 
             // Print the two bottom buttons that are not actaul settings
-            Print.printWhenPossible("Info", SizeHandler.HeightCenter + numOptions, leftPad + 43);
-            Print.printWhenPossible("Settings", SizeHandler.HeightCenter + numOptions, leftPad + 3);
+            Print.printWhenPossible("  Info", SizeHandler.HeightCenter + numOptions, leftPad + 41);
+            Print.printWhenPossible("  Arena", SizeHandler.HeightCenter + numOptions, leftPad + 20);
+            Print.printWhenPossible("  Settings", SizeHandler.HeightCenter + numOptions, leftPad + 1);
 
 
             Print.printWhenPossible("v" + Updater.appVersion, SizeHandler.WindowHeight - 1, 0, false);
@@ -238,6 +239,97 @@ namespace Leauge_Auto_Accept
         public static void toggleAutoAcceptSettingUI(int pos)
         {
             Print.printWhenPossible(MainLogic.isAutoAcceptOn ? ". Enabled" : " Disabled", topPad + pos, leftPad + 38);
+        }
+
+        public static void arenaMenu()
+        {
+            Print.canMovePos = false;
+            Navigation.currentPos = 0;
+            Navigation.consolePosLast = 0;
+
+            currentWindow = "arenaMenu";
+            windowType = "normal";
+            showCursor = false;
+            topPad = SizeHandler.HeightCenter - 4;
+            leftPad = SizeHandler.WidthCenter - 25;
+            maxPos = 6;
+
+            Console.Clear();
+            
+            string[] optionName = {
+                "Enable Bravery",
+                "Crowd favourite 1st",
+                "Crowd favourite 2nd",
+                "Crowd favourite 3rd",
+                "Crowd favourite 4th",
+                "Crowd favourite 5th",
+            };
+            
+            string[] optionValue = {
+                Settings.bravery ? "Yes" : "No",
+                Settings.crowdFavouraiteChamp1[0],
+                Settings.crowdFavouraiteChamp2[0],
+                Settings.crowdFavouraiteChamp3[0],
+                Settings.crowdFavouraiteChamp4[0],
+                Settings.crowdFavouraiteChamp5[0],
+            };
+            
+            // Print options
+            for (int i = 0; i < optionName.Length; i++)
+            {
+                Print.printCentered(addDotsInBetween(optionName[i], optionValue[i]), topPad + i);
+            }
+            
+            Navigation.handlePointerMovementPrint();
+            Print.canMovePos = true;
+            arenaMenuDesc(0);
+        }
+        
+        public static void arenaMenuDesc(int item)
+        {
+            switch (item)
+            {
+                case 0:
+                    Print.printCentered("Enable or disable bravery for arena games.", topPad + maxPos + 2);
+                    Print.printCentered("This will pick bravery in arena games over your selected champion", topPad + maxPos + 3);
+                    break;
+                case 1:
+                    Print.printCentered("Select the first crowd favourite champion to be picked in arena", topPad + maxPos + 2);
+                    Print.printCentered("This will be picked over bravery.", topPad + maxPos + 3);
+                    break;
+                case 2:
+                    Print.printCentered("Select the second crowd favourite champion to be picked in arena", topPad + maxPos + 2);
+                    Print.printCentered("This will be picked over bravery.", topPad + maxPos + 3);
+                    break;
+                case 3:
+                    Print.printCentered("Select the third crowd favourite champion to be picked in arena", topPad + maxPos + 2);
+                    Print.printCentered("This will be picked over bravery.", topPad + maxPos + 3);
+                    break;
+                case 4:
+                    Print.printCentered("Select the fourth crowd favourite champion to be picked in arena", topPad + maxPos + 2);
+                    Print.printCentered("This will be picked over bravery.", topPad + maxPos + 3);
+                    break;
+                case 5:
+                    Print.printCentered("Select the fifth crowd favourite champion to be picked in arena", topPad + maxPos + 2);
+                    Print.printCentered("This will be picked over bravery.", topPad + maxPos + 3);
+                    break;
+            }
+        }
+        
+        public static void arenaMenuUpdateUI(int item)
+        {
+            // Select item to toggle from settings
+
+            string outputText = item switch
+            {
+                0 => Settings.bravery ? " Yes" : ". No",
+                1 => Settings.crowdFavouraiteChamp1[0],
+                2 => Settings.crowdFavouraiteChamp2[0],
+                3 => Settings.crowdFavouraiteChamp3[0],
+                4 => Settings.crowdFavouraiteChamp4[0],
+                5 => Settings.crowdFavouraiteChamp5[0],
+            };
+            Print.printWhenPossible(outputText, item + topPad, SizeHandler.WidthCenter + 22 - outputText.Length);
         }
 
         public static void settingsMenu()
