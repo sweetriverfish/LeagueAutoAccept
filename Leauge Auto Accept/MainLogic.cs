@@ -247,7 +247,8 @@ namespace Leauge_Auto_Accept
                         // 555,
                         // 111
                         //]
-                        string[] arenaCrowdFavorites = LCU.clientRequest("GET", "lol-lobby-team-builder/champ-select/v1/crowd-favorite-champion-list");
+                        // It's misspelled in the endpoint as "favorte" instead of "favorite"
+                        string[] arenaCrowdFavorites = LCU.clientRequest("GET", "lol-lobby-team-builder/champ-select/v1/crowd-favorte-champion-list");
                         if (arenaCrowdFavorites[0] == "200")
                         {
                             string arenaCrowdFavoritesData = arenaCrowdFavorites[1].Replace("[", "").Replace("]", "").Replace("\n", "").Replace(" ", "");
@@ -259,12 +260,6 @@ namespace Leauge_Auto_Accept
                             if (arenaCrowdFavoritesSplit.Length > 2) crowdFavorite3ChampId = arenaCrowdFavoritesSplit[2];
                             if (arenaCrowdFavoritesSplit.Length > 3) crowdFavorite4ChampId = arenaCrowdFavoritesSplit[3];
                             if (arenaCrowdFavoritesSplit.Length > 4) crowdFavorite5ChampId = arenaCrowdFavoritesSplit[4];
-
-                            if (Settings.bravery || Settings.crowdFavouraiteChamp1[1] != "0" || Settings.crowdFavouraiteChamp2[1] != "0" || Settings.crowdFavouraiteChamp3[1] != "0" || Settings.crowdFavouraiteChamp4[1] != "0" || Settings.crowdFavouraiteChamp5[1] != "0")
-                            {
-                                pickedChamp = false;
-                                lockedChamp = false;
-                            }
                         }
                     }
                     
@@ -422,69 +417,84 @@ namespace Leauge_Auto_Accept
                    || Settings.instantHover;
         }
 
+        private static bool isInCrowdFavoriteChamps(string champId) =>
+            champId == crowdFavorite1ChampId ||
+            champId == crowdFavorite2ChampId ||
+            champId == crowdFavorite3ChampId ||
+            champId == crowdFavorite4ChampId ||
+            champId == crowdFavorite5ChampId;
+
         private static void handlePickAction(string actId, string championId, string ActIsInProgress, string[] currentChampSelect, bool usePrimaryChamp)
         {
             // Check if the hover gets cleared (by either a ban or teammate taking it)
             if (championId == "0") pickedChamp = false;
 
-            // If the mode is Arena
-            if (isArena && !pickedChamp)
+            if (!pickedChamp && ShouldHoverChampion(currentChampSelect))
             {
-                // If the player picked one of the crowd favorite champs, use that champ. Otherwise, if bravery is enabled, use that.
-                if (Settings.crowdFavouraiteChamp1[1] == crowdFavorite1ChampId)
-                    championId = crowdFavorite1ChampId;
-                else if (Settings.crowdFavouraiteChamp2[1] == crowdFavorite2ChampId)
-                    championId = crowdFavorite2ChampId;
-                else if (Settings.crowdFavouraiteChamp3[1] == crowdFavorite3ChampId)
-                    championId = crowdFavorite3ChampId;
-                else if (Settings.crowdFavouraiteChamp4[1] == crowdFavorite4ChampId)
-                    championId = crowdFavorite4ChampId;
-                else if (Settings.crowdFavouraiteChamp5[1] == crowdFavorite5ChampId)
-                    championId = crowdFavorite5ChampId;
-                else if (Settings.bravery) championId = "-3";
+                if (isArena)
+                {
+                    string[] favorites = {
+                        Settings.crowdFavouraiteChamp1[1],
+                        Settings.crowdFavouraiteChamp2[1],
+                        Settings.crowdFavouraiteChamp3[1],
+                        Settings.crowdFavouraiteChamp4[1],
+                        Settings.crowdFavouraiteChamp5[1]
+                    };
 
-                if (ShouldHoverChampion(currentChampSelect)) {
-                    hoverChampion(actId, championId, "pick");
-                    
+                    foreach (var favId in favorites)
+                    {
+                        if (!pickedChamp && isInCrowdFavoriteChamps(favId))
+                        {
+                            hoverChampion(actId, favId, "pick");
+                            if (pickedChamp) championId = favId; // assign only if hover succeeded
+                        }
+                    }
+
+                    if (!pickedChamp && Settings.bravery)
+                    {
+                        Debug.WriteLine("Bravery pick, ActIsInProgress: " + ActIsInProgress);
+                        // Bravery can only be picked when the pick phase is in progress.
+                        if (ActIsInProgress == "true")
+                        {
+                            hoverChampion(actId, "-3", "pick");
+                            championId = "-3";
+                        }
+                    }
+
                     // In arena mode runes and spells are disabled, so mark them as picked
-                    pickedRunes = true;
-                    pickedSpell1 = true;
-                    pickedSpell2 = true;
+                    pickedRunes = pickedSpell1 = pickedSpell2 = true;
                 }
-            }
 
-            if (!pickedChamp)
-            {
-                if (ShouldHoverChampion(currentChampSelect)) {
+                if (!pickedChamp && championId != "-3")
+                {
+                    string primaryChamp = usePrimaryChamp ? Settings.currentChamp[1] : Settings.secondaryChamp[1];
+                    string primaryRunes = usePrimaryChamp ? Settings.currentChampRunes[1] : Settings.secondaryChampRunes[1];
+                    string backupChamp = usePrimaryChamp ? Settings.currentBackupChamp[1] : Settings.secondaryBackupChamp[1];
+                    string backupRunes = usePrimaryChamp ? Settings.currentBackupChampRunes[1] : Settings.secondaryBackupChampRunes[1];
+
                     // Try first choice based on player is assigned primary or secondary role
-                    hoverChampion(actId, usePrimaryChamp ? Settings.currentChamp[1] : Settings.secondaryChamp[1], "pick");
-                    handleRunes(usePrimaryChamp ? Settings.currentChampRunes[1] : Settings.secondaryChampRunes[1]);
+                    hoverChampion(actId, primaryChamp, "pick");
+                    handleRunes(primaryRunes);
 
                     // If first choice didn't work (pickedChamp is still false), try second choice
                     if (!pickedChamp)
                     {
-                        hoverChampion(actId, usePrimaryChamp ? Settings.currentBackupChamp[1] : Settings.secondaryBackupChamp[1], "pick");
-                        handleRunes(usePrimaryChamp ? Settings.currentBackupChampRunes[1] : Settings.secondaryBackupChampRunes[1]);
-                    }
+                        hoverChampion(actId, backupChamp, "pick");
+                        handleRunes(backupRunes);
+                        if (pickedChamp) championId = backupChamp;
+                    } else championId = primaryChamp;
                 }
-
             }
 
             if (ActIsInProgress == "true")
             {
                 markPhaseStart(actId);
+                Debug.WriteLine($"ActIsInProgress: true | pickedChamp: {pickedChamp}, lockedChamp: {lockedChamp}, championId: {championId}");
 
                 if (!lockedChamp)
                 {
-                    // Check the instalock setting
-                    if (!Settings.instaLock)
-                    {
-                        checkLockDelay(actId, championId, currentChampSelect, "pick");
-                    }
-                    else
-                    {
-                        lockChampion(actId, championId, "pick");
-                    }
+                    if (Settings.instaLock) lockChampion(actId, championId, "pick");
+                    else checkLockDelay(actId, championId, currentChampSelect, "pick");
                 }
             }
         }

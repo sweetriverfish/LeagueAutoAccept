@@ -77,15 +77,7 @@ namespace Leauge_Auto_Accept
                     }
 
                     // Check if the champ can be picked
-                    bool isAvailable;
-                    if (champOwned == "true" || champFree == "true" || champFreeXboxPass == "true")
-                    {
-                        isAvailable = true;
-                    }
-                    else
-                    {
-                        isAvailable = false;
-                    }
+                    bool isAvailable = champOwned == "true" || champFree == "true" || champFreeXboxPass == "true";
                     champs.Add(new itemList() { name = champName, id = champId, free = isAvailable });
                 }
 
