@@ -450,17 +450,6 @@ namespace Leauge_Auto_Accept
                         }
                     }
 
-                    if (!pickedChamp && Settings.bravery)
-                    {
-                        Debug.WriteLine("Bravery pick, ActIsInProgress: " + ActIsInProgress);
-                        // Bravery can only be picked when the pick phase is in progress.
-                        if (ActIsInProgress == "true")
-                        {
-                            hoverChampion(actId, "-3", "pick");
-                            championId = "-3";
-                        }
-                    }
-
                     // In arena mode runes and spells are disabled, so mark them as picked
                     pickedRunes = pickedSpell1 = pickedSpell2 = true;
                 }
@@ -490,6 +479,12 @@ namespace Leauge_Auto_Accept
             {
                 markPhaseStart(actId);
                 Debug.WriteLine($"ActIsInProgress: true | pickedChamp: {pickedChamp}, lockedChamp: {lockedChamp}, championId: {championId}");
+
+                if (isArena && !pickedChamp && Settings.bravery)
+                {
+                    hoverChampion(actId, "-3", "pick");
+                    if (pickedChamp) championId = "-3";
+                }
 
                 if (!lockedChamp)
                 {
