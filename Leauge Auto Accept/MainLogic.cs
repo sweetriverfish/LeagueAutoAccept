@@ -263,7 +263,7 @@ namespace Leauge_Auto_Accept
                         }
                     }
                     
-                    if (!pickedChamp || !lockedChamp || !pickedBan || !lockedBan)
+                    if (isArena || !pickedChamp || !lockedChamp || !pickedBan || !lockedBan)
                     {
                         handleChampSelectActions(currentChampSelect, localPlayerCellId);
                     }
