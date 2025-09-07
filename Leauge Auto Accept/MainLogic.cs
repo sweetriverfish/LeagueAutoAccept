@@ -508,7 +508,7 @@ namespace Leauge_Auto_Accept
                     // Hover champion when champ select starts
                     long currentTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 
-                    if ((currentTime - Settings.banStartHoverDelay) > champSelectStart) // Check if enough time has passed since planning phase has started
+                    if (currentTime - Settings.banStartHoverDelay > champSelectStart) // Check if enough time has passed since planning phase has started
                     {
                         hoverChampion(actId, Settings.currentBan[1], "ban");
                     }
