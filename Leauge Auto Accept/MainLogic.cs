@@ -203,7 +203,7 @@ namespace Leauge_Auto_Accept
                     // Get more needed data from the current champ select
                     string localPlayerCellId = currentChampSelect[1].Split("localPlayerCellId\":")[1].Split(',')[0];
 
-                    if (Settings.currentChamp[1] == "0")
+                    if (Settings.currentChamp[1] == "0" && !isArena)
                     {
                         pickedChamp = true;
                         lockedChamp = true;
@@ -480,10 +480,15 @@ namespace Leauge_Auto_Accept
                 markPhaseStart(actId);
                 Debug.WriteLine($"ActIsInProgress: true | pickedChamp: {pickedChamp}, lockedChamp: {lockedChamp}, championId: {championId}");
 
-                if (isArena && !pickedChamp && Settings.bravery)
+                if (isArena && Settings.bravery)
                 {
-                    hoverChampion(actId, "-3", "pick");
-                    if (pickedChamp) championId = "-3";
+                    if (!pickedChamp)
+                    {
+                        hoverChampion(actId, "-3", "pick");
+                        if (pickedChamp) championId = "-3";
+                    }
+
+                    lockedChamp = false;
                 }
 
                 if (!lockedChamp)
@@ -510,7 +515,9 @@ namespace Leauge_Auto_Accept
 
                     if (currentTime - Settings.banStartHoverDelay > champSelectStart) // Check if enough time has passed since planning phase has started
                     {
-                        hoverChampion(actId, Settings.currentBan[1], "ban");
+                        // Ban none if the setting is disabled.
+                        bool dontBanCrowd = isArena && !Settings.banCrowdFavourite && isInCrowdFavoriteChamps(Settings.currentBan[1]);
+                        hoverChampion(actId, dontBanCrowd ? "0" : Settings.currentBan[1], "ban");
                     }
                 }
 
