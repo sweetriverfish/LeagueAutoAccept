@@ -13,7 +13,6 @@ namespace Leauge_Auto_Accept
         private static bool lockedChamp = false;
         private static bool pickedBan = false;
         private static bool lockedBan = false;
-        private static bool pickedRunes = false;
         private static bool pickedSpell1 = false;
         private static bool pickedSpell2 = false;
         private static bool sentChatMessages = false;
@@ -26,9 +25,7 @@ namespace Leauge_Auto_Accept
         private static string crowdFavorite4ChampId = "";
         private static string crowdFavorite5ChampId = "";
 
-        private static long lastActStartTime;
         private static long champSelectStart;
-        private static string lastActId = "";
         private static string lastChatRoom = "";
 
         private static long queueStartTime;
@@ -178,7 +175,6 @@ namespace Leauge_Auto_Accept
                     lockedChamp = false;
                     pickedBan = false;
                     lockedBan = false;
-                    pickedRunes = false;
                     pickedSpell1 = false;
                     pickedSpell2 = false;
                     sentChatMessages = false;
@@ -212,10 +208,6 @@ namespace Leauge_Auto_Accept
                     {
                         pickedBan = true;
                         lockedBan = true;
-                    }
-                    if (Settings.currentChampRunes[1] == "0")
-                    {
-                        pickedRunes = true;
                     }
                     if (Settings.currentSpell1[1] == "0")
                     {
@@ -451,7 +443,7 @@ namespace Leauge_Auto_Accept
                     }
 
                     // In arena mode runes and spells are disabled, so mark them as picked
-                    pickedRunes = pickedSpell1 = pickedSpell2 = true;
+                    pickedSpell1 = pickedSpell2 = true;
                 }
 
                 if (!pickedChamp && championId != "-3")
@@ -477,7 +469,6 @@ namespace Leauge_Auto_Accept
 
             if (ActIsInProgress == "true")
             {
-                markPhaseStart(actId);
                 Debug.WriteLine($"ActIsInProgress: true | pickedChamp: {pickedChamp}, lockedChamp: {lockedChamp}, championId: {championId}");
 
                 if (isArena && Settings.bravery)
@@ -506,7 +497,6 @@ namespace Leauge_Auto_Accept
             // make sure it's my turn to pick and that it is not the planning phase anymore
             if (ActIsInProgress == "true" && champSelectPhase != "PLANNING")
             {
-                markPhaseStart(actId);
 
                 if (!pickedBan)
                 {
@@ -536,15 +526,6 @@ namespace Leauge_Auto_Accept
             }
         }
 
-        private static void markPhaseStart(string actId)
-        {
-            if (actId != lastActId)
-            {
-                lastActId = actId;
-                lastActStartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            }
-        }
-
         private static void hoverChampion(string actId, string currentChamp, string actType)
         {
             string[] champSelectAction = LCU.clientRequest("PATCH", "lol-champ-select/v1/session/actions/" + actId, "{\"championId\":" + currentChamp + "}");
@@ -563,11 +544,7 @@ namespace Leauge_Auto_Accept
 
         private static void handleRunes(string currentRunes)
         {
-            string[] runeSelectAction = LCU.clientRequest("PUT", "lol-perks/v1/currentpage", currentRunes);
-            if (runeSelectAction[0] == "201")
-            {
-                pickedRunes = true;
-            }
+            LCU.clientRequest("PUT", "lol-perks/v1/currentpage", currentRunes);
         }
 
         private static void lockChampion(string actId, string championId, string actType)
@@ -588,36 +565,20 @@ namespace Leauge_Auto_Accept
 
         private static void checkLockDelay(string actId, string championId, string[] currentChampSelect, string actType)
         {
-            string timer = currentChampSelect[1].Split("totalTimeInPhase\":")[1].Split("}")[0];
-            long timerInt = Convert.ToInt64(timer);
-            long currentTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            long totalTime = Convert.ToInt64(currentChampSelect[1].Split("totalTimeInPhase\":")[1].Split(",")[0]);
+            long remaining = Convert.ToInt64(currentChampSelect[1].Split("adjustedTimeLeftInPhase\":")[1].Split(",")[0]);
+            long elapsed = totalTime - remaining;
 
-            int delayPreEnd = 0;
-            if (actType == "pick")
-            {
-                delayPreEnd = Settings.pickEndlockDelay;
-            }
-            else if (actType == "ban")
-            {
-                delayPreEnd = Settings.banEndlockDelay;
-            }
-            if (currentTime >= lastActStartTime + timerInt - delayPreEnd)
+            int startDelay = actType == "pick" ? Settings.pickStartlockDelay : Settings.banStartlockDelay;
+            int endDelay = actType == "pick" ? Settings.pickEndlockDelay : Settings.banEndlockDelay;
+
+            if (remaining <= endDelay)
             {
                 lockChampion(actId, championId, actType);
                 return;
             }
 
-            int delayAfterStart = 0;
-            if (actType == "pick")
-            {
-                delayAfterStart = Settings.pickStartlockDelay;
-            }
-            else if (actType == "ban")
-            {
-                delayAfterStart = Settings.banStartlockDelay;
-            }
-
-            if (currentTime >= lastActStartTime + delayAfterStart)
+            if (elapsed >= startDelay)
             {
                 lockChampion(actId, championId, actType);
             }
