@@ -565,20 +565,14 @@ namespace Leauge_Auto_Accept
 
         private static void checkLockDelay(string actId, string championId, string[] currentChampSelect, string actType)
         {
-            long totalTime = Convert.ToInt64(currentChampSelect[1].Split("totalTimeInPhase\":")[1].Split(",")[0]);
-            long remaining = Convert.ToInt64(currentChampSelect[1].Split("adjustedTimeLeftInPhase\":")[1].Split(",")[0]);
+            long totalTime = Convert.ToInt64(currentChampSelect[1].Split("totalTimeInPhase\":")[1].Split(",")[0].Split("}")[0]);
+            long remaining = Convert.ToInt64(currentChampSelect[1].Split("adjustedTimeLeftInPhase\":")[1].Split(",")[0].Split("}")[0]);
             long elapsed = totalTime - remaining;
 
             int startDelay = actType == "pick" ? Settings.pickStartlockDelay : Settings.banStartlockDelay;
             int endDelay = actType == "pick" ? Settings.pickEndlockDelay : Settings.banEndlockDelay;
 
-            if (remaining <= endDelay)
-            {
-                lockChampion(actId, championId, actType);
-                return;
-            }
-
-            if (elapsed >= startDelay)
+            if (remaining <= endDelay || elapsed >= startDelay)
             {
                 lockChampion(actId, championId, actType);
             }
