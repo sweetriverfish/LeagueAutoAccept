@@ -506,7 +506,7 @@ namespace Leauge_Auto_Accept
                     if (currentTime - Settings.banStartHoverDelay > champSelectStart) // Check if enough time has passed since planning phase has started
                     {
                         // Ban none if the setting is disabled.
-                        bool dontBanCrowd = isArena && !Settings.banCrowdFavourite && isInCrowdFavoriteChamps(Settings.currentBan[1]);
+                        bool dontBanCrowd = isArena && Settings.banCrowdFavourite && isInCrowdFavoriteChamps(Settings.currentBan[1]);
                         hoverChampion(actId, dontBanCrowd ? "0" : Settings.currentBan[1], "ban");
                     }
                 }

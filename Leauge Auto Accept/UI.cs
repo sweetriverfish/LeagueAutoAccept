@@ -296,7 +296,7 @@ namespace Leauge_Auto_Accept
                     break;
                 case 1:
                     Print.printCentered("Enable or disable banning one of the selected crowd favourite champion", topPad + maxPos + 2);
-                    Print.printCentered("If the ban matches one of the crowd favourite champions, It will ban None.", topPad + maxPos + 3);
+                    Print.printCentered("If true and the ban matches one of the crowd favourite champions, It will ban None.", topPad + maxPos + 3);
                     break;
                 case 2:
                     Print.printCentered("Select the first crowd favourite champion to be picked in arena", topPad + maxPos + 2);
