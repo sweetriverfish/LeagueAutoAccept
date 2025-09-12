@@ -19,6 +19,7 @@ namespace Leauge_Auto_Accept
         public static string[] currentSpell1 = { "Unselected", "0" };
         public static string[] currentSpell2 = { "Unselected", "0" };
         public static bool bravery = false;
+        public static bool banCrowdFavourite = false;
         public static string[] crowdFavouraiteChamp1 = { "Unselected", "0" };
         public static string[] crowdFavouraiteChamp2 = { "Unselected", "0" };
         public static string[] crowdFavouraiteChamp3 = { "Unselected", "0" };
@@ -474,6 +475,7 @@ namespace Leauge_Auto_Accept
                 ",secondaryBackupChampRuneName:" + secondaryBackupChampRunes[0] +
                 ",secondaryBackupChampRuneId:" + secondaryBackupChampRunes[1] +
                 ",arenaBravery:" + bravery +
+                ",banCrowdFavourite:" + banCrowdFavourite +
                 ",arenaCrowdFavourite1Name:" + crowdFavouraiteChamp1[0] +
                 ",arenaCrowdFavourite1ChampId:" + crowdFavouraiteChamp1[1] +
                 ",arenaCrowdFavourite2Name:" + crowdFavouraiteChamp2[0] +
@@ -524,7 +526,16 @@ namespace Leauge_Auto_Accept
                 settingsSave();
             }
         }
-        
+
+        public static void toggleBanCrowdFavouriteSetting()
+        {
+            banCrowdFavourite = !banCrowdFavourite;
+            if (saveSettings)
+            {
+                settingsSave();
+            }
+        }
+
         public static void toggleAutoAcceptSetting()
         {
             if (MainLogic.isAutoAcceptOn)
@@ -611,6 +622,9 @@ namespace Leauge_Auto_Accept
                             break;
                         case "arenaBravery":
                             bravery = Boolean.Parse(columns[1]);
+                            break;
+                        case "banCrowdFavourite":
+                            banCrowdFavourite = Boolean.Parse(columns[1]);
                             break;
                         case "arenaCrowdFavourite1Name":
                             crowdFavouraiteChamp1[0] = columns[1];

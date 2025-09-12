@@ -228,7 +228,6 @@ namespace Leauge_Auto_Accept
             Print.printWhenPossible("  Arena", SizeHandler.HeightCenter + numOptions, leftPad + 20);
             Print.printWhenPossible("  Settings", SizeHandler.HeightCenter + numOptions, leftPad + 1);
 
-
             Print.printWhenPossible("v" + Updater.appVersion, SizeHandler.WindowHeight - 1, 0, false);
 
             Navigation.handlePointerMovementPrint();
@@ -252,12 +251,13 @@ namespace Leauge_Auto_Accept
             showCursor = false;
             topPad = SizeHandler.HeightCenter - 4;
             leftPad = SizeHandler.WidthCenter - 25;
-            maxPos = 6;
+            maxPos = 7;
 
             Console.Clear();
             
             string[] optionName = {
                 "Enable Bravery",
+                "Ban crowd favourite champion",
                 "Crowd favourite 1st",
                 "Crowd favourite 2nd",
                 "Crowd favourite 3rd",
@@ -267,6 +267,7 @@ namespace Leauge_Auto_Accept
             
             string[] optionValue = {
                 Settings.bravery ? "Yes" : "No",
+                Settings.banCrowdFavourite ? "Yes" : "No",
                 Settings.crowdFavouraiteChamp1[0],
                 Settings.crowdFavouraiteChamp2[0],
                 Settings.crowdFavouraiteChamp3[0],
@@ -294,22 +295,26 @@ namespace Leauge_Auto_Accept
                     Print.printCentered("This will pick bravery in arena games over your selected champion", topPad + maxPos + 3);
                     break;
                 case 1:
+                    Print.printCentered("Enable or disable banning one of the selected crowd favourite champion", topPad + maxPos + 2);
+                    Print.printCentered("If true and the ban matches one of the crowd favourite champions, It will ban None.", topPad + maxPos + 3);
+                    break;
+                case 2:
                     Print.printCentered("Select the first crowd favourite champion to be picked in arena", topPad + maxPos + 2);
                     Print.printCentered("This will be picked over bravery.", topPad + maxPos + 3);
                     break;
-                case 2:
+                case 3:
                     Print.printCentered("Select the second crowd favourite champion to be picked in arena", topPad + maxPos + 2);
                     Print.printCentered("This will be picked over bravery.", topPad + maxPos + 3);
                     break;
-                case 3:
+                case 4:
                     Print.printCentered("Select the third crowd favourite champion to be picked in arena", topPad + maxPos + 2);
                     Print.printCentered("This will be picked over bravery.", topPad + maxPos + 3);
                     break;
-                case 4:
+                case 5:
                     Print.printCentered("Select the fourth crowd favourite champion to be picked in arena", topPad + maxPos + 2);
                     Print.printCentered("This will be picked over bravery.", topPad + maxPos + 3);
                     break;
-                case 5:
+                case 6:
                     Print.printCentered("Select the fifth crowd favourite champion to be picked in arena", topPad + maxPos + 2);
                     Print.printCentered("This will be picked over bravery.", topPad + maxPos + 3);
                     break;
@@ -323,11 +328,12 @@ namespace Leauge_Auto_Accept
             string outputText = item switch
             {
                 0 => Settings.bravery ? " Yes" : ". No",
-                1 => Settings.crowdFavouraiteChamp1[0],
-                2 => Settings.crowdFavouraiteChamp2[0],
-                3 => Settings.crowdFavouraiteChamp3[0],
-                4 => Settings.crowdFavouraiteChamp4[0],
-                5 => Settings.crowdFavouraiteChamp5[0],
+                1 => Settings.banCrowdFavourite ? "Yes" : ". No",
+                2 => Settings.crowdFavouraiteChamp1[0],
+                3 => Settings.crowdFavouraiteChamp2[0],
+                4 => Settings.crowdFavouraiteChamp3[0],
+                5 => Settings.crowdFavouraiteChamp4[0],
+                6 => Settings.crowdFavouraiteChamp5[0],
             };
             Print.printWhenPossible(outputText, item + topPad, SizeHandler.WidthCenter + 22 - outputText.Length);
         }

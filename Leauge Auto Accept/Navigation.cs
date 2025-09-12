@@ -681,22 +681,25 @@ namespace Leauge_Auto_Accept
                     Settings.toggleBraverySetting();
                     return;
                 case 1:
+                    Settings.toggleBanCrowdFavouriteSetting();
+                    return;
+                case 2:
                     UI.currentChampPicker = 5;
                     UI.champSelector();
                     break;
-                case 2:
+                case 3:
                     UI.currentChampPicker = 6;
                     UI.champSelector();
                     break;
-                case 3:
+                case 4:
                     UI.currentChampPicker = 7;
                     UI.champSelector();
                     break;
-                case 4:
+                case 5:
                     UI.currentChampPicker = 8;
                     UI.champSelector();
                     break;
-                case 5:
+                case 6:
                     UI.currentChampPicker = 9;
                     UI.champSelector();
                     break;
