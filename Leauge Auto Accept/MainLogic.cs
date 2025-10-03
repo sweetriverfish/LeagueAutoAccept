@@ -7,6 +7,8 @@ namespace Leauge_Auto_Accept
 {
     internal class MainLogic
     {
+        private static readonly NLog.ILogger Log = NLog.LogManager.GetCurrentClassLogger();
+
         public static bool isAutoAcceptOn = false;
 
         private static bool pickedChamp = false;
@@ -96,11 +98,11 @@ namespace Leauge_Auto_Accept
                             lastChatRoom = "";
                         }
                     }
-                    Thread.Sleep(50);
+                    Thread.Sleep(1000);
                 }
                 else
                 {
-                    Thread.Sleep(1000);
+                    Thread.Sleep(10000);
                 }
             }
         }
@@ -469,7 +471,7 @@ namespace Leauge_Auto_Accept
 
             if (ActIsInProgress == "true")
             {
-                Debug.WriteLine($"ActIsInProgress: true | pickedChamp: {pickedChamp}, lockedChamp: {lockedChamp}, championId: {championId}");
+                Log.Debug($"ActIsInProgress: true | pickedChamp: {pickedChamp}, lockedChamp: {lockedChamp}, championId: {championId}");
 
                 if (isArena && Settings.bravery)
                 {

@@ -6,12 +6,16 @@ using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Text.Json;
 
 namespace Leauge_Auto_Accept
 {
     internal class LCU
     {
-        private static string[] leagueAuth;
+        private static readonly NLog.ILogger Log = NLog.LogManager.GetCurrentClassLogger();
+        private static readonly NLog.ILogger JsonLog = NLog.LogManager.GetLogger("JsonLog");
+
+		private static string[] leagueAuth;
         private static int lcuPid = 0;
         public static bool isLeagueOpen = false;
 
@@ -124,6 +128,7 @@ namespace Leauge_Auto_Accept
                     }
 
                     // Get the response
+                    Log.Debug("{0} {1}", request.Method, request.RequestUri.ToString());
                     HttpResponseMessage response = client.SendAsync(request).Result;
 
                     // If the response is null (League client closed?)
@@ -138,6 +143,11 @@ namespace Leauge_Auto_Accept
 
                     // Get the body
                     string responseFromServer = response.Content.ReadAsStringAsync().Result;
+                    if (JsonLog.IsDebugEnabled)
+                    {
+                        var jsonpretty = JsonSerializer.Serialize(JsonDocument.Parse(responseFromServer), new JsonSerializerOptions() { WriteIndented = true });
+                        JsonLog.Debug("Output from {0}:\n{1}", url, jsonpretty);
+                    }
 
                     // Clean up the response
                     response.Dispose();
