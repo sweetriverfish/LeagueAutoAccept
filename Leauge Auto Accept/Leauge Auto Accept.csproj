@@ -15,6 +15,7 @@
   <ItemGroup>
     <Content Include="icon.ico" />
     <PackageReference Include="NLog" Version="6.0.4" />
+    <PackageReference Include="RestSharp" Version="112.1.0" />
     <PackageReference Include="System.Management" Version="4.7.0" />
   </ItemGroup>
 
