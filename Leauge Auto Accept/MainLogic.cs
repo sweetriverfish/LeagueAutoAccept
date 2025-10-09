@@ -40,18 +40,18 @@ namespace Leauge_Auto_Accept
             {
                 if (isAutoAcceptOn)
                 {
-                    var gameSession = LCU.clientRequest("GET", "lol-gameflow/v1/session");
+                    var gameSessionResp = LCU.clientRequest<LCUTypes.LolGameflowSessionV1>("GET", "lol-gameflow/v1/session");
 
-                    if (gameSession.IsSuccessful)
+                    if (gameSessionResp.IsSuccessful)
                     {
-                        string phase = gameSession.Content.Split("phase").Last().Split('"')[2];
+                        var gameSession = gameSessionResp.Data;
 
                         if (Settings.autoRestartQueue)
                         {
-                            handleQueueRestart(phase);
+                            handleQueueRestart(gameSession.Phase);
                         }
 
-                        switch (phase)
+                        switch (gameSession.Phase)
                         {
                             case "Lobby":
                                 Thread.Sleep(5000);
@@ -94,7 +94,7 @@ namespace Leauge_Auto_Accept
                                 break;
                         }
 
-                        if (phase != "ChampSelect")
+                        if (gameSession.Phase != "ChampSelect")
                         {
                             lastChatRoom = "";
                         }
@@ -165,12 +165,12 @@ namespace Leauge_Auto_Accept
         private static void handleChampSelect()
         {
             // Get data for the current ongoing champ select
-            var currentChampSelect = LCU.clientRequest("GET", "lol-champ-select/v1/session");
+            var currentChampSelect = LCU.clientRequest<LCUTypes.LolChampSelectSessionV1>("GET", "lol-champ-select/v1/session");
 
             if (currentChampSelect.IsSuccessStatusCode)
             {
                 // Get needed data from the current champ select 
-                string currentChatRoom = currentChampSelect.Content.Split("multiUserChatId\":\"")[1].Split('"')[0];
+                string currentChatRoom = currentChampSelect.Data.ChatDetails.MultiUserChatId;// Content.Split("multiUserChatId\":\"")[1].Split('"')[0];
                 if (lastChatRoom != currentChatRoom || lastChatRoom == "")
                 {
                     // Reset stuff in case someone dodged the champ select
@@ -182,8 +182,8 @@ namespace Leauge_Auto_Accept
                     pickedSpell2 = false;
                     sentChatMessages = false;
                     champSelectStart = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-                    
-                    isArena = currentChampSelect.Content.Contains("\"queueId\":1700");
+
+                    isArena = currentChampSelect.Data.QueueId == 1700; //1700=arena
                     crowdFavorite1ChampId = "";
                     crowdFavorite2ChampId = "";
                     crowdFavorite3ChampId = "";
@@ -192,6 +192,7 @@ namespace Leauge_Auto_Accept
                 }
                 lastChatRoom = currentChatRoom;
 
+                Log.Debug("pickedChamp={0} lockedChamp={1} pickedBan={2} lockedBan={3} pickedSpell1={4} pickedSpell2={5}", pickedChamp, lockedChamp, pickedBan, lockedBan, pickedSpell1, pickedSpell2, sentChatMessages);
                 if (pickedChamp && lockedChamp && pickedBan && lockedBan && pickedSpell1 && pickedSpell2 && sentChatMessages)
                 {
                     // Sleep a little if we already did everything we needed to do
@@ -268,7 +269,7 @@ namespace Leauge_Auto_Accept
                     }
                     if (!pickedSpell1)
                     {
-                        var champSelectAction = LCU.clientRequest("PATCH", "lol-champ-select/v1/session/my-selection", "{\"spell1Id\":" + Settings.currentSpell1[1] + "}");
+                        var champSelectAction = LCU.clientRequest("PATCH", "lol-champ-select/v1/session/my-selection", new { spellId = Settings.currentSpell1[1] });
                         if (champSelectAction.IsSuccessStatusCode)
                         {
                             pickedSpell1 = true;
@@ -288,7 +289,7 @@ namespace Leauge_Auto_Accept
 
 
         // Check player's assigned position and adjust champion pick to primary (true) or secondary (false)
-        private static bool handleChampPositionPreferences(RestResponse currentChampSelect, string localPlayerCellId)
+        private static bool handleChampPositionPreferences(RestResponse<LCUTypes.LolChampSelectSessionV1> currentChampSelect, string localPlayerCellId)
         {
             // Check lobby endpoint for position preferences
             var lobbySession = LCU.clientRequest("GET", "lol-lobby/v2/lobby");
@@ -377,23 +378,19 @@ namespace Leauge_Auto_Accept
             sentChatMessages = true;
         }
 
-        private static void handleChampSelectActions(RestResponse currentChampSelect, string localPlayerCellId)
+        private static void handleChampSelectActions(RestResponse<LCUTypes.LolChampSelectSessionV1> currentChampSelect, string localPlayerCellId)
         {
             // This logic skips modes that aren't draft
-            if (!currentChampSelect.Content.Contains("actions\":[[{")) return;
+            if (currentChampSelect.Data.Actions.Count == 0) return;
 
-            string csActs = currentChampSelect.Content.Split("actions\":[[{")[1].Split("}]],")[0];
-            csActs = csActs.Replace("}],[{", "},{");
-            string[] csActsArr = csActs.Split("},{");
-
-            foreach (var act in csActsArr)
+            foreach (var act in currentChampSelect.Data.Actions.SelectMany(list=>list.AsArray()))
             {
-                string ActCctorCellId = act.Split("actorCellId\":")[1].Split(',')[0];
-                string ActCompleted = act.Split("completed\":")[1].Split(',')[0];
-                string ActType = act.Split("type\":\"")[1].Split('"')[0];
-                string championId = act.Split("championId\":")[1].Split(',')[0];
-                string actId = act.Split(",\"id\":")[1].Split(',')[0];
-                string ActIsInProgress = act.Split("isInProgress\":")[1].Split(',')[0];
+                string ActCctorCellId = act["actorCellId"].GetValue<string>();
+                string ActCompleted = act["completed"].GetValue<string>();
+                string ActType = act["type"].GetValue<string>();
+                string championId = act["championId"].GetValue<string>();
+                string actId = act["id"].GetValue<string>();
+                string ActIsInProgress = act["isInProgress"].GetValue<string>();
 
                 if (ActCctorCellId == localPlayerCellId && ActCompleted == "false" && ActType == "pick")
                 {
