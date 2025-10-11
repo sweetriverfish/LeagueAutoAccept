@@ -61,7 +61,7 @@ namespace Leauge_Auto_Accept
                     MainLogic.isAutoAcceptOn = false;
                     Data.champsSorted.Clear();
                     Data.spellsSorted.Clear();
-                    Data.currentSummonerId = "";
+                    Data.currentSummonerId = 0;
                     if (UI.currentWindow != "leagueClientIsClosedMessage" && UI.currentWindow != "exitMenu")
                     {
                         UI.leagueClientIsClosedMessage();

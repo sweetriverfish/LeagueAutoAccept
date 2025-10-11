@@ -19,17 +19,17 @@ namespace Leauge_Auto_Accept
         public static List<itemList> runesList = new List<itemList>();
         public static List<itemList> spellsSorted = new List<itemList>();
 
-        public static string currentSummonerId = "";
+        public static long currentSummonerId = 0;
         public static string currentChatId = "";
 
         public static void loadSummonerId()
         {
-            if (currentSummonerId == "")
+            if (currentSummonerId == 0)
             {
                 Print.printCentered("Getting summoner ID...", 15);
-                var currentSummoner = LCU.clientRequestUntilSuccess("GET", "lol-summoner/v1/current-summoner");
+                var currentSummoner = LCU.clientRequestUntilSuccess<LCUTypes.LolSummonerV1CurrentSummoner>("GET", "lol-summoner/v1/current-summoner");
                 Console.Clear();
-                currentSummonerId = currentSummoner.Content.Split("summonerId\":")[1].Split(',')[0];
+                currentSummonerId = currentSummoner.Data.SummonerId;
             }
         }
 
@@ -37,7 +37,7 @@ namespace Leauge_Auto_Accept
         {
             var myChatProfile = LCU.clientRequest("GET", "lol-chat/v1/me");
             currentChatId = myChatProfile.Content.Split("\"id\":\"")[1].Split("\",")[0];
-            currentSummonerId = myChatProfile.Content.Split("\"summonerId\":")[1].Split(",\"")[0];
+            currentSummonerId = long.Parse(myChatProfile.Content.Split("\"summonerId\":")[1].Split(",\"")[0]);
         }
 
         public static void loadChampionsList()
