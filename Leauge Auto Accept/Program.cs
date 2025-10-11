@@ -18,6 +18,9 @@ namespace Leauge_Auto_Accept
     {
         private static void Main()
         {
+            //force culture to be invariant for now.
+            Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+
             // Start application using conhost (Windows Terminal do not support resize)
             // Ref: https://github.com/microsoft/terminal/issues/5094
             var parentProc = ParentProcessUtilities.GetParentProcess();
