@@ -177,7 +177,7 @@ namespace Leauge_Auto_Accept
 
 			if (Log.IsDebugEnabled)
 			{
-				Log.Debug("statusCode={0}, isSuccessful={1}", restResp?.StatusCode, restResp?.IsSuccessful);
+				 Log.Debug("statusCode={0}, isSuccessful={1}", restResp?.StatusCode, restResp?.IsSuccessful);
 			}
 
 			if (JsonLog.IsDebugEnabled)

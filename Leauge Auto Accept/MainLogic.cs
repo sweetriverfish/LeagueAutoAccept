@@ -264,7 +264,7 @@ namespace Leauge_Auto_Accept
                     
                     if (isArena || !pickedChamp || !lockedChamp || !pickedBan || !lockedBan)
                     {
-                        handleChampSelectActions(currentChampSelect, currentChampSelect.Data.LocalPlayerCellId);
+                        handleChampSelectActions(currentChampSelect.Data, currentChampSelect.Data.LocalPlayerCellId);
                     }
                     if (!sentChatMessages)
                     {
@@ -291,50 +291,26 @@ namespace Leauge_Auto_Accept
         }
 
 
-        // Check player's assigned position and adjust champion pick to primary (true) or secondary (false)
-        private static bool handleChampPositionPreferences(RestResponse<LCUTypes.LolChampSelectSessionV1> currentChampSelect, int localPlayerCellId)
+        /// <summary>
+        /// Check player's assigned position and adjust champion pick to primary (true) or secondary (false)
+        /// </summary>
+        /// <param name="currentChampSelect"></param>
+        /// <param name="localPlayerCellId"></param>
+        /// <returns>true for usePrimaryChamp, false for useSecondaryChamp</returns>
+        private static bool handleChampPositionPreferences(LCUTypes.LolChampSelectSessionV1 currentChampSelect, int localPlayerCellId)
         {
             // Check lobby endpoint for position preferences
-            var lobbySession = LCU.clientRequest("GET", "lol-lobby/v2/lobby");
-            if (!lobbySession.Content.Contains("firstPositionPreference\":") || !lobbySession.Content.Contains("secondPositionPreference\":")) return true;
+            var lobbySessionResp = LCU.clientRequest<LCUTypes.LolLobbyV2Lobby>("GET", "lol-lobby/v2/lobby");
+            var lobbySession = lobbySessionResp.Data;
 
-            string firstPositionPreference = lobbySession.Content.Split("firstPositionPreference\":")[1].Split(',')[0].Trim('"').ToLower();
-            string secondPositionPreference = lobbySession.Content.Split("secondPositionPreference\":")[1].Split(',')[0].Trim('"').ToLower();
+            string firstPositionPreference = lobbySession.LocalMember.FirstPositionPreference;
+            string secondPositionPreference = lobbySession.LocalMember.SecondPositionPreference;
 
-            // Locate the "myTeam":[{ ... }] block
-            int startIndex = currentChampSelect.Content.IndexOf("\"myTeam\":[");
-            if (startIndex == -1) return true;
-
-            int teamDataStart = currentChampSelect.Content.IndexOf("[{", startIndex);
-            int teamDataEnd = currentChampSelect.Content.IndexOf("}]", teamDataStart);
-            if (teamDataStart == -1 || teamDataEnd == -1) return true;
+            //find current player within MyTeam array
+            var player = currentChampSelect.MyTeam.FirstOrDefault(x=>x.CellId == localPlayerCellId);
             
-            string myTeam = currentChampSelect.Content.Substring(teamDataStart + 1, teamDataEnd - teamDataStart);
-
-            // Split objects (players) using '{' as a separator
-            string[] players = myTeam.Split(new string[] { "{" }, StringSplitOptions.RemoveEmptyEntries);
-
-            string assignedPosition = "";
-            foreach (var player in players)
-            {
-                // Match the cell IDs
-                if (player.Contains("\"cellId\":" + localPlayerCellId + ","))
-                {
-                    string[] lines = player.Split(',');
-                    foreach (var line in lines)
-                    {
-                        // Extract the assigned position
-                        if (line.Contains("\"assignedPosition\""))
-                        {
-                            string[] parts = line.Split(':');
-                            assignedPosition = parts[1].Trim('"');
-                        }
-                    }
-                }
-            }
-            
-            if (firstPositionPreference == assignedPosition) return true;
-            if (secondPositionPreference == assignedPosition) return false;
+            if (string.Compare(firstPositionPreference, player.AssignedPosition, true) == 0) return true;
+            if (string.Compare(secondPositionPreference, player.AssignedPosition, true) == 0) return false;
             
             return true;
         }
@@ -381,12 +357,12 @@ namespace Leauge_Auto_Accept
             sentChatMessages = true;
         }
 
-        private static void handleChampSelectActions(RestResponse<LCUTypes.LolChampSelectSessionV1> currentChampSelect, int localPlayerCellId)
+        private static void handleChampSelectActions(LCUTypes.LolChampSelectSessionV1 currentChampSelect, int localPlayerCellId)
         {
             // This logic skips modes that aren't draft
-            if (currentChampSelect.Data.Actions.Count == 0) return;
+            if (currentChampSelect.Actions.Count == 0) return;
 
-            foreach (var act in currentChampSelect.Data.Actions.SelectMany(list=>list.AsArray()))
+            foreach (var act in currentChampSelect.Actions.SelectMany(list=>list.AsArray())) //flatten the weird two dimensional array
             {
                 int ActCctorCellId = act["actorCellId"].GetValue<int>();
                 bool ActCompleted = act["completed"].GetValue<bool>();
@@ -397,7 +373,7 @@ namespace Leauge_Auto_Accept
 
                 if (ActCctorCellId == localPlayerCellId && ActCompleted == false && ActType == "pick")
                 {
-                    bool usePrimaryChamp = handleChampPositionPreferences(currentChampSelect, currentChampSelect.Data.LocalPlayerCellId);
+                    bool usePrimaryChamp = handleChampPositionPreferences(currentChampSelect, currentChampSelect.LocalPlayerCellId);
                     handlePickAction(actId, championId, ActIsInProgress, currentChampSelect, usePrimaryChamp);
                 }
                 else if (ActCctorCellId == localPlayerCellId && ActCompleted == false && ActType == "ban")
@@ -407,10 +383,10 @@ namespace Leauge_Auto_Accept
             }
         }
 
-        private static bool ShouldHoverChampion(RestResponse<LCUTypes.LolChampSelectSessionV1> currentChampSelect)
+        private static bool ShouldHoverChampion(LCUTypes.LolChampSelectSessionV1 currentChampSelect)
         {
             // Hover champion when champ select starts
-            string champSelectPhase = currentChampSelect.Content.Split("\"phase\":\"")[1].Split('"')[0];
+            string champSelectPhase = currentChampSelect.Timer.Phase;
             long currentTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             return (currentTime - Settings.pickStartHoverDelay) > champSelectStart
                    || champSelectPhase != "PLANNING"
@@ -424,7 +400,7 @@ namespace Leauge_Auto_Accept
             champId == crowdFavorite4ChampId ||
             champId == crowdFavorite5ChampId;
 
-        private static void handlePickAction(int actId, int championId, bool ActIsInProgress, RestResponse<LCUTypes.LolChampSelectSessionV1> currentChampSelect, bool usePrimaryChamp)
+        private static void handlePickAction(int actId, int championId, bool ActIsInProgress, LCUTypes.LolChampSelectSessionV1 currentChampSelect, bool usePrimaryChamp)
         {
             // Check if the hover gets cleared (by either a ban or teammate taking it)
             if (championId == 0) pickedChamp = false;
@@ -472,7 +448,11 @@ namespace Leauge_Auto_Accept
                         hoverChampion(actId, backupChampId, "pick");
                         handleRunes(backupRunesId);
                         if (pickedChamp) championId = backupChampId;
-                    } else championId = primaryChampId;
+                    }
+                    else
+                    {
+                        championId = primaryChampId;
+                    }
                 }
             }
 
@@ -502,9 +482,9 @@ namespace Leauge_Auto_Accept
             }
         }
 
-        private static void handleBanAction(int actId, int championId, bool ActIsInProgress, RestResponse<LCUTypes.LolChampSelectSessionV1> currentChampSelect)
+        private static void handleBanAction(int actId, int championId, bool ActIsInProgress, LCUTypes.LolChampSelectSessionV1 currentChampSelect)
         {
-            string champSelectPhase = currentChampSelect.Data.Timer.Phase;
+            string champSelectPhase = currentChampSelect.Timer.Phase;
 
             // make sure it's my turn to pick and that it is not the planning phase anymore
             if (ActIsInProgress == true && champSelectPhase != "PLANNING")
@@ -561,7 +541,7 @@ namespace Leauge_Auto_Accept
 
         private static void lockChampion(int actId, int championId, string actType)
         {
-            var champSelectAction = LCU.clientRequest("PATCH", $"lol-champ-select/v1/session/actions/{actId}", "{'completed':true,'championId':" + championId + "}");
+            var champSelectAction = LCU.clientRequest("PATCH", $"lol-champ-select/v1/session/actions/{actId}", new { completed = true, championId = championId });
             if (champSelectAction.IsSuccessStatusCode)
             {
                 if (actType == "pick")
@@ -575,10 +555,10 @@ namespace Leauge_Auto_Accept
             }
         }
 
-        private static void checkLockDelay(int actId, int championId, RestResponse<LCUTypes.LolChampSelectSessionV1> currentChampSelect, string actType)
+        private static void checkLockDelay(int actId, int championId, LCUTypes.LolChampSelectSessionV1 currentChampSelect, string actType)
         {
-            long totalTime = currentChampSelect.Data.Timer.TotalTimeInPhase; // Convert.ToInt64(currentChampSelect.Content.Split("totalTimeInPhase\":")[1].Split(",")[0].Split("}")[0]);
-            long remaining = currentChampSelect.Data.Timer.AdjustedTimeLeftInPhase; // Convert.ToInt64(currentChampSelect.Content.Split("adjustedTimeLeftInPhase\":")[1].Split(",")[0].Split("}")[0]);
+            long totalTime = currentChampSelect.Timer.TotalTimeInPhase;
+            long remaining = currentChampSelect.Timer.AdjustedTimeLeftInPhase;
             long elapsed = totalTime - remaining;
 
             int startDelay = actType == "pick" ? Settings.pickStartlockDelay : Settings.banStartlockDelay;
