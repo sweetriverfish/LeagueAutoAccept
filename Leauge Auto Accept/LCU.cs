@@ -17,7 +17,7 @@ namespace Leauge_Auto_Accept
         private static readonly NLog.ILogger Log = NLog.LogManager.GetCurrentClassLogger();
         private static readonly NLog.ILogger JsonLog = NLog.LogManager.GetLogger("JsonLog");
 
-		private static string[] leagueAuth;
+        private static string[] leagueAuth;
         private static int lcuPid = 0;
         public static bool isLeagueOpen = false;
 
@@ -31,13 +31,13 @@ namespace Leauge_Auto_Accept
                     isLeagueOpen = true;
                     if (lcuPid != client.Id)
                     {
-						lcuPid = client.Id;
+                        lcuPid = client.Id;
 
-						//get token and port
-						leagueAuth = getLeagueAuth(client);
+                        //get token and port
+                        leagueAuth = getLeagueAuth(client);
 
-						//reset restclient
-						S_restClient?.Dispose(); S_restClient = null;
+                        //reset restclient
+                        S_restClient?.Dispose(); S_restClient = null;
 
                         // Check if preload data was enabled last time
                         if (Settings.preloadData)
@@ -113,221 +113,221 @@ namespace Leauge_Auto_Accept
 
         private static RestClient S_restClient;
 
-		public static RestResponse clientRequest(string method, string url, object json)
-		{
-			string body = null;
-			
-			if (json != null) body = JsonSerializer.Serialize(json);
+        public static RestResponse clientRequest(string method, string url, object json)
+        {
+            string body = null;
+            
+            if (json != null) body = JsonSerializer.Serialize(json);
 
-			return clientRequest(method, url, body);
-		}
+            return clientRequest(method, url, body);
+        }
 
-		public static RestResponse clientRequest(string method, string url, string body = null)
-		{
-			if (S_restClient == null)
-			{
-				S_restClient = new RestClient(c => {
-					c.BaseUrl = new Uri("https://127.0.0.1:" + leagueAuth[1] + "/");
-					//c.Authenticator = new HttpBasicAuthenticator(leagueAuth[0], "");
+        public static RestResponse clientRequest(string method, string url, string body = null)
+        {
+            if (S_restClient == null)
+            {
+                S_restClient = new RestClient(c => {
+                    c.BaseUrl = new Uri("https://127.0.0.1:" + leagueAuth[1] + "/");
+                    //c.Authenticator = new HttpBasicAuthenticator(leagueAuth[0], "");
 
-					//disable ssl checks
-					c.RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicy) => true;
+                    //disable ssl checks
+                    c.RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicy) => true;
 
-				}, h => {
-					h.Authorization = new AuthenticationHeaderValue("Basic", leagueAuth[0]);
-				});
-			}
+                }, h => {
+                    h.Authorization = new AuthenticationHeaderValue("Basic", leagueAuth[0]);
+                });
+            }
 
-			Log.Debug("Initiating request {0} {1}", method, url);
+            Log.Debug("Initiating request {0} {1}", method, url);
 
-			RestRequest req = null;
-			RestResponse restResp = null;
-			if (method == "GET")
-			{
-				req = new RestRequest(url, Method.Get);
-				restResp = S_restClient.ExecuteGet(req);
-			}
+            RestRequest req = null;
+            RestResponse restResp = null;
+            if (method == "GET")
+            {
+                req = new RestRequest(url, Method.Get);
+                restResp = S_restClient.ExecuteGet(req);
+            }
 
-			if (method == "POST")
-			{
-				req = new RestRequest(url, Method.Post);
-				if (body != null) req.AddStringBody(body, ContentType.Plain);
-				restResp = S_restClient.ExecutePost(req);
-			}
+            if (method == "POST")
+            {
+                req = new RestRequest(url, Method.Post);
+                if (body != null) req.AddStringBody(body, ContentType.Plain);
+                restResp = S_restClient.ExecutePost(req);
+            }
 
-			if (method == "PUT")
-			{
-				req = new RestRequest(url, Method.Post);
-				if (body != null) req.AddStringBody(body, ContentType.Json);
-				restResp = S_restClient.ExecutePut(req);
-			}
+            if (method == "PUT")
+            {
+                req = new RestRequest(url, Method.Post);
+                if (body != null) req.AddStringBody(body, ContentType.Json);
+                restResp = S_restClient.ExecutePut(req);
+            }
 
 
-			if (method == "PATCH")
-			{
-				req = new RestRequest(url, Method.Post);
-				if (body != null) req.AddStringBody(body, ContentType.Json);
-				restResp = S_restClient.ExecutePatch(req);
-			}
+            if (method == "PATCH")
+            {
+                req = new RestRequest(url, Method.Post);
+                if (body != null) req.AddStringBody(body, ContentType.Json);
+                restResp = S_restClient.ExecutePatch(req);
+            }
 
-			if (method == "DELETE")
-			{
-				req = new RestRequest(url, Method.Delete);
-				restResp = S_restClient.ExecuteDelete(req);
-			}
+            if (method == "DELETE")
+            {
+                req = new RestRequest(url, Method.Delete);
+                restResp = S_restClient.ExecuteDelete(req);
+            }
 
-			if (Log.IsDebugEnabled)
-			{
-				 Log.Debug("statusCode={0}, isSuccessful={1}", restResp?.StatusCode, restResp?.IsSuccessful);
-			}
+            if (Log.IsDebugEnabled)
+            {
+                 Log.Debug("statusCode={0}, isSuccessful={1}", restResp?.StatusCode, restResp?.IsSuccessful);
+            }
 
-			WriteToJsonLog(req, restResp);
+            WriteToJsonLog(req, restResp);
 
-			return restResp ?? new RestResponse(new RestRequest());
-		}
+            return restResp ?? new RestResponse(new RestRequest());
+        }
 
-		private static Dictionary<string, string> S_JsonLog_Values = new Dictionary<string, string>();
+        private static Dictionary<string, string> S_JsonLog_Values = new Dictionary<string, string>();
 
         public static RestResponse clientRequestUntilSuccess(string method, string url, string body = null)
         {
             RestResponse request;
-			do
-			{
-				request = clientRequest(method, url, body);
-				if (request.IsSuccessStatusCode == true)
-				{
-					return request;
-				}
-				else
-				{
-					if (CheckIfLeagueClientIsOpen())
-					{
-						Thread.Sleep(1000);
-					}
-					else
-					{
-						return request;
-					}
-				}
-			} while (request.IsSuccessStatusCode == false);
+            do
+            {
+                request = clientRequest(method, url, body);
+                if (request.IsSuccessStatusCode == true)
+                {
+                    return request;
+                }
+                else
+                {
+                    if (CheckIfLeagueClientIsOpen())
+                    {
+                        Thread.Sleep(1000);
+                    }
+                    else
+                    {
+                        return request;
+                    }
+                }
+            } while (request.IsSuccessStatusCode == false);
 
-			return request;
+            return request;
         }
 
-		public static RestResponse<TResponse> clientRequest<TResponse>(string method, string url, string body = null)
-		{
-			if (S_restClient == null)
-			{
-				S_restClient = new RestClient(c => {
-					c.BaseUrl = new Uri("https://127.0.0.1:" + leagueAuth[1] + "/");
-					//c.Authenticator = new HttpBasicAuthenticator(leagueAuth[0], "");
+        public static RestResponse<TResponse> clientRequest<TResponse>(string method, string url, string body = null)
+        {
+            if (S_restClient == null)
+            {
+                S_restClient = new RestClient(c => {
+                    c.BaseUrl = new Uri("https://127.0.0.1:" + leagueAuth[1] + "/");
+                    //c.Authenticator = new HttpBasicAuthenticator(leagueAuth[0], "");
 
-					//disable ssl checks
-					c.RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicy) => true;
+                    //disable ssl checks
+                    c.RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicy) => true;
 
-				}, h => {
-					h.Authorization = new AuthenticationHeaderValue("Basic", leagueAuth[0]);
-				});
-			}
+                }, h => {
+                    h.Authorization = new AuthenticationHeaderValue("Basic", leagueAuth[0]);
+                });
+            }
 
-			Log.Debug("Initiating request {0} {1}", method, url);
+            Log.Debug("Initiating request {0} {1}", method, url);
 
-			RestRequest req = null;
-			RestResponse<TResponse> restResp = null;
-			if (method == "GET")
-			{
-				req = new RestRequest(url, Method.Get);
-				restResp = S_restClient.ExecuteGet<TResponse>(url);
-			}
+            RestRequest req = null;
+            RestResponse<TResponse> restResp = null;
+            if (method == "GET")
+            {
+                req = new RestRequest(url, Method.Get);
+                restResp = S_restClient.ExecuteGet<TResponse>(url);
+            }
 
-			if (method == "POST")
-			{
-				req = new RestRequest(url, Method.Post);
-				req.AddStringBody(body, ContentType.Plain);
-				restResp = S_restClient.ExecutePost<TResponse>(req);
-			}
+            if (method == "POST")
+            {
+                req = new RestRequest(url, Method.Post);
+                req.AddStringBody(body, ContentType.Plain);
+                restResp = S_restClient.ExecutePost<TResponse>(req);
+            }
 
-			if (method == "PUT")
-			{
-				req = new RestRequest(url, Method.Post);
-				if (body != null) req.AddStringBody(body, ContentType.Json);
-				restResp = S_restClient.ExecutePut<TResponse>(req);
-			}
+            if (method == "PUT")
+            {
+                req = new RestRequest(url, Method.Post);
+                if (body != null) req.AddStringBody(body, ContentType.Json);
+                restResp = S_restClient.ExecutePut<TResponse>(req);
+            }
 
-			if (method == "PATCH")
-			{
-				req = new RestRequest(url, Method.Post);
-				if (body != null) req.AddStringBody(body, ContentType.Json);
-				restResp = S_restClient.ExecutePatch<TResponse>(req);
-			}
+            if (method == "PATCH")
+            {
+                req = new RestRequest(url, Method.Post);
+                if (body != null) req.AddStringBody(body, ContentType.Json);
+                restResp = S_restClient.ExecutePatch<TResponse>(req);
+            }
 
-			if (method == "DELETE")
-			{
-				restResp = S_restClient.ExecuteDelete<TResponse>(url);
-			}
+            if (method == "DELETE")
+            {
+                restResp = S_restClient.ExecuteDelete<TResponse>(url);
+            }
 
-			if (Log.IsDebugEnabled)
-			{
-				Log.Debug("statusCode={0}, isSuccessful={1}", restResp.StatusCode, restResp.IsSuccessful);
-			}
+            if (Log.IsDebugEnabled)
+            {
+                Log.Debug("statusCode={0}, isSuccessful={1}", restResp.StatusCode, restResp.IsSuccessful);
+            }
 
-			WriteToJsonLog(req, restResp);
+            WriteToJsonLog(req, restResp);
 
-			return restResp ?? new RestResponse<TResponse>(new RestRequest());
-		}
+            return restResp ?? new RestResponse<TResponse>(new RestRequest());
+        }
 
-		public static RestResponse<TResponse> clientRequestUntilSuccess<TResponse>(string method, string url, string body = null)
-		{
-			RestResponse<TResponse> request;
-			do
-			{
-				request = clientRequest<TResponse>(method, url, body);
-				if (request.IsSuccessStatusCode == true)
-				{
-					return request;
-				}
-				else
-				{
-					if (CheckIfLeagueClientIsOpen())
-					{
-						Thread.Sleep(1000);
-					}
-					else
-					{
-						return request;
-					}
-				}
-			} while (request.IsSuccessStatusCode == false);
+        public static RestResponse<TResponse> clientRequestUntilSuccess<TResponse>(string method, string url, string body = null)
+        {
+            RestResponse<TResponse> request;
+            do
+            {
+                request = clientRequest<TResponse>(method, url, body);
+                if (request.IsSuccessStatusCode == true)
+                {
+                    return request;
+                }
+                else
+                {
+                    if (CheckIfLeagueClientIsOpen())
+                    {
+                        Thread.Sleep(1000);
+                    }
+                    else
+                    {
+                        return request;
+                    }
+                }
+            } while (request.IsSuccessStatusCode == false);
 
-			return request;
-		}
+            return request;
+        }
 
-		private static void WriteToJsonLog(RestRequest request, RestResponse restResp)
-		{
-			if (request == null) throw new ArgumentNullException(nameof(request));
+        private static void WriteToJsonLog(RestRequest request, RestResponse restResp)
+        {
+            if (request == null) throw new ArgumentNullException(nameof(request));
 
-			if (JsonLog.IsDebugEnabled)
-			{
-				try
-				{
-					string httprequest = $"{request.Method} {request.Resource}";
-					object body = request.Parameters.FirstOrDefault(x => x.Type == ParameterType.RequestBody)?.Value;
-					if (body != null) httprequest = httprequest + " " + body.GetHashCode().ToStringInvariant();
-					if (S_JsonLog_Values.TryGetValue(httprequest, out string storedvalue))
-					{
-						if (storedvalue == restResp?.Content) goto skipwrite;
-					}
+            if (JsonLog.IsDebugEnabled)
+            {
+                try
+                {
+                    string httprequest = $"{request.Method} {request.Resource}";
+                    object body = request.Parameters.FirstOrDefault(x => x.Type == ParameterType.RequestBody)?.Value;
+                    if (body != null) httprequest = httprequest + " " + body.GetHashCode().ToStringInvariant();
+                    if (S_JsonLog_Values.TryGetValue(httprequest, out string storedvalue))
+                    {
+                        if (storedvalue == restResp?.Content) goto skipwrite;
+                    }
 
-					S_JsonLog_Values[httprequest] = restResp?.Content;
-					var jdoc = JsonDocument.Parse(restResp?.Content ?? "");
-					JsonLog.Debug("{0} {1}:\n{2}", request.Method, request.Resource, JsonSerializer.Serialize(jdoc, new JsonSerializerOptions() { WriteIndented = true }));
+                    S_JsonLog_Values[httprequest] = restResp?.Content;
+                    var jdoc = JsonDocument.Parse(restResp?.Content ?? "");
+                    JsonLog.Debug("{0} {1}:\n{2}", request.Method, request.Resource, JsonSerializer.Serialize(jdoc, new JsonSerializerOptions() { WriteIndented = true }));
 
-				skipwrite:
-					;
-				}
-				catch { }
-			}
-		}
+                skipwrite:
+                    ;
+                }
+                catch { }
+            }
+        }
 
-	}
+    }
 }
