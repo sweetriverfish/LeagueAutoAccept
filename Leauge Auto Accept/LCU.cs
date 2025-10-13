@@ -9,6 +9,7 @@ using System.Threading;
 using System.Text.Json;
 using RestSharp;
 using System.Collections.Generic;
+using System.Text.Json.Nodes;
 
 namespace Leauge_Auto_Accept
 {
@@ -115,15 +116,33 @@ namespace Leauge_Auto_Accept
 
         public static RestResponse clientRequest(string method, string url, object json)
         {
-            string body = null;
-            
-            if (json != null) body = JsonSerializer.Serialize(json);
+            var methodEnum = Enum.Parse<Method>(method, true);
 
-            return clientRequest(method, url, body);
+            var req = new RestRequest(url, methodEnum);
+            if (json != null)
+                req.AddJsonBody(json, ContentType.Json);
+
+            return clientRequest(req);
         }
 
         public static RestResponse clientRequest(string method, string url, string body = null)
         {
+            var methodEnum = Enum.Parse<Method>(method, true);
+
+            var req = new RestRequest(url, methodEnum);
+            if (body != null)
+            {
+                if (body.StartsWith("{"))
+                    req.AddJsonBody(body);
+                else
+                    req.AddStringBody(body, ContentType.Plain);
+            }
+
+             return clientRequest(req);
+        }
+
+        public static RestResponse clientRequest(RestRequest req)
+        { 
             if (S_restClient == null)
             {
                 S_restClient = new RestClient(c => {
@@ -138,43 +157,10 @@ namespace Leauge_Auto_Accept
                 });
             }
 
-            Log.Debug("Initiating request {0} {1}", method, url);
+            Log.Debug("Initiating request {0} {1}", req.Method, req.Resource);
 
-            RestRequest req = null;
-            RestResponse restResp = null;
-            if (method == "GET")
-            {
-                req = new RestRequest(url, Method.Get);
-                restResp = S_restClient.ExecuteGet(req);
-            }
-
-            if (method == "POST")
-            {
-                req = new RestRequest(url, Method.Post);
-                if (body != null) req.AddStringBody(body, ContentType.Plain);
-                restResp = S_restClient.ExecutePost(req);
-            }
-
-            if (method == "PUT")
-            {
-                req = new RestRequest(url, Method.Post);
-                if (body != null) req.AddStringBody(body, ContentType.Json);
-                restResp = S_restClient.ExecutePut(req);
-            }
-
-
-            if (method == "PATCH")
-            {
-                req = new RestRequest(url, Method.Post);
-                if (body != null) req.AddStringBody(body, ContentType.Json);
-                restResp = S_restClient.ExecutePatch(req);
-            }
-
-            if (method == "DELETE")
-            {
-                req = new RestRequest(url, Method.Delete);
-                restResp = S_restClient.ExecuteDelete(req);
-            }
+            //execute request
+            RestResponse restResp = S_restClient.Execute(req);
 
             if (Log.IsDebugEnabled)
             {
@@ -214,8 +200,35 @@ namespace Leauge_Auto_Accept
             return request;
         }
 
+        public static RestResponse clientRequest<TResponse>(string method, string url, object json)
+        {
+            var methodEnum = Enum.Parse<Method>(method, true);
+
+            var req = new RestRequest(url, methodEnum);
+            if (json != null)
+                req.AddJsonBody(json, ContentType.Json);
+
+            return clientRequest<TResponse>(req);
+        }
+
         public static RestResponse<TResponse> clientRequest<TResponse>(string method, string url, string body = null)
         {
+            var methodEnum = Enum.Parse<Method>(method, true);
+
+            var req = new RestRequest(url, methodEnum);
+            if (body != null)
+            {
+                if (body.StartsWith("{"))
+                    req.AddJsonBody(body);
+                else
+                    req.AddStringBody(body, ContentType.Plain);
+            }
+
+            return clientRequest<TResponse>(req);
+        }
+
+        public static RestResponse<TResponse> clientRequest<TResponse>(RestRequest req)
+        { 
             if (S_restClient == null)
             {
                 S_restClient = new RestClient(c => {
@@ -230,41 +243,11 @@ namespace Leauge_Auto_Accept
                 });
             }
 
-            Log.Debug("Initiating request {0} {1}", method, url);
+            Log.Debug("Initiating request {0} {1}", req.Method, req.Resource);
 
-            RestRequest req = null;
-            RestResponse<TResponse> restResp = null;
-            if (method == "GET")
-            {
-                req = new RestRequest(url, Method.Get);
-                restResp = S_restClient.ExecuteGet<TResponse>(url);
-            }
 
-            if (method == "POST")
-            {
-                req = new RestRequest(url, Method.Post);
-                req.AddStringBody(body, ContentType.Plain);
-                restResp = S_restClient.ExecutePost<TResponse>(req);
-            }
-
-            if (method == "PUT")
-            {
-                req = new RestRequest(url, Method.Post);
-                if (body != null) req.AddStringBody(body, ContentType.Json);
-                restResp = S_restClient.ExecutePut<TResponse>(req);
-            }
-
-            if (method == "PATCH")
-            {
-                req = new RestRequest(url, Method.Post);
-                if (body != null) req.AddStringBody(body, ContentType.Json);
-                restResp = S_restClient.ExecutePatch<TResponse>(req);
-            }
-
-            if (method == "DELETE")
-            {
-                restResp = S_restClient.ExecuteDelete<TResponse>(url);
-            }
+            var restResp = S_restClient.Execute<TResponse>(req);
+            
 
             if (Log.IsDebugEnabled)
             {
@@ -298,6 +281,8 @@ namespace Leauge_Auto_Accept
                     }
                 }
             } while (request.IsSuccessStatusCode == false);
+
+            JsonNode x;
 
             return request;
         }
