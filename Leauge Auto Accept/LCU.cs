@@ -140,23 +140,24 @@ namespace Leauge_Auto_Accept
 
 			Log.Debug("Initiating request {0} {1}", method, url);
 
+			RestRequest req = null;
 			RestResponse restResp = null;
 			if (method == "GET")
 			{
-				RestRequest req = new RestRequest(url, Method.Get);
+				req = new RestRequest(url, Method.Get);
 				restResp = S_restClient.ExecuteGet(req);
 			}
 
 			if (method == "POST")
 			{
-				RestRequest req = new RestRequest(url, Method.Post);
+				req = new RestRequest(url, Method.Post);
 				if (body != null) req.AddStringBody(body, ContentType.Plain);
 				restResp = S_restClient.ExecutePost(req);
 			}
 
 			if (method == "PUT")
 			{
-				RestRequest req = new RestRequest(url, Method.Post);
+				req = new RestRequest(url, Method.Post);
 				if (body != null) req.AddStringBody(body, ContentType.Json);
 				restResp = S_restClient.ExecutePut(req);
 			}
@@ -164,14 +165,14 @@ namespace Leauge_Auto_Accept
 
 			if (method == "PATCH")
 			{
-				RestRequest req = new RestRequest(url, Method.Post);
+				req = new RestRequest(url, Method.Post);
 				if (body != null) req.AddStringBody(body, ContentType.Json);
 				restResp = S_restClient.ExecutePatch(req);
 			}
 
 			if (method == "DELETE")
 			{
-				RestRequest req = new RestRequest(url, Method.Delete);
+				req = new RestRequest(url, Method.Delete);
 				restResp = S_restClient.ExecuteDelete(req);
 			}
 
@@ -180,30 +181,10 @@ namespace Leauge_Auto_Accept
 				 Log.Debug("statusCode={0}, isSuccessful={1}", restResp?.StatusCode, restResp?.IsSuccessful);
 			}
 
-			if (JsonLog.IsDebugEnabled)
-			{
-				try
-				{
-					string httprequest = $"{method} {url}";
-					if (body != null) httprequest = string.Concat(httprequest, " ", body.GetHashCode().ToStringInvariant());
-					if (S_JsonLog_Values.TryGetValue(httprequest, out string storedvalue))
-					{
-						if (storedvalue == restResp?.Content) goto skipwrite;
-					}
-
-					S_JsonLog_Values[httprequest] = restResp?.Content;
-					var jdoc = JsonDocument.Parse(restResp?.Content ?? "");
-					JsonLog.Debug("{0} {1}:\n{2}", method, url, JsonSerializer.Serialize(jdoc, new JsonSerializerOptions() { WriteIndented = true }));
-
-				skipwrite:
-					;
-				}
-				catch { }
-			}
+			WriteToJsonLog(req, restResp);
 
 			return restResp ?? new RestResponse(new RestRequest());
 		}
-
 
 		private static Dictionary<string, string> S_JsonLog_Values = new Dictionary<string, string>();
 
@@ -251,30 +232,31 @@ namespace Leauge_Auto_Accept
 
 			Log.Debug("Initiating request {0} {1}", method, url);
 
+			RestRequest req = null;
 			RestResponse<TResponse> restResp = null;
 			if (method == "GET")
 			{
-				RestRequest req = new RestRequest(url, Method.Get);
+				req = new RestRequest(url, Method.Get);
 				restResp = S_restClient.ExecuteGet<TResponse>(url);
 			}
 
 			if (method == "POST")
 			{
-				RestRequest req = new RestRequest(url, Method.Post);
+				req = new RestRequest(url, Method.Post);
 				req.AddStringBody(body, ContentType.Plain);
 				restResp = S_restClient.ExecutePost<TResponse>(req);
 			}
 
 			if (method == "PUT")
 			{
-				RestRequest req = new RestRequest(url, Method.Post);
+				req = new RestRequest(url, Method.Post);
 				if (body != null) req.AddStringBody(body, ContentType.Json);
 				restResp = S_restClient.ExecutePut<TResponse>(req);
 			}
 
 			if (method == "PATCH")
 			{
-				RestRequest req = new RestRequest(url, Method.Post);
+				req = new RestRequest(url, Method.Post);
 				if (body != null) req.AddStringBody(body, ContentType.Json);
 				restResp = S_restClient.ExecutePatch<TResponse>(req);
 			}
@@ -289,26 +271,7 @@ namespace Leauge_Auto_Accept
 				Log.Debug("statusCode={0}, isSuccessful={1}", restResp.StatusCode, restResp.IsSuccessful);
 			}
 
-			if (JsonLog.IsDebugEnabled)
-			{
-				try
-				{
-					string httprequest = $"{method} {url}";
-					if (body != null) httprequest = string.Concat(httprequest, " ", body.GetHashCode().ToStringInvariant());
-					if (S_JsonLog_Values.TryGetValue(httprequest, out string storedvalue))
-					{
-						if (storedvalue == restResp?.Content) goto skipwrite;
-					}
-
-					S_JsonLog_Values[httprequest] = restResp?.Content;
-					var jdoc = JsonDocument.Parse(restResp?.Content ?? "");
-					JsonLog.Debug("{0} {1}:\n{2}", method, url, JsonSerializer.Serialize(jdoc, new JsonSerializerOptions() { WriteIndented = true }));
-
-				skipwrite:
-					;
-				}
-				catch { }
-			}
+			WriteToJsonLog(req, restResp);
 
 			return restResp ?? new RestResponse<TResponse>(new RestRequest());
 		}
@@ -338,5 +301,33 @@ namespace Leauge_Auto_Accept
 
 			return request;
 		}
+
+		private static void WriteToJsonLog(RestRequest request, RestResponse restResp)
+		{
+			if (request == null) throw new ArgumentNullException(nameof(request));
+
+			if (JsonLog.IsDebugEnabled)
+			{
+				try
+				{
+					string httprequest = $"{request.Method} {request.Resource}";
+					object body = request.Parameters.FirstOrDefault(x => x.Type == ParameterType.RequestBody)?.Value;
+					if (body != null) httprequest = httprequest + " " + body.GetHashCode().ToStringInvariant();
+					if (S_JsonLog_Values.TryGetValue(httprequest, out string storedvalue))
+					{
+						if (storedvalue == restResp?.Content) goto skipwrite;
+					}
+
+					S_JsonLog_Values[httprequest] = restResp?.Content;
+					var jdoc = JsonDocument.Parse(restResp?.Content ?? "");
+					JsonLog.Debug("{0} {1}:\n{2}", request.Method, request.Resource, JsonSerializer.Serialize(jdoc, new JsonSerializerOptions() { WriteIndented = true }));
+
+				skipwrite:
+					;
+				}
+				catch { }
+			}
+		}
+
 	}
 }
