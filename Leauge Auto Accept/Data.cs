@@ -52,38 +52,19 @@ namespace Leauge_Auto_Accept
                 List<itemList> champs = new List<itemList>();
 
                 Print.printCentered("Getting champions and ownership list...", 15);
-                var ownedChamps = LCU.clientRequestUntilSuccess("GET", "lol-champions/v1/inventories/" + currentSummonerId + "/champions-minimal");
+                var ownedChampsResp = LCU.clientRequestUntilSuccess<LCUTypes.LolChampionsInventoriesChampionsMinimalV1[]>("GET", $"lol-champions/v1/inventories/{currentSummonerId}/champions-minimal");
                 Console.Clear();
-                string[] champsSplit = ownedChamps.Content.Split("},{");
-                Debug.WriteLine(ownedChamps.Content);
 
-                foreach (var champ in champsSplit)
-                {
-                    string champName = champ.Split("name\":\"")[1].Split('"')[0];
-                    string champId = champ.Split("id\":")[1].Split(',')[0];
-                    string champOwned = champ.Split("owned\":")[1].Split(',')[0];
-                    string champFreeXboxPass = champ.Split("xboxGPReward\":")[1].Split('}')[0];
-                    string champFree = champ.Split("freeToPlay\":")[1].Split(',')[0];
+                champs = ownedChampsResp.Data
+                    .Where(x => x.Name != "None")
+                    .Select(x => {
+                        bool isAvailable = x.Ownership.Owned || x.Ownership.XboxGPReward || x.FreeToPlay;
+                        return new itemList() { name = x.Name, id = x.Id.ToString(), free = isAvailable };
+                    })
+                    .OrderBy(x => x.name)
+                    .ToList();
 
-                    // For some reason Riot provides a "None" champion
-                    if (champName == "None")
-                    {
-                        continue;
-                    }
-
-                    // Fuck the yeti
-                    if (champName == "Nunu & Willump")
-                    {
-                        champName = "Nunu";
-                    }
-
-                    // Check if the champ can be picked
-                    bool isAvailable = champOwned == "true" || champFree == "true" || champFreeXboxPass == "true";
-                    champs.Add(new itemList() { name = champName, id = champId, free = isAvailable });
-                }
-
-                // Sort alphabetically
-                champsSorted = champs.OrderBy(o => o.name).ToList();
+                champsSorted = champs;
             }
 
             SizeHandler.resizeBasedOnChampsCount();
