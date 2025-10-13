@@ -315,14 +315,15 @@ namespace Leauge_Auto_Accept
                 if (string.Compare(secondPositionPreference, player.AssignedPosition, true) == 0) return false;
 
             }
-			return true;
-		}
+            return true;
+        }
 
 
-		private static void handleChampSelectChat(string chatId)
+        private static void handleChampSelectChat(string chatId)
         {
-            var chats = LCU.clientRequest("GET", "lol-chat/v1/conversations", "");
-            if (chats.Content.Contains(chatId))
+            var conversationsResp = LCU.clientRequest<LCUTypes.LolChatConversationsV1[]>("GET", "lol-chat/v1/conversations", "");
+
+            if (conversationsResp.Content.Contains(chatId))
             {
                 Data.loadPlayerChatId();
 
@@ -334,30 +335,44 @@ namespace Leauge_Auto_Accept
                 }
 
             }
+
         }
 
         private static void handleChampSelectChatSendMsg(string chatId)
         {
             foreach (var message in Settings.chatMessages)
             {
+                Log.Info("Sending chat message '{0}'.", message);
+
                 int attempts = 0;
                 RestResponse httpRes;
                 do
                 {
                     string timestamp = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ");
-                    string body = "{\"type\":\"chat\",\"fromId\":\"" + Data.currentChatId + "\",\"fromSummonerId\":" + Data.currentSummonerId + ",\"isHistorical\":false,\"timestamp\":\"" + timestamp + "\",\"body\":\"" + message + "\"}";
-                    httpRes = LCU.clientRequest("POST", "lol-chat/v1/conversations/" + chatId + "/messages", body);
 
-                    if (httpRes.IsSuccessful == false)
+                    var json = new LCUTypes.LolChatConversationsMessagesV1 {
+                        type = "chat",
+                        fromId = Data.currentChatId,
+                        fromSummonerId = Data.currentSummonerId,
+                        isHistorical = false,
+                        timestamp = timestamp,
+                        body = message
+                    };
+                    httpRes = LCU.clientRequest("POST", $"lol-chat/v1/conversations/{chatId}/messages", json);
+
+                    if (httpRes.IsSuccessful == true)
                     {
-                        attempts++;
-                        Thread.Sleep(attempts * 20);
+                        sentChatMessages = true;
+                        break;
                     }
 
+                    Log.Debug("Failed to send message.  attempts={0}", attempts);
+                    attempts++;
+                    Thread.Sleep(attempts * 20);
                 } while (httpRes.IsSuccessful == false && attempts < 3);
 
-			}
-            sentChatMessages = true;
+            }
+
         }
 
         internal static void handleChampSelectActions(LCUTypes.LolChampSelectSessionV1 currentChampSelect, int localPlayerCellId)
