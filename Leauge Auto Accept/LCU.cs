@@ -282,8 +282,6 @@ namespace Leauge_Auto_Accept
                 }
             } while (request.IsSuccessStatusCode == false);
 
-            JsonNode x;
-
             return request;
         }
 
