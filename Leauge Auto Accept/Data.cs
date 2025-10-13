@@ -40,9 +40,9 @@ namespace Leauge_Auto_Accept
 
         public static void loadPlayerChatId()
         {
-            var myChatProfile = LCU.clientRequest("GET", "lol-chat/v1/me");
-            currentChatId = myChatProfile.Content.Split("\"id\":\"")[1].Split("\",")[0];
-            currentSummonerId = long.Parse(myChatProfile.Content.Split("\"summonerId\":")[1].Split(",\"")[0]);
+            var chatProfileResp = LCU.clientRequest<LCUTypes.LolChatMeV1>("GET", "lol-chat/v1/me");
+            currentChatId = chatProfileResp.Data.Id;
+            currentSummonerId = chatProfileResp.Data.SummonerId;
         }
 
         public static void loadChampionsList()
