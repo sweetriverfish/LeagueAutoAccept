@@ -272,7 +272,7 @@ namespace Leauge_Auto_Accept
                     }
                     if (!pickedSpell1)
                     {
-                        var champSelectAction = LCU.clientRequest("PATCH", "lol-champ-select/v1/session/my-selection", new { spellId = int.Parse(Settings.currentSpell1[1]) });
+                        var champSelectAction = LCU.clientRequest("PATCH", "lol-champ-select/v1/session/my-selection", new { spell1Id = int.Parse(Settings.currentSpell1[1]) }); //new { spellId = int.Parse(Settings.currentSpell1[1]) });
                         if (champSelectAction.IsSuccessStatusCode)
                         {
                             pickedSpell1 = true;
@@ -280,7 +280,7 @@ namespace Leauge_Auto_Accept
                     }
                     if (!pickedSpell2)
                     {
-                        var champSelectAction = LCU.clientRequest("PATCH", "lol-champ-select/v1/session/my-selection", new { spellId = int.Parse(Settings.currentSpell2[1]) });
+                        var champSelectAction = LCU.clientRequest("PATCH", "lol-champ-select/v1/session/my-selection", new { spell2Id = int.Parse(Settings.currentSpell2[1]) });
                         if (champSelectAction.IsSuccessStatusCode)
                         {
                             pickedSpell2 = true;
