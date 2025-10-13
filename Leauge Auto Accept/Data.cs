@@ -126,7 +126,6 @@ namespace Leauge_Auto_Accept
 
                 Console.Clear();
                 var enabledGameModes = platformConfig["Mutators"]["EnabledModes"].AsArray().GetValues<string>();
-                //string[] inactiveSpellsPerGameMode = platformConfigResp.Content.Split("gameModeToInactiveSpellIds\":{")[1].Split('}')[0].Split("],");
 
                 Console.Clear();
                 foreach (var gameMode in enabledGameModes)

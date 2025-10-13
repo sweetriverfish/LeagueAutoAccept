@@ -172,7 +172,7 @@ namespace Leauge_Auto_Accept
             if (currentChampSelect.IsSuccessStatusCode)
             {
                 // Get needed data from the current champ select 
-                string currentChatRoom = currentChampSelect.Data.ChatDetails.MultiUserChatId;// Content.Split("multiUserChatId\":\"")[1].Split('"')[0];
+                string currentChatRoom = currentChampSelect.Data.ChatDetails.MultiUserChatId;
                 if (lastChatRoom != currentChatRoom || lastChatRoom == "")
                 {
                     // Reset stuff in case someone dodged the champ select
