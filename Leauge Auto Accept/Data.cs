@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace Leauge_Auto_Accept
 {
@@ -128,79 +129,53 @@ namespace Leauge_Auto_Accept
             {
                 loadSummonerId();
 
-                List<string> enabledSpells = new List<string>();
-
                 Print.printCentered("Getting a list of available summoner spells...", 15);
-                var availableSpells = LCU.clientRequestUntilSuccess("GET", "lol-collections/v1/inventories/" + currentSummonerId + "/spells");
+                var availableSpellsResp = LCU.clientRequestUntilSuccess<LCUTypes.LolCollectionsInventoriesSpellsV1>("GET", $"lol-collections/v1/inventories/{currentSummonerId}/spells");
                 Console.Clear();
-                string[] spellsSplit = availableSpells.Content.Split('[')[1].Split(']')[0].Split(',');
+                var availableSpells = new List<ulong>(availableSpellsResp.Data.Spells);
 
                 Print.printCentered("Getting a list of available gamemodes...", 15);
-                var platformConfig = LCU.clientRequestUntilSuccess("GET", "lol-platform-config/v1/namespaces");
+                var platformConfigResp = LCU.clientRequestUntilSuccess("GET", "lol-platform-config/v1/namespaces");
+
+                //couldnt use generic because the (de)serializer in restsharp was failing on key ESports and Esports being a duplicate
+                //this uses a case-sensitive deserializer
+                var platformConfig = JsonNode.Parse(platformConfigResp.Content); 
+
                 Console.Clear();
-                string[] enabledGameModes = platformConfig.Content.Split("EnabledModes\":[")[1].Split(']')[0].Split(',');
-                string[] inactiveSpellsPerGameMode = platformConfig.Content.Split("gameModeToInactiveSpellIds\":{")[1].Split('}')[0].Split("],");
+                var enabledGameModes = platformConfig["Mutators"]["EnabledModes"].AsArray().GetValues<string>();
+                //string[] inactiveSpellsPerGameMode = platformConfigResp.Content.Split("gameModeToInactiveSpellIds\":{")[1].Split('}')[0].Split("],");
 
                 Console.Clear();
                 foreach (var gameMode in enabledGameModes)
                 {
-                    foreach (var gameMode2 in inactiveSpellsPerGameMode)
+                    foreach (var spellInactive in platformConfig["ClientSystemStates"]["gameModeToInactiveSpellIds"][gameMode].AsArray())
                     {
-                        string gameMode2tmp = gameMode2 + "]".Replace("]]", "]");
-                        string gameMode2Name = gameMode2tmp.Split(':')[0];
-                        if (gameMode == gameMode2Name)
-                        {
-                            string[] inactiveSpells = gameMode2tmp.Split('[')[1].Split(']')[0].Split(',');
-                            foreach (var spell in spellsSplit)
-                            {
-                                bool isActive = true;
-                                foreach (var spellInactive in inactiveSpells)
-                                {
-                                    if (spell + ".0" == spellInactive)
-                                    {
-                                        isActive = false;
-                                        break;
-                                    }
-                                }
-                                if (isActive)
-                                {
-                                    enabledSpells.Add(spell);
-                                }
-                            }
-                        }
+                        availableSpells.Remove((ulong)spellInactive.GetValue<float>());
                     }
                 }
 
                 // Remove dupes
-                enabledSpells = enabledSpells.Distinct().ToList();
+                availableSpells = availableSpells.Distinct().ToList();
 
                 // Get sepll names
                 Print.printCentered("Getting summoner spell names...", 15);
-                var spellsResp = LCU.clientRequest("GET", "lol-game-data/assets/v1/summoner-spells.json");
+                var spellsResp = LCU.clientRequest<JsonArray>("GET", "lol-game-data/assets/v1/summoner-spells.json");
                 Console.Clear();
-                string[] spellsJsonSplit = spellsResp.Content.Split('{');
 
+                var spellsSorted2 = new List<itemList>(20);
                 // Add to list with names
-                foreach (var spell in enabledSpells)
+                foreach (var availableSpellId in availableSpells)
                 {
-                    string spellName = "";
-                    foreach (var spellSingle in spellsJsonSplit)
-                    {
-                        if (spellSingle == "[" || spellSingle == "]")
-                        {
-                            continue;
-                        }
-                        string spellId = spellSingle.Split("id\":")[1].Split(',')[0];
-                        if (spell == spellId)
-                        {
-                            spellName = spellSingle.Split("name\":\"")[1].Split('"')[0];
-                        }
-                    }
-                    spellsSorted.Add(new itemList() { name = spellName, id = spell });
+                    var spellInfo = spellsResp.Data.FirstOrDefault(x => (ulong)x["id"] == availableSpellId);
+
+                    if (spellInfo != null)
+                        spellsSorted2.Add(new itemList() { name = (string)spellInfo["name"], id = spellInfo["id"].ToString() });
                 }
 
                 // Sort alphabetically
-                spellsSorted = spellsSorted.OrderBy(o => o.name).ToList();
+                spellsSorted = spellsSorted2.OrderBy(o => o.name).ToList();
+
+                //Debug.WriteLine(spellsSorted2.Count);
             }
         }
     }
