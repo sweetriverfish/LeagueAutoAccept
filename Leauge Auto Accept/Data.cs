@@ -16,6 +16,8 @@ namespace Leauge_Auto_Accept
 
     internal class Data
     {
+        private static readonly NLog.ILogger Log = NLog.LogManager.GetCurrentClassLogger();
+
         public static List<itemList> champsSorted = new List<itemList>();
         public static List<itemList> runesList = new List<itemList>();
         public static List<itemList> spellsSorted = new List<itemList>();
@@ -25,8 +27,10 @@ namespace Leauge_Auto_Accept
 
         public static void loadSummonerId()
         {
+            Log.Debug("currentSummonerId={0}", currentSummonerId);
             if (currentSummonerId == 0)
             {
+                Log.Info("Loading summonerId from service");
                 Print.printCentered("Getting summoner ID...", 15);
                 var currentSummoner = LCU.clientRequestUntilSuccess<LCUTypes.LolSummonerV1CurrentSummoner>("GET", "lol-summoner/v1/current-summoner");
                 Console.Clear();
@@ -45,8 +49,10 @@ namespace Leauge_Auto_Accept
         {
             Console.Clear();
 
+            Log.Debug("champsSorted.Count={0}", champsSorted?.Count);
             if (!champsSorted.Any())
             {
+                Log.Info("Loading available champions list from service");
                 loadSummonerId();
 
                 List<itemList> champs = new List<itemList>();
@@ -75,6 +81,7 @@ namespace Leauge_Auto_Accept
         {
             Console.Clear();
 
+            Log.Debug("runesList.Count={0}", runesList?.Count);
             if (!runesList.Any())
             {
                 loadSummonerId();
@@ -97,9 +104,13 @@ namespace Leauge_Auto_Accept
         public static void loadSpellsList()
         {
             Console.Clear();
+
+            Log.Debug("spellsSorted.Count={0}", spellsSorted?.Count);
             if (!spellsSorted.Any())
             {
                 loadSummonerId();
+
+                Log.Info("Loading available summoner spells from service.");
 
                 Print.printCentered("Getting a list of available summoner spells...", 15);
                 var availableSpellsResp = LCU.clientRequestUntilSuccess<LCUTypes.LolCollectionsInventoriesSpellsV1>("GET", $"lol-collections/v1/inventories/{currentSummonerId}/spells");
@@ -146,8 +157,6 @@ namespace Leauge_Auto_Accept
 
                 // Sort alphabetically
                 spellsSorted = spellsSorted2.OrderBy(o => o.name).ToList();
-
-                //Debug.WriteLine(spellsSorted2.Count);
             }
         }
     }
