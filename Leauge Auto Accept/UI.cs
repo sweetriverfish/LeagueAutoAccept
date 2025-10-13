@@ -334,6 +334,7 @@ namespace Leauge_Auto_Accept
                 4 => Settings.crowdFavouraiteChamp3[0],
                 5 => Settings.crowdFavouraiteChamp4[0],
                 6 => Settings.crowdFavouraiteChamp5[0],
+                _ => throw new NotImplementedException(), //added to suppress CS8509
             };
             Print.printWhenPossible(outputText, item + topPad, SizeHandler.WidthCenter + 22 - outputText.Length);
         }
