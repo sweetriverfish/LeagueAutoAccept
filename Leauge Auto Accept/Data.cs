@@ -101,22 +101,13 @@ namespace Leauge_Auto_Accept
                 List<itemList> list = new List<itemList>();
 
                 Print.printCentered("Getting runes list...", 15);
-                var runesResponse = LCU.clientRequestUntilSuccess("GET", "lol-perks/v1/pages");
+                var runesResp = LCU.clientRequestUntilSuccess<LCUTypes.LolPerksPagesV1[]>("GET", "lol-perks/v1/pages");
                 Console.Clear();
-                using JsonDocument runesJSON = JsonDocument.Parse(runesResponse.Content);
-                Debug.WriteLine(runesJSON);
 
-                foreach (JsonElement rune in runesJSON.RootElement.EnumerateArray())
-                {
-                    string runeName = rune.GetProperty("name").GetString();
-                    string runeId = rune.GetProperty("id").GetInt32().ToString();
-
-                    
-                    list.Add(new itemList() { name = runeName, id = runeId, free = true });
-                }
-
-                // Sort alphabetically
-                runesList = list;
+                runesList = runesResp.Data
+                    .Where(x => x.IsValid == true)
+                    .Select(x => new itemList() { name = (string)x.Name, id = x.Id.ToStringInvariant(), free = true })
+                    .ToList();
             }
 
             Console.Clear();
