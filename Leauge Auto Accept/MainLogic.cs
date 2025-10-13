@@ -303,20 +303,23 @@ namespace Leauge_Auto_Accept
             var lobbySessionResp = LCU.clientRequest<LCUTypes.LolLobbyV2Lobby>("GET", "lol-lobby/v2/lobby");
             var lobbySession = lobbySessionResp.Data;
 
-            string firstPositionPreference = lobbySession.LocalMember.FirstPositionPreference;
-            string secondPositionPreference = lobbySession.LocalMember.SecondPositionPreference;
+            if (lobbySessionResp.IsSuccessful)
+            {
+                string firstPositionPreference = lobbySession.LocalMember.FirstPositionPreference;
+                string secondPositionPreference = lobbySession.LocalMember.SecondPositionPreference;
 
-            //find current player within MyTeam array
-            var player = currentChampSelect.MyTeam.FirstOrDefault(x=>x.CellId == localPlayerCellId);
-            
-            if (string.Compare(firstPositionPreference, player.AssignedPosition, true) == 0) return true;
-            if (string.Compare(secondPositionPreference, player.AssignedPosition, true) == 0) return false;
-            
-            return true;
-        }
+                //find current player within MyTeam array
+                var player = currentChampSelect.MyTeam.FirstOrDefault(x => x.CellId == localPlayerCellId);
+
+                if (string.Compare(firstPositionPreference, player.AssignedPosition, true) == 0) return true;
+                if (string.Compare(secondPositionPreference, player.AssignedPosition, true) == 0) return false;
+
+            }
+			return true;
+		}
 
 
-        private static void handleChampSelectChat(string chatId)
+		private static void handleChampSelectChat(string chatId)
         {
             var chats = LCU.clientRequest("GET", "lol-chat/v1/conversations", "");
             if (chats.Content.Contains(chatId))
@@ -357,28 +360,29 @@ namespace Leauge_Auto_Accept
             sentChatMessages = true;
         }
 
-        private static void handleChampSelectActions(LCUTypes.LolChampSelectSessionV1 currentChampSelect, int localPlayerCellId)
+        internal static void handleChampSelectActions(LCUTypes.LolChampSelectSessionV1 currentChampSelect, int localPlayerCellId)
         {
             // This logic skips modes that aren't draft
             if (currentChampSelect.Actions.Count == 0) return;
 
-            foreach (var act in currentChampSelect.Actions.SelectMany(list=>list.AsArray())) //flatten the weird two dimensional array
-            {
-                int ActCctorCellId = act["actorCellId"].GetValue<int>();
-                bool ActCompleted = act["completed"].GetValue<bool>();
-                string ActType = act["type"].GetValue<string>();
-                int championId = act["championId"].GetValue<int>();
-                int actId = act["id"].GetValue<int>();
-                bool ActIsInProgress = act["isInProgress"].GetValue<bool>();
+            var actionsFlat = currentChampSelect.Actions.SelectMany(list => list.AsArray()); //flatten the weird two dimensional array
 
-                if (ActCctorCellId == localPlayerCellId && ActCompleted == false && ActType == "pick")
+            foreach (var act in actionsFlat.Where(x => (int)x["actorCellId"] == localPlayerCellId && (bool)x["completed"] == false))
+            {
+                string actionType = (string)act["type"];
+                int championId = (int)act["championId"];
+                int actId = (int)act["id"];
+                bool ActIsInProgress = (bool)act["isInProgress"];
+
+                switch(actionType)
                 {
-                    bool usePrimaryChamp = handleChampPositionPreferences(currentChampSelect, currentChampSelect.LocalPlayerCellId);
-                    handlePickAction(actId, championId, ActIsInProgress, currentChampSelect, usePrimaryChamp);
-                }
-                else if (ActCctorCellId == localPlayerCellId && ActCompleted == false && ActType == "ban")
-                {
-                    handleBanAction(actId, championId, ActIsInProgress, currentChampSelect);
+                    case "pick":
+                        bool usePrimaryChamp = handleChampPositionPreferences(currentChampSelect, currentChampSelect.LocalPlayerCellId);
+                        handlePickAction(actId, championId, ActIsInProgress, currentChampSelect, usePrimaryChamp);
+                        break;
+                    case "ban":
+                        handleBanAction(actId, championId, ActIsInProgress, currentChampSelect);
+                        break;
                 }
             }
         }
