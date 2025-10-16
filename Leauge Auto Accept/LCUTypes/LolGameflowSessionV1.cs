@@ -58,7 +58,7 @@ namespace Leauge_Auto_Accept.LCUTypes
 	);
 
 	public record GameData(
-		[property: JsonPropertyName("gameId")] uint GameId,
+		[property: JsonPropertyName("gameId")] ulong GameId,
 		[property: JsonPropertyName("gameName")] string GameName,
 		[property: JsonPropertyName("isCustomGame")] bool IsCustomGame,
 		[property: JsonPropertyName("password")] string Password,

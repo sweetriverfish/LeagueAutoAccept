@@ -77,6 +77,7 @@ namespace Leauge_Auto_Accept
             Process client = Process.GetProcessesByName("LeagueClientUx").FirstOrDefault();
             if (client != null)
             {
+                Log.Info($"LeagueClientUx process info: id={client.Id}");
                 return true;
             }
             else
@@ -132,10 +133,10 @@ namespace Leauge_Auto_Accept
             var req = new RestRequest(url, methodEnum);
             if (body != null)
             {
-                if (body.StartsWith("{"))
-                    req.AddJsonBody(body);
-                else
-                    req.AddStringBody(body, ContentType.Plain);
+                //if (body.StartsWith("{"))
+                req.AddJsonBody(body);
+                //else
+                //    req.AddStringBody(body, ContentType.Plain);
             }
 
              return clientRequest(req);
@@ -218,10 +219,10 @@ namespace Leauge_Auto_Accept
             var req = new RestRequest(url, methodEnum);
             if (body != null)
             {
-                if (body.StartsWith("{"))
-                    req.AddJsonBody(body);
-                else
-                    req.AddStringBody(body, ContentType.Plain);
+                //if (body.StartsWith("{"))
+                req.AddJsonBody(body);
+                //else
+                //    req.AddStringBody(body, ContentType.Plain);
             }
 
             return clientRequest<TResponse>(req);
@@ -252,6 +253,10 @@ namespace Leauge_Auto_Accept
             if (Log.IsDebugEnabled)
             {
                 Log.Debug("statusCode={0}, isSuccessful={1}", restResp.StatusCode, restResp.IsSuccessful);
+                if (restResp.IsSuccessful==false)
+                {
+                    Log.Debug("statusDescription={0}, content=\n{1}", restResp.StatusDescription, restResp.Content);
+                }
             }
 
             WriteToJsonLog(req, restResp);

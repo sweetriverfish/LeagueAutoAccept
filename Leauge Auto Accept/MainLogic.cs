@@ -272,7 +272,7 @@ namespace Leauge_Auto_Accept
                     }
                     if (!pickedSpell1)
                     {
-                        var champSelectAction = LCU.clientRequest("PATCH", "lol-champ-select/v1/session/my-selection", new { spell1Id = int.Parse(Settings.currentSpell1[1]) }); //new { spellId = int.Parse(Settings.currentSpell1[1]) });
+                        var champSelectAction = LCU.clientRequest("PATCH", "lol-champ-select/v1/session/my-selection", new { spell1Id = ulong.Parse(Settings.currentSpell1[1]) }); //new { spellId = int.Parse(Settings.currentSpell1[1]) });
                         if (champSelectAction.IsSuccessStatusCode)
                         {
                             pickedSpell1 = true;
@@ -280,7 +280,7 @@ namespace Leauge_Auto_Accept
                     }
                     if (!pickedSpell2)
                     {
-                        var champSelectAction = LCU.clientRequest("PATCH", "lol-champ-select/v1/session/my-selection", new { spell2Id = int.Parse(Settings.currentSpell2[1]) });
+                        var champSelectAction = LCU.clientRequest("PATCH", "lol-champ-select/v1/session/my-selection", new { spell2Id = ulong.Parse(Settings.currentSpell2[1]) });
                         if (champSelectAction.IsSuccessStatusCode)
                         {
                             pickedSpell2 = true;
@@ -309,7 +309,7 @@ namespace Leauge_Auto_Accept
                 string secondPositionPreference = lobbySession.LocalMember.SecondPositionPreference;
 
                 //find current player within MyTeam array
-                var player = currentChampSelect.MyTeam.FirstOrDefault(x => x.CellId == localPlayerCellId);
+                var player = currentChampSelect.MyTeam.Single(x => x.CellId == localPlayerCellId);
 
                 if (string.Compare(firstPositionPreference, player.AssignedPosition, true) == 0) return true;
                 if (string.Compare(secondPositionPreference, player.AssignedPosition, true) == 0) return false;
@@ -555,11 +555,13 @@ namespace Leauge_Auto_Accept
 
         private static void handleRunes(int currentRunesId)
         {
-            LCU.clientRequest("PUT", "lol-perks/v1/currentpage", $"{currentRunesId}");
+            Log.Info("handleRunes: currentRunesId={0}", currentRunesId);
+            var runesResp = LCU.clientRequest("PUT", "lol-perks/v1/currentpage", $"{currentRunesId}");
         }
 
         private static void lockChampion(int actId, int championId, string actType)
         {
+            Log.Info("lockChampion: championId={0} actType={1}", championId, actType);
             var champSelectAction = LCU.clientRequest("PATCH", $"lol-champ-select/v1/session/actions/{actId}", new { completed = true, championId = championId });
             if (champSelectAction.IsSuccessStatusCode)
             {
