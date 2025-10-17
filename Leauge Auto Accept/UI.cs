@@ -691,7 +691,7 @@ namespace Leauge_Auto_Accept
                 if (champ.name.ToLower().Contains(Navigation.currentInput.ToLower()))
                 {
                     // Make sure the champ is free or if it's for a ban before adding it to the list
-                    if (champ.free || currentChampPicker == 4)
+                     if (champ.free || currentChampPicker == 4 && int.Parse(champ.id) < 10000)
                     {
                         champsFiltered.Add(new itemList() { name = champ.name, id = champ.id });
                     }
@@ -1134,4 +1134,5 @@ namespace Leauge_Auto_Accept
         }
     }
 }
+
 
