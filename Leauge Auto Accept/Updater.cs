@@ -7,6 +7,8 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using RestSharp;
+using System.Text.Json.Nodes;
 
 namespace Leauge_Auto_Accept
 {
@@ -32,8 +34,8 @@ namespace Leauge_Auto_Accept
         {
             Console.Clear();
             Print.printCentered("Checking for an update...", SizeHandler.HeightCenter);
-            string[] latestRelease = webRequest("https://api.github.com/repos/sweetriverfish/LeagueAutoAccept/releases/latest");
-            if (latestRelease[0] != "200")
+            var releaseResp = webRequest("https://api.github.com/repos/sweetriverfish/LeagueAutoAccept/releases/latest");
+            if (releaseResp.IsSuccessStatusCode == false)
             {
                 // Network error
                 Console.Clear();
@@ -46,7 +48,10 @@ namespace Leauge_Auto_Accept
             {
                 try
                 {
-                    string latestTag = latestRelease[1].Split("tag_name\": \"")[1].Split("\"")[0];
+                    var latestRelease = JsonNode.Parse(releaseResp.Content);
+
+                    var latestTag = (string)latestRelease["tag_name"];
+
                     if ('v' + appVersion == latestTag)
                     {
                         // Running latest version, no update found/needed
@@ -83,32 +88,29 @@ namespace Leauge_Auto_Accept
             }
         }
 
-        public static string[] webRequest(string url)
+        public static RestResponse webRequest(string url)
         {
+            RestResponse resp = null;
+            
             try
             {
-                using (HttpClient client = new HttpClient())
+                using (var client = new RestClient(configureDefaultHeaders: headers => {
+                    headers.Add("User-Agent", "League_Auto_Accept/" + appVersion);
+                }))
                 {
-                    // Set URL, User-Agent
-                    client.BaseAddress = new Uri(url);
-                    client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36");
 
                     // Get the response
-                    using (HttpResponseMessage response = client.GetAsync(url).Result)
-                    {
-                        response.EnsureSuccessStatusCode();
-                        string content = response.Content.ReadAsStringAsync().Result;
-
-                        return new[] { ((int)response.StatusCode).ToString(), content };
-                    }
+                    resp = client.ExecuteGet(new RestRequest(url));
+                    resp.ThrowIfError();
+                    return resp;
                 }
             }
-            catch
+            catch(Exception ex)
             {
-                // If the URL is invalid
-                string[] output = { "999", "" };
-                return output;
+                return resp;
             }
-        }
+        } 
+
     }
+
 }

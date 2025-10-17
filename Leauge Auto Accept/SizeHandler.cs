@@ -20,7 +20,9 @@ namespace Leauge_Auto_Accept
             Console.CursorVisible = false;
 
             // Set the console size
+#pragma warning disable CA1416 // Validate platform compatibility
             Console.SetWindowSize(minWidth, minHeight);
+#pragma warning restore CA1416 // Validate platform compatibility
         }
 
         public static void SizeReader()

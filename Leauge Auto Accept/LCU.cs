@@ -6,11 +6,18 @@ using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Text.Json;
+using RestSharp;
+using System.Collections.Generic;
+using System.Text.Json.Nodes;
 
 namespace Leauge_Auto_Accept
 {
     internal class LCU
     {
+        private static readonly NLog.ILogger Log = NLog.LogManager.GetCurrentClassLogger();
+        private static readonly NLog.ILogger JsonLog = NLog.LogManager.GetLogger("JsonLog");
+
         private static string[] leagueAuth;
         private static int lcuPid = 0;
         public static bool isLeagueOpen = false;
@@ -22,11 +29,17 @@ namespace Leauge_Auto_Accept
                 Process client = Process.GetProcessesByName("LeagueClientUx").FirstOrDefault();
                 if (client != null)
                 {
-                    leagueAuth = getLeagueAuth(client);
                     isLeagueOpen = true;
                     if (lcuPid != client.Id)
                     {
                         lcuPid = client.Id;
+
+                        //get token and port
+                        leagueAuth = getLeagueAuth(client);
+
+                        //reset restclient
+                        S_restClient?.Dispose(); S_restClient = null;
+
                         // Check if preload data was enabled last time
                         if (Settings.preloadData)
                         {
@@ -49,7 +62,7 @@ namespace Leauge_Auto_Accept
                     MainLogic.isAutoAcceptOn = false;
                     Data.champsSorted.Clear();
                     Data.spellsSorted.Clear();
-                    Data.currentSummonerId = "";
+                    Data.currentSummonerId = 0;
                     if (UI.currentWindow != "leagueClientIsClosedMessage" && UI.currentWindow != "exitMenu")
                     {
                         UI.leagueClientIsClosedMessage();
@@ -64,6 +77,7 @@ namespace Leauge_Auto_Accept
             Process client = Process.GetProcessesByName("LeagueClientUx").FirstOrDefault();
             if (client != null)
             {
+                Log.Info($"LeagueClientUx process info: id={client.Id}");
                 return true;
             }
             else
@@ -99,67 +113,75 @@ namespace Leauge_Auto_Accept
             return new string[] { authBase64, port };
         }
 
-        public static string[] clientRequest(string method, string url, string body = null)
+        private static RestClient S_restClient;
+
+        public static RestResponse clientRequest(string method, string url, object json)
         {
-            // Ignore invalid https
-            var handler = new HttpClientHandler()
-            {
-                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
-            };
-            try
-            {
-                using (HttpClient client = new HttpClient(handler))
-                {
-                    // Set URL
-                    client.BaseAddress = new Uri("https://127.0.0.1:" + leagueAuth[1] + "/");
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", leagueAuth[0]);
+            var methodEnum = Enum.Parse<Method>(method, true);
 
-                    // Set headers
-                    HttpRequestMessage request = new HttpRequestMessage(new HttpMethod(method), url);
+            var req = new RestRequest(url, methodEnum);
+            if (json != null)
+                req.AddJsonBody(json, ContentType.Json);
 
-                    // Send POST data when doing a post request
-                    if (!string.IsNullOrEmpty(body))
-                    {
-                        request.Content = new StringContent(body, Encoding.UTF8, "application/json");
-                    }
-
-                    // Get the response
-                    HttpResponseMessage response = client.SendAsync(request).Result;
-
-                    // If the response is null (League client closed?)
-                    if (response == null)
-                    {
-                        return new string[] { "999", "" };
-                    }
-
-                    // Get the HTTP status code
-                    int statusCode = (int)response.StatusCode;
-                    string statusString = statusCode.ToString();
-
-                    // Get the body
-                    string responseFromServer = response.Content.ReadAsStringAsync().Result;
-
-                    // Clean up the response
-                    response.Dispose();
-
-                    // Return content
-                    return new string[] { statusString, responseFromServer };
-                }
-            }
-            catch
-            {
-                // If the URL is invalid (League client closed?)
-                return new string[] { "999", "" };
-            }
+            return clientRequest(req);
         }
 
-        public static string[] clientRequestUntilSuccess(string method, string url, string body = null)
+        public static RestResponse clientRequest(string method, string url, string body = null)
         {
-            string[] request = { "000", "" };
-            while (request[0].Substring(0, 1) != "2")
+            var methodEnum = Enum.Parse<Method>(method, true);
+
+            var req = new RestRequest(url, methodEnum);
+            if (body != null)
+            {
+                //if (body.StartsWith("{"))
+                req.AddJsonBody(body);
+                //else
+                //    req.AddStringBody(body, ContentType.Plain);
+            }
+
+             return clientRequest(req);
+        }
+
+        public static RestResponse clientRequest(RestRequest req)
+        { 
+            if (S_restClient == null)
+            {
+                S_restClient = new RestClient(c => {
+                    c.BaseUrl = new Uri("https://127.0.0.1:" + leagueAuth[1] + "/");
+                    //c.Authenticator = new HttpBasicAuthenticator(leagueAuth[0], "");
+
+                    //disable ssl checks
+                    c.RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicy) => true;
+
+                }, h => {
+                    h.Authorization = new AuthenticationHeaderValue("Basic", leagueAuth[0]);
+                });
+            }
+
+            Log.Debug("Initiating request {0} {1}", req.Method, req.Resource);
+
+            //execute request
+            RestResponse restResp = S_restClient.Execute(req);
+
+            if (Log.IsDebugEnabled)
+            {
+                 Log.Debug("statusCode={0}, isSuccessful={1}", restResp?.StatusCode, restResp?.IsSuccessful);
+            }
+
+            WriteToJsonLog(req, restResp);
+
+            return restResp ?? new RestResponse(new RestRequest());
+        }
+
+        private static Dictionary<string, string> S_JsonLog_Values = new Dictionary<string, string>();
+
+        public static RestResponse clientRequestUntilSuccess(string method, string url, string body = null)
+        {
+            RestResponse request;
+            do
             {
                 request = clientRequest(method, url, body);
-                if (request[0].Substring(0, 1) == "2")
+                if (request.IsSuccessStatusCode == true)
                 {
                     return request;
                 }
@@ -174,8 +196,126 @@ namespace Leauge_Auto_Accept
                         return request;
                     }
                 }
-            }
+            } while (request.IsSuccessStatusCode == false);
+
             return request;
         }
+
+        public static RestResponse clientRequest<TResponse>(string method, string url, object json)
+        {
+            var methodEnum = Enum.Parse<Method>(method, true);
+
+            var req = new RestRequest(url, methodEnum);
+            if (json != null)
+                req.AddJsonBody(json, ContentType.Json);
+
+            return clientRequest<TResponse>(req);
+        }
+
+        public static RestResponse<TResponse> clientRequest<TResponse>(string method, string url, string body = null)
+        {
+            var methodEnum = Enum.Parse<Method>(method, true);
+
+            var req = new RestRequest(url, methodEnum);
+            if (body != null)
+            {
+                //if (body.StartsWith("{"))
+                req.AddJsonBody(body);
+                //else
+                //    req.AddStringBody(body, ContentType.Plain);
+            }
+
+            return clientRequest<TResponse>(req);
+        }
+
+        public static RestResponse<TResponse> clientRequest<TResponse>(RestRequest req)
+        { 
+            if (S_restClient == null)
+            {
+                S_restClient = new RestClient(c => {
+                    c.BaseUrl = new Uri("https://127.0.0.1:" + leagueAuth[1] + "/");
+                    //c.Authenticator = new HttpBasicAuthenticator(leagueAuth[0], "");
+
+                    //disable ssl checks
+                    c.RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicy) => true;
+
+                }, h => {
+                    h.Authorization = new AuthenticationHeaderValue("Basic", leagueAuth[0]);
+                });
+            }
+
+            Log.Debug("Initiating request {0} {1}", req.Method, req.Resource);
+
+
+            var restResp = S_restClient.Execute<TResponse>(req);
+            
+
+            if (Log.IsDebugEnabled)
+            {
+                Log.Debug("statusCode={0}, isSuccessful={1}", restResp.StatusCode, restResp.IsSuccessful);
+                if (restResp.IsSuccessful==false)
+                {
+                    Log.Debug("statusDescription={0}, content=\n{1}", restResp.StatusDescription, restResp.Content);
+                }
+            }
+
+            WriteToJsonLog(req, restResp);
+
+            return restResp ?? new RestResponse<TResponse>(new RestRequest());
+        }
+
+        public static RestResponse<TResponse> clientRequestUntilSuccess<TResponse>(string method, string url, string body = null)
+        {
+            RestResponse<TResponse> request;
+            do
+            {
+                request = clientRequest<TResponse>(method, url, body);
+                if (request.IsSuccessStatusCode == true)
+                {
+                    return request;
+                }
+                else
+                {
+                    if (CheckIfLeagueClientIsOpen())
+                    {
+                        Thread.Sleep(1000);
+                    }
+                    else
+                    {
+                        return request;
+                    }
+                }
+            } while (request.IsSuccessStatusCode == false);
+
+            return request;
+        }
+
+        private static void WriteToJsonLog(RestRequest request, RestResponse restResp)
+        {
+            if (request == null) throw new ArgumentNullException(nameof(request));
+
+            if (JsonLog.IsDebugEnabled)
+            {
+                try
+                {
+                    string httprequest = $"{request.Method} {request.Resource}";
+                    object body = request.Parameters.FirstOrDefault(x => x.Type == ParameterType.RequestBody)?.Value;
+                    if (body != null) httprequest = httprequest + " " + body.GetHashCode().ToStringInvariant();
+                    if (S_JsonLog_Values.TryGetValue(httprequest, out string storedvalue))
+                    {
+                        if (storedvalue == restResp?.Content) goto skipwrite;
+                    }
+
+                    S_JsonLog_Values[httprequest] = restResp?.Content;
+                    var jdoc = JsonDocument.Parse(restResp?.Content ?? "");
+                    JsonLog.Debug("{0} {1}:\n{2}", request.Method, request.Resource, JsonSerializer.Serialize(jdoc, new JsonSerializerOptions() { WriteIndented = true }));
+
+                skipwrite:
+                    ;
+                }
+                catch { }
+            }
+        }
+
     }
 }
