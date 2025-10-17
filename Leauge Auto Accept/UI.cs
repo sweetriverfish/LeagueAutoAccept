@@ -599,7 +599,8 @@ namespace Leauge_Auto_Accept
                 "mrmark1998",
                 "mrcyclo",
                 "considerate-mouth",
-                "DanielBiondi"
+                "DanielBiondi",
+                "ericnewton76"
             };
 
             Random rng = new Random();
@@ -1134,6 +1135,7 @@ namespace Leauge_Auto_Accept
         }
     }
 }
+
 
 
 
