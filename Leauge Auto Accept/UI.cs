@@ -185,13 +185,13 @@ namespace Leauge_Auto_Accept
             // Define options
             string[] optionName = {
                 "Select primary champion",
-                " Runes",
+                " Rune page",
                 "Primary backup champion",
-                " Runes",
+                " Rune page",
                 "Select secondary champion",
-                " Runes",
+                " Rune page",
                 "Secondary backup champion",
-                " Runes",
+                " Rune page",
                 "Select a ban",
                 "Select summoner spell 1",
                 "Select summoner spell 2",
@@ -1134,5 +1134,6 @@ namespace Leauge_Auto_Accept
         }
     }
 }
+
 
 
