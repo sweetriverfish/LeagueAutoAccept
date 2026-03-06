@@ -599,21 +599,26 @@ namespace Leauge_Auto_Accept
                 return;
             }
 
-            // Get ongoing swap data
-            var swapResp = LCU.clientRequest("GET", "lol-champ-select/v1/ongoing-swap");
+            // Get pending swap requests
+            var swapResp = LCU.clientRequest("GET", "lol-champ-select/v1/session/swaps");
             if (swapResp.IsSuccessStatusCode)
             {
-                // If the swap was called by local player, return
-                if (swapResp.Content.Contains("initiatedByLocalPlayer\":true"))
-                {
-                    return;
-                }
-                // Get action ID
-                string swapId = swapResp.Content.Split("\"id\":")[1].Split(',')[0];
+                var swaps = System.Text.Json.Nodes.JsonNode.Parse(swapResp.Content)?.AsArray();
+                if (swaps == null) return;
 
-                // Swap pick order
-                LCU.clientRequest("POST", "lol-champ-select/v1/session/swaps/" + swapId + "/accept");
-                LCU.clientRequest("POST", "lol-champ-select/v1/ongoing-swap/" + swapId + "/clear");
+                foreach (var swap in swaps)
+                {
+                    bool initiatedByLocalPlayer = (bool)(swap["initiatedByLocalPlayer"] ?? false);
+                    string state = (string)swap["state"];
+
+                    // Accept swap requests sent to us (not initiated by us)
+                    if (!initiatedByLocalPlayer && state == "RECEIVED")
+                    {
+                        int swapId = (int)swap["id"];
+                        LCU.clientRequest("POST", $"lol-champ-select/v1/session/swaps/{swapId}/accept");
+                        break;
+                    }
+                }
             }
         }
     }
