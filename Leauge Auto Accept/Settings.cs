@@ -15,6 +15,10 @@ namespace Leauge_Auto_Accept
         public static string[] secondaryChampRunes = { "Unselected", "0" };
         public static string[] secondaryBackupChamp = { "Unselected", "0" };
         public static string[] secondaryBackupChampRunes = { "Unselected", "0" };
+        public static string[] fillChamp = { "Unselected", "0" };
+        public static string[] fillChampRunes = { "Unselected", "0" };
+        public static string[] fillBackupChamp = { "Unselected", "0" };
+        public static string[] fillBackupChampRunes = { "Unselected", "0" };
         public static string[] currentBan = { "Unselected", "0" };
         public static string[] currentSpell1 = { "Unselected", "0" };
         public static string[] currentSpell2 = { "Unselected", "0" };
@@ -260,6 +264,14 @@ namespace Leauge_Auto_Accept
                         secondaryBackupChamp[0] = name;
                         secondaryBackupChamp[1] = id;
                         break;
+                    case 10:
+                        fillChamp[0] = name;
+                        fillChamp[1] = id;
+                        break;
+                    case 11:
+                        fillBackupChamp[0] = name;
+                        fillBackupChamp[1] = id;
+                        break;
                     case 4:
                         currentBan[0] = name;
                         currentBan[1] = id;
@@ -387,6 +399,14 @@ namespace Leauge_Auto_Accept
                         secondaryBackupChampRunes[0] = name;
                         secondaryBackupChampRunes[1] = id;
                         break;
+                    case 10:
+                        fillChampRunes[0] = name;
+                        fillChampRunes[1] = id;
+                        break;
+                    case 11:
+                        fillBackupChampRunes[0] = name;
+                        fillBackupChampRunes[1] = id;
+                        break;
                 }
 
                 if (saveSettings)
@@ -474,6 +494,14 @@ namespace Leauge_Auto_Accept
                 ",secondaryBackupChampId:" + secondaryBackupChamp[1] +
                 ",secondaryBackupChampRuneName:" + secondaryBackupChampRunes[0] +
                 ",secondaryBackupChampRuneId:" + secondaryBackupChampRunes[1] +
+                ",fillChampName:" + fillChamp[0] +
+                ",fillChampId:" + fillChamp[1] +
+                ",fillChampRuneName:" + fillChampRunes[0] +
+                ",fillChampRuneId:" + fillChampRunes[1] +
+                ",fillBackupChampName:" + fillBackupChamp[0] +
+                ",fillBackupChampId:" + fillBackupChamp[1] +
+                ",fillBackupChampRuneName:" + fillBackupChampRunes[0] +
+                ",fillBackupChampRuneId:" + fillBackupChampRunes[1] +
                 ",arenaBravery:" + bravery +
                 ",banCrowdFavourite:" + banCrowdFavourite +
                 ",arenaCrowdFavourite1Name:" + crowdFavouraiteChamp1[0] +
@@ -619,6 +647,30 @@ namespace Leauge_Auto_Accept
                             break;
                         case "secondaryBackupChampRuneId":
                             secondaryBackupChampRunes[1] = columns[1];
+                            break;
+                        case "fillChampName":
+                            fillChamp[0] = columns[1];
+                            break;
+                        case "fillChampId":
+                            fillChamp[1] = columns[1];
+                            break;
+                        case "fillChampRuneName":
+                            fillChampRunes[0] = columns[1];
+                            break;
+                        case "fillChampRuneId":
+                            fillChampRunes[1] = columns[1];
+                            break;
+                        case "fillBackupChampName":
+                            fillBackupChamp[0] = columns[1];
+                            break;
+                        case "fillBackupChampId":
+                            fillBackupChamp[1] = columns[1];
+                            break;
+                        case "fillBackupChampRuneName":
+                            fillBackupChampRunes[0] = columns[1];
+                            break;
+                        case "fillBackupChampRuneId":
+                            fillBackupChampRunes[1] = columns[1];
                             break;
                         case "arenaBravery":
                             bravery = Boolean.Parse(columns[1]);

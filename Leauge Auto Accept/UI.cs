@@ -158,7 +158,7 @@ namespace Leauge_Auto_Accept
             currentWindow = "mainScreen";
             windowType = "normal";
             showCursor = false;
-            topPad = SizeHandler.HeightCenter - 1;
+            topPad = SizeHandler.HeightCenter - 4;
             leftPad = SizeHandler.WidthCenter - 25;
 
             Console.Clear();
@@ -192,6 +192,10 @@ namespace Leauge_Auto_Accept
                 " Rune page",
                 "Secondary backup champion",
                 " Rune page",
+                "Select fill champion",
+                " Rune page",
+                "Fill backup champion",
+                " Rune page",
                 "Select a ban",
                 "Select summoner spell 1",
                 "Select summoner spell 2",
@@ -207,6 +211,10 @@ namespace Leauge_Auto_Accept
                 Settings.secondaryChampRunes[0],
                 Settings.secondaryBackupChamp[0],
                 Settings.secondaryBackupChampRunes[0],
+                Settings.fillChamp[0],
+                Settings.fillChampRunes[0],
+                Settings.fillBackupChamp[0],
+                Settings.fillBackupChampRunes[0],
                 Settings.currentBan[0],
                 Settings.currentSpell1[0],
                 Settings.currentSpell2[0],
@@ -224,9 +232,9 @@ namespace Leauge_Auto_Accept
             }
 
             // Print the two bottom buttons that are not actaul settings
-            Print.printWhenPossible("  Info", SizeHandler.HeightCenter + numOptions, leftPad + 41);
-            Print.printWhenPossible("  Arena", SizeHandler.HeightCenter + numOptions, leftPad + 20);
-            Print.printWhenPossible("  Settings", SizeHandler.HeightCenter + numOptions, leftPad + 1);
+            Print.printWhenPossible("  Info", topPad + numOptions, leftPad + 41);
+            Print.printWhenPossible("  Arena", topPad + numOptions, leftPad + 20);
+            Print.printWhenPossible("  Settings", topPad + numOptions, leftPad + 1);
 
             Print.printWhenPossible("v" + Updater.appVersion, SizeHandler.WindowHeight - 1, 0, false);
 

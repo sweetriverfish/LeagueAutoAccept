@@ -28,6 +28,9 @@ namespace Leauge_Auto_Accept
         private static string crowdFavorite4ChampId = "";
         private static string crowdFavorite5ChampId = "";
 
+        private enum PositionRole { Primary, Secondary, Fill }
+        private static PositionRole? cachedPositionRole = null;
+
         private static long champSelectStart;
         private static string lastChatRoom = "";
 
@@ -185,6 +188,7 @@ namespace Leauge_Auto_Accept
                     pickedSpell1 = false;
                     pickedSpell2 = false;
                     sentChatMessages = false;
+                    cachedPositionRole = null;
                     champSelectStart = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 
                     isArena = currentChampSelect.Data.QueueId == 1700; //1700=arena
@@ -292,30 +296,40 @@ namespace Leauge_Auto_Accept
 
 
         /// <summary>
-        /// Check player's assigned position and adjust champion pick to primary (true) or secondary (false)
+        /// Detect the player's assigned position role (Primary, Secondary, or Fill/autofill).
+        /// Result is cached for the duration of the champion select session.
         /// </summary>
-        /// <param name="currentChampSelect"></param>
-        /// <param name="localPlayerCellId"></param>
-        /// <returns>true for usePrimaryChamp, false for useSecondaryChamp</returns>
-        private static bool handleChampPositionPreferences(LCUTypes.LolChampSelectSessionV1 currentChampSelect, int localPlayerCellId)
+        private static PositionRole handleChampPositionPreferences(LCUTypes.LolChampSelectSessionV1 currentChampSelect, int localPlayerCellId)
         {
-            // Check lobby endpoint for position preferences
+            if (cachedPositionRole.HasValue) return cachedPositionRole.Value;
+
             var lobbySessionResp = LCU.clientRequest<LCUTypes.LolLobbyV2Lobby>("GET", "lol-lobby/v2/lobby");
-            var lobbySession = lobbySessionResp.Data;
 
             if (lobbySessionResp.IsSuccessful)
             {
+                var lobbySession = lobbySessionResp.Data;
                 string firstPositionPreference = lobbySession.LocalMember.FirstPositionPreference;
                 string secondPositionPreference = lobbySession.LocalMember.SecondPositionPreference;
 
-                //find current player within MyTeam array
                 var player = currentChampSelect.MyTeam.Single(x => x.CellId == localPlayerCellId);
+                string assignedPosition = player.AssignedPosition;
 
-                if (string.Compare(firstPositionPreference, player.AssignedPosition, true) == 0) return true;
-                if (string.Compare(secondPositionPreference, player.AssignedPosition, true) == 0) return false;
+                PositionRole role;
+                if (string.Compare(firstPositionPreference, assignedPosition, true) == 0)
+                    role = PositionRole.Primary;
+                else if (string.Compare(secondPositionPreference, assignedPosition, true) == 0)
+                    role = PositionRole.Secondary;
+                else if (Settings.fillChamp[1] != "0")
+                    role = PositionRole.Fill; // autofilled and fill champion is configured
+                else
+                    role = PositionRole.Primary; // autofilled but no fill champion set, fall back to primary
 
+                Log.Info("Position detection: first={0} second={1} assigned={2} role={3}", firstPositionPreference, secondPositionPreference, assignedPosition, role);
+                cachedPositionRole = role;
+                return role;
             }
-            return true;
+
+            return PositionRole.Primary;
         }
 
 
@@ -392,8 +406,8 @@ namespace Leauge_Auto_Accept
                 switch(actionType)
                 {
                     case "pick":
-                        bool usePrimaryChamp = handleChampPositionPreferences(currentChampSelect, currentChampSelect.LocalPlayerCellId);
-                        handlePickAction(actId, championId, ActIsInProgress, currentChampSelect, usePrimaryChamp);
+                        PositionRole positionRole = handleChampPositionPreferences(currentChampSelect, currentChampSelect.LocalPlayerCellId);
+                        handlePickAction(actId, championId, ActIsInProgress, currentChampSelect, positionRole);
                         break;
                     case "ban":
                         handleBanAction(actId, championId, ActIsInProgress, currentChampSelect);
@@ -419,7 +433,7 @@ namespace Leauge_Auto_Accept
             champId == crowdFavorite4ChampId ||
             champId == crowdFavorite5ChampId;
 
-        private static void handlePickAction(int actId, int championId, bool ActIsInProgress, LCUTypes.LolChampSelectSessionV1 currentChampSelect, bool usePrimaryChamp)
+        private static void handlePickAction(int actId, int championId, bool ActIsInProgress, LCUTypes.LolChampSelectSessionV1 currentChampSelect, PositionRole positionRole)
         {
             // Check if the hover gets cleared (by either a ban or teammate taking it)
             if (championId == 0) pickedChamp = false;
@@ -452,10 +466,26 @@ namespace Leauge_Auto_Accept
 
                 if (!pickedChamp && championId != -3)  //TODO: -3 is what???
                 {
-                    int primaryChampId = int.Parse(usePrimaryChamp ? Settings.currentChamp[1] : Settings.secondaryChamp[1]);
-                    int primaryRunesId = int.Parse(usePrimaryChamp ? Settings.currentChampRunes[1] : Settings.secondaryChampRunes[1]);
-                    int backupChampId = int.Parse(usePrimaryChamp ? Settings.currentBackupChamp[1] : Settings.secondaryBackupChamp[1]);
-                    int backupRunesId = int.Parse(usePrimaryChamp ? Settings.currentBackupChampRunes[1] : Settings.secondaryBackupChampRunes[1]);
+                    int primaryChampId = positionRole switch {
+                        PositionRole.Secondary => int.Parse(Settings.secondaryChamp[1]),
+                        PositionRole.Fill => int.Parse(Settings.fillChamp[1]),
+                        _ => int.Parse(Settings.currentChamp[1])
+                    };
+                    int primaryRunesId = positionRole switch {
+                        PositionRole.Secondary => int.Parse(Settings.secondaryChampRunes[1]),
+                        PositionRole.Fill => int.Parse(Settings.fillChampRunes[1]),
+                        _ => int.Parse(Settings.currentChampRunes[1])
+                    };
+                    int backupChampId = positionRole switch {
+                        PositionRole.Secondary => int.Parse(Settings.secondaryBackupChamp[1]),
+                        PositionRole.Fill => int.Parse(Settings.fillBackupChamp[1]),
+                        _ => int.Parse(Settings.currentBackupChamp[1])
+                    };
+                    int backupRunesId = positionRole switch {
+                        PositionRole.Secondary => int.Parse(Settings.secondaryBackupChampRunes[1]),
+                        PositionRole.Fill => int.Parse(Settings.fillBackupChampRunes[1]),
+                        _ => int.Parse(Settings.currentBackupChampRunes[1])
+                    };
 
                     // Try first choice based on player is assigned primary or secondary role
                     hoverChampion(actId, primaryChampId, "pick");

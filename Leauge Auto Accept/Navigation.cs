@@ -643,31 +643,47 @@ namespace Leauge_Auto_Accept
                     UI.runeSelector();
                     break;
                 case 8:
-                    UI.currentChampPicker = 4;
+                    UI.currentChampPicker = 10;
                     UI.champSelector();
                     break;
                 case 9:
+                    UI.currentChampPicker = 10;
+                    UI.runeSelector();
+                    break;
+                case 10:
+                    UI.currentChampPicker = 11;
+                    UI.champSelector();
+                    break;
+                case 11:
+                    UI.currentChampPicker = 11;
+                    UI.runeSelector();
+                    break;
+                case 12:
+                    UI.currentChampPicker = 4;
+                    UI.champSelector();
+                    break;
+                case 13:
                     UI.currentSpellSlot = 0;
                     UI.spellSelector();
                     break;
-                case 10:
+                case 14:
                     UI.currentSpellSlot = 1;
                     UI.spellSelector();
                     break;
-                case 11:
+                case 15:
                     UI.chatMessagesWindow();
                     break;
-                case 12:
+                case 16:
                     Settings.toggleAutoAcceptSetting();
                     UI.toggleAutoAcceptSettingUI(currentPos);
                     break;
-                case 13:
+                case 17:
                     UI.settingsMenu();
                     break;
-                case 14:
+                case 18:
                     UI.arenaMenu();
                     break;
-                case 15:
+                case 19:
                     UI.infoMenu();
                     break;
             }
