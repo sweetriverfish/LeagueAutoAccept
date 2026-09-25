@@ -122,6 +122,9 @@ namespace Leauge_Auto_Accept
                 case "delayMenu":
                     delayMenu();
                     break;
+                case "languageMenu":
+                    languageMenu();
+                    break;
                 case "leagueClientIsClosedMessage":
                     leagueClientIsClosedMessage();
                     break;
@@ -184,19 +187,19 @@ namespace Leauge_Auto_Accept
 
             // Define options
             string[] optionName = {
-                "Select primary champion",
-                " Rune page",
-                "Primary backup champion",
-                " Rune page",
-                "Select secondary champion",
-                " Rune page",
-                "Secondary backup champion",
-                " Rune page",
-                "Select a ban",
-                "Select summoner spell 1",
-                "Select summoner spell 2",
-                "Instant chat messages",
-                "Enable auto accept"
+                Strings.Get("select_primary_champion"),
+                Strings.Get("rune_page"),
+                Strings.Get("primary_backup_champion"),
+                Strings.Get("rune_page"),
+                Strings.Get("select_secondary_champion"),
+                Strings.Get("rune_page"),
+                Strings.Get("secondary_backup_champion"),
+                Strings.Get("rune_page"),
+                Strings.Get("select_a_ban"),
+                Strings.Get("select_summoner_spell_1"),
+                Strings.Get("select_summoner_spell_2"),
+                Strings.Get("instant_chat_messages"),
+                Strings.Get("enable_auto_accept")
             };
             string[] optionValue = {
                 Settings.currentChamp[0],
@@ -210,8 +213,8 @@ namespace Leauge_Auto_Accept
                 Settings.currentBan[0],
                 Settings.currentSpell1[0],
                 Settings.currentSpell2[0],
-                Settings.chatMessagesEnabled ? "Enabled, " + Settings.chatMessages.Count : "Disabled",
-                MainLogic.isAutoAcceptOn ? "Enabled" : "Disabled"
+                Settings.chatMessagesEnabled ? Strings.Get("enabled") + ", " + Settings.chatMessages.Count : Strings.Get("disabled"),
+                MainLogic.isAutoAcceptOn ? Strings.Get("enabled") : Strings.Get("disabled")
             };
 
             numOptions = optionName.Length;
@@ -350,38 +353,38 @@ namespace Leauge_Auto_Accept
             showCursor = false;
             topPad = SizeHandler.HeightCenter - 4;
             leftPad = SizeHandler.WidthCenter - 25;
-            maxPos = 10;
+            maxPos = 11;
 
             Console.Clear();
 
-            // Define options
             string[] optionName = {
-                "Save settings/config",
-                "Preload data",
-                "Instalock pick",
-                "Instalock ban",
-                "Disable update check",
-                "Automatically trade pick order",
-                "Instantly hover pick",
-                "Automatically restart queue",
-                "Cancel queue after dodge",
-                "Delay settings"
+                Strings.Get("save_settings_config"),
+                Strings.Get("preload_data"),
+                Strings.Get("instalock_pick"),
+                Strings.Get("instalock_ban"),
+                Strings.Get("disable_update_check"),
+                Strings.Get("auto_trade_pick_order"),
+                Strings.Get("instant_hover_pick"),
+                Strings.Get("auto_restart_queue"),
+                Strings.Get("cancel_queue_after_dodge"),
+                Strings.Get("delay_settings"),
+                Strings.Get("language")
             };
 
             string[] optionValue = {
-                Settings.saveSettings ? "Yes" : "No",
-                Settings.preloadData ? "Yes" : "No",
-                Settings.instaLock ? "Yes" : "No",
-                Settings.instaBan ? "Yes" : "No",
-                Settings.disableUpdateCheck ? "Yes" : "No",
-                Settings.autoPickOrderTrade ? "Yes" : "No",
-                Settings.instantHover ? "Yes" : "No",
-                Settings.autoRestartQueue ? "Yes" : "No",
-                Settings.cancelQueueAfterDodge ? "Yes" : "No",
-                ""
+                Settings.saveSettings ? Strings.Get("yes") : Strings.Get("no"),
+                Settings.preloadData ? Strings.Get("yes") : Strings.Get("no"),
+                Settings.instaLock ? Strings.Get("yes") : Strings.Get("no"),
+                Settings.instaBan ? Strings.Get("yes") : Strings.Get("no"),
+                Settings.disableUpdateCheck ? Strings.Get("yes") : Strings.Get("no"),
+                Settings.autoPickOrderTrade ? Strings.Get("yes") : Strings.Get("no"),
+                Settings.instantHover ? Strings.Get("yes") : Strings.Get("no"),
+                Settings.autoRestartQueue ? Strings.Get("yes") : Strings.Get("no"),
+                Settings.cancelQueueAfterDodge ? Strings.Get("yes") : Strings.Get("no"),
+                "",
+                Strings.NameForCode(Settings.currentLanguage)
             };
 
-            // Print options
             for (int i = 0; i < optionName.Length; i++)
             {
                 Print.printCentered(addDotsInBetween(optionName[i], optionValue[i]), topPad + i);
@@ -396,47 +399,50 @@ namespace Leauge_Auto_Accept
 
         public static void settingsMenuDesc(int item)
         {
-            // settings descrptions
             switch (item)
             {
                 case 0:
-                    Print.printCentered("Save settings for the next time you open the app.", topPad + maxPos + 2);
-                    Print.printCentered("This will create a settings file in the %AppData% folder.");
+                    Print.printCentered(Strings.Get("desc_save_settings_1"), topPad + maxPos + 2);
+                    Print.printCentered(Strings.Get("desc_save_settings_2"));
                     break;
                 case 1:
-                    Print.printCentered("Preload all data the app will need on launch.", topPad + maxPos + 2);
-                    Print.printCentered("This includes champions list, summoner spells list and more.");
+                    Print.printCentered(Strings.Get("desc_preload_data_1"), topPad + maxPos + 2);
+                    Print.printCentered(Strings.Get("desc_preload_data_2"));
                     break;
                 case 2:
-                    Print.printCentered("Instanly lock in when it's your turn to pick.", topPad + maxPos + 2);
-                    Print.printCentered("This will bypass the lock in delay setting.");
+                    Print.printCentered(Strings.Get("desc_instalock_pick_1"), topPad + maxPos + 2);
+                    Print.printCentered(Strings.Get("desc_bypass_lock_delay"));
                     break;
                 case 3:
-                    Print.printCentered("Instanly lock in when it's your turn to ban.", topPad + maxPos + 2);
-                    Print.printCentered("This will bypass the lock in delay setting.");
+                    Print.printCentered(Strings.Get("desc_instalock_ban_1"), topPad + maxPos + 2);
+                    Print.printCentered(Strings.Get("desc_bypass_lock_delay"));
                     break;
                 case 4:
-                    Print.printCentered("Disable update check on startup.", topPad + maxPos + 2);
+                    Print.printCentered(Strings.Get("desc_disable_update_check"), topPad + maxPos + 2);
                     Print.printCentered("");
                     break;
                 case 5:
-                    Print.printCentered("Automatically trade pick order when someone requests to.", topPad + maxPos + 2);
+                    Print.printCentered(Strings.Get("desc_auto_trade_pick_order"), topPad + maxPos + 2);
                     Print.printCentered("");
                     break;
                 case 6:
-                    Print.printCentered("Instantly hover champion as soon as joining champ select.", topPad + maxPos + 2);
-                    Print.printCentered("In draft pick, it will hover before you are normally able to.");
+                    Print.printCentered(Strings.Get("desc_instant_hover_1"), topPad + maxPos + 2);
+                    Print.printCentered(Strings.Get("desc_instant_hover_2"));
                     break;
                 case 7:
-                    Print.printCentered("Automatically restart queue every few minutes.", topPad + maxPos + 2);
-                    Print.printCentered("Default is 5 mintues, can be configured in the delays settings.");
+                    Print.printCentered(Strings.Get("desc_auto_restart_queue_1"), topPad + maxPos + 2);
+                    Print.printCentered(Strings.Get("desc_auto_restart_queue_2"));
                     break;
                 case 8:
-                    Print.printCentered("Automatically cancel the queue after someone dodges the lobby.", topPad + maxPos + 2);
+                    Print.printCentered(Strings.Get("desc_cancel_queue_dodge"), topPad + maxPos + 2);
                     Print.printCentered("");
                     break;
                 case 9:
-                    Print.printCentered("Adjust different delays.", topPad + maxPos + 2);
+                    Print.printCentered(Strings.Get("desc_delay_settings"), topPad + maxPos + 2);
+                    Print.printCentered("");
+                    break;
+                case 10:
+                    Print.printCentered(Strings.Get("desc_language"), topPad + maxPos + 2);
                     Print.printCentered("");
                     break;
             }
@@ -462,8 +468,6 @@ namespace Leauge_Auto_Accept
             Print.printWhenPossible(outputText, item + topPad, SizeHandler.WidthCenter + 22 - outputText.Length);
         }
 
-
-
         public static void delayMenu()
         {
             Print.canMovePos = false;
@@ -479,16 +483,15 @@ namespace Leauge_Auto_Accept
 
             Console.Clear();
 
-            // Define options
             string[] optionName = {
-                "Pick hover delay upon phase start",
-                "Pick lock delay upon phase start",
-                "Pick lock delay before phase end",
-                "Ban hover delay upon phase start",
-                "Ban lock delay upon phase start",
-                "Ban lock delay before phase end",
-                "Max queue time before restart",
-                "Chat Messages Delay"
+                Strings.Get("pick_hover_delay"),
+                Strings.Get("pick_lock_delay_start"),
+                Strings.Get("pick_lock_delay_end"),
+                Strings.Get("ban_hover_delay"),
+                Strings.Get("ban_lock_delay_start"),
+                Strings.Get("ban_lock_delay_end"),
+                Strings.Get("max_queue_time"),
+                Strings.Get("chat_messages_delay")
             };
             string[] optionValue = {
                 Settings.pickStartHoverDelay.ToString(),
@@ -501,7 +504,6 @@ namespace Leauge_Auto_Accept
                 Settings.chatMessagesDelay.ToString()
             };
 
-            // Print options
             for (int i = 0; i < optionName.Length; i++)
             {
                 Print.printCentered(addDotsInBetween(optionName[i], optionValue[i]), topPad + i);
@@ -514,42 +516,41 @@ namespace Leauge_Auto_Accept
             delayMenuDesc(0);
         }
 
-        public static void delayMenuDesc(int item)
+       public static void delayMenuDesc(int item)
         {
-            // settings descrptions
             switch (item)
             {
                 case 0:
-                    Print.printCentered("Delay after which to hover your pick.", topPad + maxPos + 2);
-                    Print.printCentered("Default is 10000.");
+                    Print.printCentered(Strings.Get("desc_pick_hover_delay"), topPad + maxPos + 2);
+                    Print.printCentered(Strings.Get("desc_default_10000"));
                     break;
                 case 1:
-                    Print.printCentered("Delay after which to lock in your pick, after you are able to.", topPad + maxPos + 2);
-                    Print.printCentered("Default is 999999999.");
+                    Print.printCentered(Strings.Get("desc_pick_lock_delay_start"), topPad + maxPos + 2);
+                    Print.printCentered(Strings.Get("desc_default_999999999"));
                     break;
                 case 2:
-                    Print.printCentered("Time to lock in before your time runs out.", topPad + maxPos + 2);
-                    Print.printCentered("Do not set too low (<300), it will cause you to dodge. Default is 1000.");
+                    Print.printCentered(Strings.Get("desc_pick_lock_delay_end"), topPad + maxPos + 2);
+                    Print.printCentered(Strings.Get("desc_lock_end_warning"));
                     break;
                 case 3:
-                    Print.printCentered("Delay after which to hover your ban.", topPad + maxPos + 2);
-                    Print.printCentered("Default is 1500.");
+                    Print.printCentered(Strings.Get("desc_ban_hover_delay"), topPad + maxPos + 2);
+                    Print.printCentered(Strings.Get("desc_default_1500"));
                     break;
                 case 4:
-                    Print.printCentered("Delay after which to lock in your pick, after you are able to.", topPad + maxPos + 2);
-                    Print.printCentered("Default is 999999999.");
+                    Print.printCentered(Strings.Get("desc_pick_lock_delay_start"), topPad + maxPos + 2);
+                    Print.printCentered(Strings.Get("desc_default_999999999"));
                     break;
                 case 5:
-                    Print.printCentered("Time to lock in before your time runs out", topPad + maxPos + 2);
-                    Print.printCentered("Default is 1000.");
+                    Print.printCentered(Strings.Get("desc_ban_lock_delay_end"), topPad + maxPos + 2);
+                    Print.printCentered(Strings.Get("desc_default_1000"));
                     break;
                 case 6:
-                    Print.printCentered("How long should the queue be before cancelling and restarting it?", topPad + maxPos + 2);
-                    Print.printCentered("Default is 300000.");
+                    Print.printCentered(Strings.Get("desc_max_queue_time"), topPad + maxPos + 2);
+                    Print.printCentered(Strings.Get("desc_default_300000"));
                     break;
                 case 7:
-                    Print.printCentered("Delay after which the chat messages will be sent", topPad + maxPos + 2);
-                    Print.printCentered("Default is 100.");
+                    Print.printCentered(Strings.Get("desc_chat_messages_delay"), topPad + maxPos + 2);
+                    Print.printCentered(Strings.Get("desc_default_100"));
                     break;
             }
         }
@@ -571,6 +572,33 @@ namespace Leauge_Auto_Accept
                 _ => ""
             };
             Print.printWhenPossible(outputText, item + topPad, SizeHandler.WidthCenter + 22 - outputText.Length);
+        }
+
+        public static void languageMenu()
+        {
+            Print.canMovePos = false;
+            Navigation.currentPos = 0;
+            Navigation.consolePosLast = 0;
+
+            currentWindow = "languageMenu";
+            windowType = "normal";
+            showCursor = false;
+            topPad = SizeHandler.HeightCenter - 2;
+            leftPad = SizeHandler.WidthCenter - 25;
+            maxPos = Strings.AvailableLanguages.Count;
+
+            Console.Clear();
+
+            for (int i = 0; i < Strings.AvailableLanguages.Count; i++)
+            {
+                var lang = Strings.AvailableLanguages[i];
+                string value = Settings.currentLanguage == lang.Code ? Strings.Get("selected") : "";
+                Print.printCentered(addDotsInBetween(lang.Name, value), topPad + i);
+            }
+
+            Navigation.handlePointerMovementPrint();
+
+            Print.canMovePos = true;
         }
 
         public static void infoMenu()

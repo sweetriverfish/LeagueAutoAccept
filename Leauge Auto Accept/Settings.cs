@@ -37,6 +37,7 @@ namespace Leauge_Auto_Accept
         public static bool shouldAutoAcceptbeOn = false;
         public static bool autoRestartQueue = false;
         public static bool cancelQueueAfterDodge = false;
+        public static string currentLanguage = "en";
 
         public static int pickStartHoverDelay = 10000;
         public static int pickStartlockDelay = 999999999;
@@ -101,6 +102,9 @@ namespace Leauge_Auto_Accept
                 case 9:
                     UI.delayMenu();
                     break;
+                case 10:
+                    UI.languageMenu();
+                    break;
             }
 
             if (saveSettings)
@@ -110,6 +114,20 @@ namespace Leauge_Auto_Accept
             else if (item == 0)
             {
                 deleteSettings();
+            }
+        }
+
+        public static void languageModify(int item)
+        {
+            if (item >= 0 && item < Strings.AvailableLanguages.Count)
+            {
+                currentLanguage = Strings.AvailableLanguages[item].Code;
+                Strings.CurrentLanguage = currentLanguage;
+            }
+
+            if (saveSettings)
+            {
+                settingsSave();
             }
         }
 
@@ -509,7 +527,8 @@ namespace Leauge_Auto_Accept
                 ",autoRestartQueue:" + autoRestartQueue +
                 ",cancelQueueAfterDodge:" + cancelQueueAfterDodge +
                 ",disableUpdateCheck:" + disableUpdateCheck +
-                ",chatMessages:" + encodeMessagesIntoBase64();
+                ",chatMessages:" + encodeMessagesIntoBase64() +
+                ",language:" + currentLanguage;
 
             string dirParameter = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Leauge Auto Accept Config.txt";
             using (StreamWriter m_WriterParameter = new StreamWriter(dirParameter, false))
@@ -728,6 +747,10 @@ namespace Leauge_Auto_Accept
                         case "chatMessages":
                             decodeMessagesFromBase64(columns[1]);
                             updateChatMessagesToggle();
+                            break;
+                        case "language":
+                            currentLanguage = columns[1];
+                            Strings.CurrentLanguage = currentLanguage;
                             break;
                     }
                     saveSettings = true;
