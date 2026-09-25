@@ -259,6 +259,9 @@ namespace Leauge_Auto_Accept
                 case "delayMenu":
                     UI.settingsMenu();
                     break;
+                case "languageMenu":
+                    UI.settingsMenu();
+                    break;
                 case "mainScreen":
                     UI.exitMenu();
                     break;
@@ -315,6 +318,10 @@ namespace Leauge_Auto_Accept
                 case "delayMenu":
                     //Settings.delayModify(currentPos);
                     //UI.delayMenuUpdateUI(currentPos);
+                    break;
+                case "languageMenu":
+                    Settings.languageModify(currentPos);
+                    UI.settingsMenu();
                     break;
                 case "exitMenu":
                     exitMenuNav();

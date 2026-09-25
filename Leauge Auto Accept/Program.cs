@@ -48,6 +48,8 @@ namespace Leauge_Auto_Accept
             // Set output to UTF8
             Console.OutputEncoding = Encoding.UTF8;
 
+            Strings.LoadLanguages();
+
             // Attempt to load existing settings
             Settings.loadSettings();
 
