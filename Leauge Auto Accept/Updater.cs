@@ -33,15 +33,15 @@ namespace Leauge_Auto_Accept
         private static void versionCheck()
         {
             Console.Clear();
-            Print.printCentered("Checking for an update...", SizeHandler.HeightCenter);
+            Print.printCentered(Strings.Get("checking_for_update"), SizeHandler.HeightCenter);
             var releaseResp = webRequest("https://api.github.com/repos/sweetriverfish/LeagueAutoAccept/releases/latest");
             if (releaseResp == null || releaseResp.IsSuccessStatusCode == false)
             {
                 // Network error
                 Console.Clear();
-                Print.printCentered("Failed to check for an update.", SizeHandler.HeightCenter - 1);
-                Print.printCentered("You can disable this check in the settings.");
-                Print.printCentered("App will launch shortly.");
+                Print.printCentered(Strings.Get("failed_check_update"), SizeHandler.HeightCenter - 1);
+                Print.printCentered(Strings.Get("disable_check_in_settings"));
+                Print.printCentered(Strings.Get("app_launch_shortly"));
                 Thread.Sleep(1500);
             }
             else
@@ -56,7 +56,7 @@ namespace Leauge_Auto_Accept
                     {
                         // Running latest version, no update found/needed
                         Console.Clear();
-                        Print.printCentered("No update found. Already using the latest version.", SizeHandler.HeightCenter);
+                        Print.printCentered(Strings.Get("no_update_found"), SizeHandler.HeightCenter);
                         Thread.Sleep(178);
                         return;
                     }
@@ -64,14 +64,14 @@ namespace Leauge_Auto_Accept
                     {
                         // Running an different version than the latest release, suggest an update
                         Console.Clear();
-                        Print.printCentered("An update has been found, consider updating.", SizeHandler.HeightCenter - 3);
-                        Print.printCentered("Current version is v" + appVersion + ", latest version is " + latestTag);
+                        Print.printCentered(Strings.Get("update_found"), SizeHandler.HeightCenter - 3);
+                        Print.printCentered(string.Format(Strings.Get("current_latest_version_format"), appVersion, latestTag));
 
-                        Print.printCentered("Latest version can be found at:", SizeHandler.HeightCenter);
+                        Print.printCentered(Strings.Get("latest_version_found_at"), SizeHandler.HeightCenter);
                         Print.printCentered("github.com/sweetriverfish/LeagueAutoAccept/releases/latest");
 
-                        Print.printCentered("You can disable this check in the settings.", SizeHandler.HeightCenter + 3);
-                        Print.printCentered("App will launch in 5 seconds.");
+                        Print.printCentered(Strings.Get("disable_check_in_settings"), SizeHandler.HeightCenter + 3);
+                        Print.printCentered(Strings.Get("app_launch_5_seconds"));
 
                         Thread.Sleep(5000);
                     }
@@ -80,9 +80,9 @@ namespace Leauge_Auto_Accept
                 {
                     // Default case, in case github changes the json format or something idk
                     Console.Clear();
-                    Print.printCentered("Failed to check for an update.", SizeHandler.HeightCenter - 1);
-                    Print.printCentered("You can disable this check in the settings.");
-                    Print.printCentered("App will launch in 5 seconds.");
+                    Print.printCentered(Strings.Get("failed_check_update"), SizeHandler.HeightCenter - 1);
+                    Print.printCentered(Strings.Get("disable_check_in_settings"));
+                    Print.printCentered(Strings.Get("app_launch_5_seconds"));
                     Thread.Sleep(5000);
                 }
             }

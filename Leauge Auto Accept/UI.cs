@@ -60,7 +60,7 @@ namespace Leauge_Auto_Accept
             windowType = "nocursor";
             showCursor = false;
 
-            Print.printCentered("Initializing...", SizeHandler.HeightCenter);
+            Print.printCentered(Strings.Get("initializing"), SizeHandler.HeightCenter);
         }
 
         public static void leagueClientIsClosedMessage()
@@ -72,7 +72,7 @@ namespace Leauge_Auto_Accept
 
             Console.Clear();
 
-            Print.printCentered("League client cannot be found.", SizeHandler.HeightCenter);
+            Print.printCentered(Strings.Get("league_client_not_found"), SizeHandler.HeightCenter);
         }
 
         public static void consoleTooSmallMessage(string direction)
@@ -91,13 +91,13 @@ namespace Leauge_Auto_Accept
 
             if (direction == "width")
             {
-                Print.printCentered("Console width is too small. Please resize it.", SizeHandler.HeightCenter);
-                Print.printCentered("Minimum width:" + SizeHandler.minWidth + " | Current width:" + SizeHandler.WindowWidth);
+                Print.printCentered(Strings.Get("console_width_too_small"), SizeHandler.HeightCenter);
+                Print.printCentered(Strings.Get("minimum_width_label") + SizeHandler.minWidth + Strings.Get("current_width_label") + SizeHandler.WindowWidth);
             }
             else
             {
-                Print.printCentered("Console height is too small. Please resize it.", SizeHandler.HeightCenter);
-                Print.printCentered("Minimum height:" + SizeHandler.minHeight + " | Current height:" + SizeHandler.WindowHeight);
+                Print.printCentered(Strings.Get("console_height_too_small"), SizeHandler.HeightCenter);
+                Print.printCentered(Strings.Get("minimum_height_label") + SizeHandler.minHeight + Strings.Get("current_height_label") + SizeHandler.WindowHeight);
             }
         }
 
@@ -227,9 +227,9 @@ namespace Leauge_Auto_Accept
             }
 
             // Print the two bottom buttons that are not actaul settings
-            Print.printWhenPossible("  Info", SizeHandler.HeightCenter + numOptions, leftPad + 41);
-            Print.printWhenPossible("  Arena", SizeHandler.HeightCenter + numOptions, leftPad + 20);
-            Print.printWhenPossible("  Settings", SizeHandler.HeightCenter + numOptions, leftPad + 1);
+            Print.printWhenPossible("  " + Strings.Get("nav_info"), SizeHandler.HeightCenter + numOptions, leftPad + 41);
+            Print.printWhenPossible("  " + Strings.Get("nav_arena"), SizeHandler.HeightCenter + numOptions, leftPad + 20);
+            Print.printWhenPossible("  " + Strings.Get("nav_settings"), SizeHandler.HeightCenter + numOptions, leftPad + 1);
 
             Print.printWhenPossible("v" + Updater.appVersion, SizeHandler.WindowHeight - 1, 0, false);
 
@@ -240,7 +240,11 @@ namespace Leauge_Auto_Accept
 
         public static void toggleAutoAcceptSettingUI(int pos)
         {
-            Print.printWhenPossible(MainLogic.isAutoAcceptOn ? ". Enabled" : " Disabled", topPad + pos, leftPad + 38);
+            string enabledText = " " + Strings.Get("enabled");
+            string disabledText = " " + Strings.Get("disabled");
+            int width = Math.Max(enabledText.Length, disabledText.Length);
+            string text = (MainLogic.isAutoAcceptOn ? enabledText : disabledText).PadRight(width);
+            Print.printWhenPossible(text, topPad + pos, leftPad + 38);
         }
 
         public static void arenaMenu()
@@ -259,18 +263,18 @@ namespace Leauge_Auto_Accept
             Console.Clear();
             
             string[] optionName = {
-                "Enable Bravery",
-                "Ban crowd favourite champion",
-                "Crowd favourite 1st",
-                "Crowd favourite 2nd",
-                "Crowd favourite 3rd",
-                "Crowd favourite 4th",
-                "Crowd favourite 5th",
+                Strings.Get("enable_bravery"),
+                Strings.Get("ban_crowd_favourite"),
+                Strings.Get("crowd_favourite_1st"),
+                Strings.Get("crowd_favourite_2nd"),
+                Strings.Get("crowd_favourite_3rd"),
+                Strings.Get("crowd_favourite_4th"),
+                Strings.Get("crowd_favourite_5th"),
             };
-            
+
             string[] optionValue = {
-                Settings.bravery ? "Yes" : "No",
-                Settings.banCrowdFavourite ? "Yes" : "No",
+                Settings.bravery ? Strings.Get("yes") : Strings.Get("no"),
+                Settings.banCrowdFavourite ? Strings.Get("yes") : Strings.Get("no"),
                 Settings.crowdFavouraiteChamp1[0],
                 Settings.crowdFavouraiteChamp2[0],
                 Settings.crowdFavouraiteChamp3[0],
@@ -294,32 +298,32 @@ namespace Leauge_Auto_Accept
             switch (item)
             {
                 case 0:
-                    Print.printCentered("Enable or disable bravery for arena games.", topPad + maxPos + 2);
-                    Print.printCentered("This will pick bravery in arena games over your selected champion", topPad + maxPos + 3);
+                    Print.printCentered(Strings.Get("desc_enable_bravery_1"), topPad + maxPos + 2);
+                    Print.printCentered(Strings.Get("desc_enable_bravery_2"), topPad + maxPos + 3);
                     break;
                 case 1:
-                    Print.printCentered("Enable or disable banning one of the selected crowd favourite champion", topPad + maxPos + 2);
-                    Print.printCentered("If true and the ban matches one of the crowd favourite champions, It will ban None.", topPad + maxPos + 3);
+                    Print.printCentered(Strings.Get("desc_ban_crowd_favourite_1"), topPad + maxPos + 2);
+                    Print.printCentered(Strings.Get("desc_ban_crowd_favourite_2"), topPad + maxPos + 3);
                     break;
                 case 2:
-                    Print.printCentered("Select the first crowd favourite champion to be picked in arena", topPad + maxPos + 2);
-                    Print.printCentered("This will be picked over bravery.", topPad + maxPos + 3);
+                    Print.printCentered(Strings.Get("desc_crowd_favourite_1st"), topPad + maxPos + 2);
+                    Print.printCentered(Strings.Get("desc_picked_over_bravery"), topPad + maxPos + 3);
                     break;
                 case 3:
-                    Print.printCentered("Select the second crowd favourite champion to be picked in arena", topPad + maxPos + 2);
-                    Print.printCentered("This will be picked over bravery.", topPad + maxPos + 3);
+                    Print.printCentered(Strings.Get("desc_crowd_favourite_2nd"), topPad + maxPos + 2);
+                    Print.printCentered(Strings.Get("desc_picked_over_bravery"), topPad + maxPos + 3);
                     break;
                 case 4:
-                    Print.printCentered("Select the third crowd favourite champion to be picked in arena", topPad + maxPos + 2);
-                    Print.printCentered("This will be picked over bravery.", topPad + maxPos + 3);
+                    Print.printCentered(Strings.Get("desc_crowd_favourite_3rd"), topPad + maxPos + 2);
+                    Print.printCentered(Strings.Get("desc_picked_over_bravery"), topPad + maxPos + 3);
                     break;
                 case 5:
-                    Print.printCentered("Select the fourth crowd favourite champion to be picked in arena", topPad + maxPos + 2);
-                    Print.printCentered("This will be picked over bravery.", topPad + maxPos + 3);
+                    Print.printCentered(Strings.Get("desc_crowd_favourite_4th"), topPad + maxPos + 2);
+                    Print.printCentered(Strings.Get("desc_picked_over_bravery"), topPad + maxPos + 3);
                     break;
                 case 6:
-                    Print.printCentered("Select the fifth crowd favourite champion to be picked in arena", topPad + maxPos + 2);
-                    Print.printCentered("This will be picked over bravery.", topPad + maxPos + 3);
+                    Print.printCentered(Strings.Get("desc_crowd_favourite_5th"), topPad + maxPos + 2);
+                    Print.printCentered(Strings.Get("desc_picked_over_bravery"), topPad + maxPos + 3);
                     break;
             }
         }
@@ -330,8 +334,8 @@ namespace Leauge_Auto_Accept
 
             string outputText = item switch
             {
-                0 => Settings.bravery ? " Yes" : ". No",
-                1 => Settings.banCrowdFavourite ? "Yes" : ". No",
+                0 => Settings.bravery ? " " + Strings.Get("yes") : ". " + Strings.Get("no"),
+                1 => Settings.banCrowdFavourite ? Strings.Get("yes") : ". " + Strings.Get("no"),
                 2 => Settings.crowdFavouraiteChamp1[0],
                 3 => Settings.crowdFavouraiteChamp2[0],
                 4 => Settings.crowdFavouraiteChamp3[0],
@@ -454,15 +458,15 @@ namespace Leauge_Auto_Accept
 
             string outputText = item switch
             {
-                0 => Settings.saveSettings ? " Yes" : ". No",
-                1 => Settings.preloadData ? " Yes" : ". No",
-                2 => Settings.instaLock ? " Yes" : ". No",
-                3 => Settings.instaBan ? " Yes" : ". No",
-                4 => Settings.disableUpdateCheck ? " Yes" : ". No",
-                5 => Settings.autoPickOrderTrade ? " Yes" : ". No",
-                6 => Settings.instantHover ? " Yes" : ". No",
-                7 => Settings.autoRestartQueue ? " Yes" : ". No",
-                8 => Settings.cancelQueueAfterDodge ? " Yes" : ". No",
+                0 => Settings.saveSettings ? " " + Strings.Get("yes") : ". " + Strings.Get("no"),
+                1 => Settings.preloadData ? " " + Strings.Get("yes") : ". " + Strings.Get("no"),
+                2 => Settings.instaLock ? " " + Strings.Get("yes") : ". " + Strings.Get("no"),
+                3 => Settings.instaBan ? " " + Strings.Get("yes") : ". " + Strings.Get("no"),
+                4 => Settings.disableUpdateCheck ? " " + Strings.Get("yes") : ". " + Strings.Get("no"),
+                5 => Settings.autoPickOrderTrade ? " " + Strings.Get("yes") : ". " + Strings.Get("no"),
+                6 => Settings.instantHover ? " " + Strings.Get("yes") : ". " + Strings.Get("no"),
+                7 => Settings.autoRestartQueue ? " " + Strings.Get("yes") : ". " + Strings.Get("no"),
+                8 => Settings.cancelQueueAfterDodge ? " " + Strings.Get("yes") : ". " + Strings.Get("no"),
                 _ => ""
             };
             Print.printWhenPossible(outputText, item + topPad, SizeHandler.WidthCenter + 22 - outputText.Length);
@@ -613,13 +617,13 @@ namespace Leauge_Auto_Accept
 
             Console.Clear();
 
-            Print.printCentered(addDotsInBetween("Made by", "sweetriverfish"), SizeHandler.HeightCenter - 5);
-            Print.printCentered(addDotsInBetween("Version", Updater.appVersion));
+            Print.printCentered(addDotsInBetween(Strings.Get("made_by"), "sweetriverfish"), SizeHandler.HeightCenter - 5);
+            Print.printCentered(addDotsInBetween(Strings.Get("version_label"), Updater.appVersion));
 
-            Print.printCentered("Source code:", SizeHandler.HeightCenter -2);
+            Print.printCentered(Strings.Get("source_code"), SizeHandler.HeightCenter -2);
             Print.printCentered(" github.com/sweetriverfish/LeagueAutoAccept");
 
-            Print.printCentered("Contributors:", SizeHandler.HeightCenter + 1);
+            Print.printCentered(Strings.Get("contributors"), SizeHandler.HeightCenter + 1);
 
             string[] ContributorsList = {
                 "IxPrumxI",
@@ -663,9 +667,9 @@ namespace Leauge_Auto_Accept
 
             Console.Clear();
 
-            Print.printCentered("Are you sure you want to close this app?", topPad - 2);
-            Print.printWhenPossible((" No").PadLeft(32, ' '), topPad, leftPad + 3, false);
-            Print.printWhenPossible("Yes ", topPad, leftPad + 3, false);
+            Print.printCentered(Strings.Get("confirm_exit"), topPad - 2);
+            Print.printWhenPossible((" " + Strings.Get("no")).PadLeft(32, ' '), topPad, leftPad + 3, false);
+            Print.printWhenPossible(Strings.Get("yes") + " ", topPad, leftPad + 3, false);
 
             Navigation.handlePointerMovementPrint();
 
@@ -688,8 +692,8 @@ namespace Leauge_Auto_Accept
 
             if (!Data.loadChampionsList())
             {
-                Print.printCentered("Failed to load champions from League.", SizeHandler.HeightCenter - 1);
-                Print.printCentered("Press Escape to return.");
+                Print.printCentered(Strings.Get("failed_load_champions"), SizeHandler.HeightCenter - 1);
+                Print.printCentered(Strings.Get("press_escape_to_return"));
                 return;
             }
 
@@ -787,8 +791,8 @@ namespace Leauge_Auto_Accept
 
             if (!Data.loadRunesList())
             {
-                Print.printCentered("Failed to load rune pages from League.", SizeHandler.HeightCenter - 1);
-                Print.printCentered("Press Escape to return.");
+                Print.printCentered(Strings.Get("failed_load_runes"), SizeHandler.HeightCenter - 1);
+                Print.printCentered(Strings.Get("press_escape_to_return"));
                 return;
             }
 
@@ -875,8 +879,8 @@ namespace Leauge_Auto_Accept
 
             if (!Data.loadSpellsList())
             {
-                Print.printCentered("Failed to load summoner spells from League.", SizeHandler.HeightCenter - 1);
-                Print.printCentered("Press Escape to return.");
+                Print.printCentered(Strings.Get("failed_load_spells"), SizeHandler.HeightCenter - 1);
+                Print.printCentered(Strings.Get("press_escape_to_return"));
                 return;
             }
 
@@ -965,7 +969,7 @@ namespace Leauge_Auto_Accept
 
             Navigation.currentPos = 0;
             Console.CursorVisible = false;
-            string consoleLine = "Search: " + Navigation.currentInput;
+            string consoleLine = Strings.Get("search_label") + Navigation.currentInput;
             Print.printCentered(consoleLine, Console.WindowHeight - 1, false, true);
 
             Console.SetCursorPosition(0, 0);
@@ -1079,15 +1083,15 @@ namespace Leauge_Auto_Accept
             // Add a button to create a new message
             if (!(currentMessagePrint + 1 > totalRows)) // +1 for "new message" row
             {
-                Print.printWhenPossible("[new message]", currentConsoleRow++, leftPad + 3, false);
+                Print.printWhenPossible(Strings.Get("new_message"), currentConsoleRow++, leftPad + 3, false);
             }
 
             // Print pages count, if needed
             if (totalPages > 1)
             {
-                string pagesPrint = Print.centerString("Current page: " + (pageToLoad + 1) + " / " + totalPages)[0];
-                pagesPrint = Print.replaceAt(pagesPrint, "<- previous page", leftPad + 3);
-                pagesPrint = Print.replaceAt(pagesPrint, "next page ->", SizeHandler.WindowWidth - 17);
+                string pagesPrint = Print.centerString(Strings.Get("current_page") + (pageToLoad + 1) + " / " + totalPages)[0];
+                pagesPrint = Print.replaceAt(pagesPrint, Strings.Get("previous_page"), leftPad + 3);
+                pagesPrint = Print.replaceAt(pagesPrint, Strings.Get("next_page"), SizeHandler.WindowWidth - 17);
                 Print.printWhenPossible(pagesPrint, SizeHandler.WindowHeight - 2, 0, false);
             }
 
@@ -1120,7 +1124,7 @@ namespace Leauge_Auto_Accept
 
             updateMessageEdit();
 
-            Print.printCentered("Save          Delete         Cancel", topPad + 3, false);
+            Print.printCentered(Strings.Get("save_button").PadRight(14) + Strings.Get("delete_button").PadRight(15) + Strings.Get("cancel_button"), topPad + 3, false);
 
 
             Print.canMovePos = true;

@@ -72,5 +72,21 @@ namespace Leauge_Auto_Accept
             var match = AvailableLanguages.FirstOrDefault(l => l.Code == code);
             return match.Name ?? code;
         }
+
+        public static string MatchLocale(string locale)
+        {
+            if (string.IsNullOrWhiteSpace(locale))
+                return null;
+
+            string normalized = locale.Replace('_', '-');
+
+            var exact = AvailableLanguages.FirstOrDefault(l => string.Equals(l.Code, normalized, StringComparison.OrdinalIgnoreCase));
+            if (exact.Code != null)
+                return exact.Code;
+
+            string primary = normalized.Split('-')[0];
+            var partial = AvailableLanguages.FirstOrDefault(l => string.Equals(l.Code.Split('-')[0], primary, StringComparison.OrdinalIgnoreCase));
+            return partial.Code;
+        }
     }
 }

@@ -50,6 +50,8 @@ namespace Leauge_Auto_Accept
                         //reset restclient
                         S_restClient?.Dispose(); S_restClient = null;
 
+                        TryApplyClientLanguage();
+
                         // Check if preload data was enabled last time
                         if (Settings.preloadData)
                         {
@@ -58,8 +60,8 @@ namespace Leauge_Auto_Accept
                             if (!championsLoaded || !spellsLoaded)
                             {
                                 Console.Clear();
-                                Print.printCentered("Some League data failed to load.", SizeHandler.HeightCenter - 1);
-                                Print.printCentered("The app will keep running; try opening the selector again.");
+                                Print.printCentered(Strings.Get("some_league_data_failed"), SizeHandler.HeightCenter - 1);
+                                Print.printCentered(Strings.Get("app_keep_running_retry"));
                                 Thread.Sleep(2500);
                             }
                         }
@@ -332,6 +334,40 @@ namespace Leauge_Auto_Accept
             } while ((!request.IsSuccessStatusCode || request.Data == null) && attempts < MaxRetryAttempts);
 
             return request;
+        }
+
+        private static void TryApplyClientLanguage()
+        {
+            if (!Settings.languageAutoDetectPending)
+                return;
+
+            try
+            {
+                var resp = clientRequest("GET", "/riotclient/region-locale");
+                if (resp == null || !resp.IsSuccessStatusCode || string.IsNullOrWhiteSpace(resp.Content))
+                    return;
+
+                using var doc = JsonDocument.Parse(resp.Content);
+                if (!doc.RootElement.TryGetProperty("locale", out var localeProp))
+                    return;
+
+                string matched = Strings.MatchLocale(localeProp.GetString());
+                if (matched == null)
+                    return;
+
+                Settings.currentLanguage = matched;
+                Strings.CurrentLanguage = matched;
+                Settings.languageAutoDetectPending = false;
+
+                if (Settings.saveSettings)
+                {
+                    Settings.settingsSave();
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Warn(ex, "Failed to detect League Client language from region-locale.");
+            }
         }
 
         private static bool EnsureClient()

@@ -38,6 +38,7 @@ namespace Leauge_Auto_Accept
         public static bool autoRestartQueue = false;
         public static bool cancelQueueAfterDodge = false;
         public static string currentLanguage = "en";
+        public static bool languageAutoDetectPending = true;
 
         public static int pickStartHoverDelay = 10000;
         public static int pickStartlockDelay = 999999999;
@@ -123,6 +124,7 @@ namespace Leauge_Auto_Accept
             {
                 currentLanguage = Strings.AvailableLanguages[item].Code;
                 Strings.CurrentLanguage = currentLanguage;
+                languageAutoDetectPending = false;
             }
 
             if (saveSettings)
@@ -584,6 +586,7 @@ namespace Leauge_Auto_Accept
             string dirParameter = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Leauge Auto Accept Config.txt";
             if (File.Exists(dirParameter))
             {
+                bool languageLoaded = false;
                 string text = File.ReadAllText(dirParameter);
                 string[] commas = text.Split(',');
                 foreach (var comma in commas)
@@ -751,10 +754,13 @@ namespace Leauge_Auto_Accept
                         case "language":
                             currentLanguage = columns[1];
                             Strings.CurrentLanguage = currentLanguage;
+                            languageLoaded = true;
                             break;
                     }
                     saveSettings = true;
                 }
+
+                languageAutoDetectPending = !languageLoaded;
             }
         }
     }
