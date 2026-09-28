@@ -196,6 +196,7 @@ namespace Leauge_Auto_Accept
                 Strings.Get("secondary_backup_champion"),
                 Strings.Get("rune_page"),
                 Strings.Get("select_a_ban"),
+                Strings.Get("backup_ban"),
                 Strings.Get("select_summoner_spell_1"),
                 Strings.Get("select_summoner_spell_2"),
                 Strings.Get("instant_chat_messages"),
@@ -211,6 +212,7 @@ namespace Leauge_Auto_Accept
                 Settings.secondaryBackupChamp[0],
                 Settings.secondaryBackupChampRunes[0],
                 Settings.currentBan[0],
+                Settings.currentBackupBan[0],
                 Settings.currentSpell1[0],
                 Settings.currentSpell2[0],
                 Settings.chatMessagesEnabled ? Strings.Get("enabled") + ", " + Settings.chatMessages.Count : Strings.Get("disabled"),
@@ -717,7 +719,7 @@ namespace Leauge_Auto_Accept
             {
                 champsFiltered.Add(new itemList() { name = "Unselected", id = "0" });
             }
-            if (currentChampPicker == 4)
+            if (currentChampPicker == 4 || currentChampPicker == 10)
             {
                 if ("none".Contains(Navigation.currentInput.ToLower()))
                 {
@@ -729,7 +731,7 @@ namespace Leauge_Auto_Accept
                 if (champ.name.ToLower().Contains(Navigation.currentInput.ToLower()))
                 {
                     // Make sure the champ is free or if it's for a ban before adding it to the list
-                     if (champ.free || currentChampPicker == 4 && int.Parse(champ.id) < 10000)
+                     if (champ.free || (currentChampPicker == 4 || currentChampPicker == 10) && int.Parse(champ.id) < 10000)
                     {
                         champsFiltered.Add(new itemList() { name = champ.name, id = champ.id });
                     }

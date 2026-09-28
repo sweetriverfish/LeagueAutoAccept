@@ -452,6 +452,18 @@ namespace Leauge_Auto_Accept
             champId == crowdFavorite4ChampId ||
             champId == crowdFavorite5ChampId;
 
+        private static bool isTeammateOnChampion(LCUTypes.LolChampSelectSessionV1 currentChampSelect, string champIdStr)
+        {
+            if (!int.TryParse(champIdStr, out int champId) || champId <= 0)
+            {
+                return false;
+            }
+
+            return currentChampSelect.MyTeam.Any(p =>
+                p.CellId != currentChampSelect.LocalPlayerCellId &&
+                (p.ChampionId == champId || p.ChampionPickIntent == champId));
+        }
+
         private static void handlePickAction(int actId, int championId, bool ActIsInProgress, LCUTypes.LolChampSelectSessionV1 currentChampSelect, bool usePrimaryChamp)
         {
             // Check if the hover gets cleared (by either a ban or teammate taking it)
@@ -564,7 +576,23 @@ namespace Leauge_Auto_Accept
                     {
                         // Ban none if the setting is disabled.
                         bool dontBanCrowd = isArena && Settings.banCrowdFavourite && isInCrowdFavoriteChamps(Settings.currentBan[1]);
-                        hoverChampion(actId, ParseId(dontBanCrowd ? "0" : Settings.currentBan[1]), "ban");
+
+                        string banTargetId;
+                        if (dontBanCrowd)
+                        {
+                            banTargetId = "0";
+                        }
+                        else if (isTeammateOnChampion(currentChampSelect, Settings.currentBan[1]))
+                        {
+                            // Avoid banning a champion a teammate already picked or is intent on picking
+                            banTargetId = Settings.currentBackupBan[1];
+                        }
+                        else
+                        {
+                            banTargetId = Settings.currentBan[1];
+                        }
+
+                        hoverChampion(actId, ParseId(banTargetId), "ban");
                     }
                 }
 
