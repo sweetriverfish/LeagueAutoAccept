@@ -16,6 +16,7 @@ namespace Leauge_Auto_Accept
         public static string[] secondaryBackupChamp = { "Unselected", "0" };
         public static string[] secondaryBackupChampRunes = { "Unselected", "0" };
         public static string[] currentBan = { "Unselected", "0" };
+        public static string[] currentBackupBan = { "Unselected", "0" };
         public static string[] currentSpell1 = { "Unselected", "0" };
         public static string[] currentSpell2 = { "Unselected", "0" };
         public static bool bravery = false;
@@ -38,6 +39,7 @@ namespace Leauge_Auto_Accept
         public static bool autoRestartQueue = false;
         public static bool cancelQueueAfterDodge = false;
         public static string currentLanguage = "en";
+        public static bool languageAutoDetectPending = true;
 
         public static int pickStartHoverDelay = 10000;
         public static int pickStartlockDelay = 999999999;
@@ -123,6 +125,7 @@ namespace Leauge_Auto_Accept
             {
                 currentLanguage = Strings.AvailableLanguages[item].Code;
                 Strings.CurrentLanguage = currentLanguage;
+                languageAutoDetectPending = false;
             }
 
             if (saveSettings)
@@ -224,7 +227,7 @@ namespace Leauge_Auto_Accept
             {
                 champsFiltered.Add(new itemList() { name = "Unselected", id = "0" });
             }
-            if (UI.currentChampPicker == 4)
+            if (UI.currentChampPicker == 4 || UI.currentChampPicker == 10)
             {
                 if ("none".Contains(Navigation.currentInput.ToLower()))
                 {
@@ -235,7 +238,7 @@ namespace Leauge_Auto_Accept
             {
                 if (champ.name.ToLower().Contains(Navigation.currentInput.ToLower()))
                 {
-                    if (UI.currentChampPicker != 4)
+                    if (UI.currentChampPicker != 4 && UI.currentChampPicker != 10)
                     {
                         if (!champ.free)
                         {
@@ -301,6 +304,10 @@ namespace Leauge_Auto_Accept
                     case 9:
                         crowdFavouraiteChamp5[0] = name;
                         crowdFavouraiteChamp5[1] = id;
+                        break;
+                    case 10:
+                        currentBackupBan[0] = name;
+                        currentBackupBan[1] = id;
                         break;
                 }
 
@@ -506,6 +513,8 @@ namespace Leauge_Auto_Accept
                 ",arenaCrowdFavourite5ChampId:" + crowdFavouraiteChamp5[1] +
                 ",banName:" + currentBan[0] +
                 ",banId:" + currentBan[1] +
+                ",backupBanName:" + currentBackupBan[0] +
+                ",backupBanId:" + currentBackupBan[1] +
                 ",spell1Name:" + currentSpell1[0] +
                 ",spell1Id:" + currentSpell1[1] +
                 ",spell2Name:" + currentSpell2[0] +
@@ -584,6 +593,7 @@ namespace Leauge_Auto_Accept
             string dirParameter = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Leauge Auto Accept Config.txt";
             if (File.Exists(dirParameter))
             {
+                bool languageLoaded = false;
                 string text = File.ReadAllText(dirParameter);
                 string[] commas = text.Split(',');
                 foreach (var comma in commas)
@@ -681,6 +691,12 @@ namespace Leauge_Auto_Accept
                         case "banId":
                             currentBan[1] = columns[1];
                             break;
+                        case "backupBanName":
+                            currentBackupBan[0] = columns[1];
+                            break;
+                        case "backupBanId":
+                            currentBackupBan[1] = columns[1];
+                            break;
                         case "spell1Name":
                             currentSpell1[0] = columns[1];
                             break;
@@ -751,10 +767,13 @@ namespace Leauge_Auto_Accept
                         case "language":
                             currentLanguage = columns[1];
                             Strings.CurrentLanguage = currentLanguage;
+                            languageLoaded = true;
                             break;
                     }
                     saveSettings = true;
                 }
+
+                languageAutoDetectPending = !languageLoaded;
             }
         }
     }

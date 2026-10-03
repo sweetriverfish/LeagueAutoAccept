@@ -38,7 +38,7 @@ namespace Leauge_Auto_Accept
             if (currentSummonerId == 0)
             {
                 Log.Info("Loading summonerId from service");
-                Print.printCentered("Getting summoner ID...", 15);
+                Print.printCentered(Strings.Get("getting_summoner_id"), 15);
                 var currentSummoner = LCU.clientRequestUntilSuccess<LCUTypes.LolSummonerV1CurrentSummoner>("GET", "lol-summoner/v1/current-summoner");
                 Console.Clear();
                 if (!currentSummoner.IsSuccessStatusCode || currentSummoner.Data == null)
@@ -80,7 +80,7 @@ namespace Leauge_Auto_Accept
 
                 List<itemList> champs = new List<itemList>();
 
-                Print.printCentered("Getting champions and ownership list...", 15);
+                Print.printCentered(Strings.Get("getting_champions_list"), 15);
                 var ownedChampsResp = LCU.clientRequestUntilSuccess<LCUTypes.LolChampionsInventoriesChampionsMinimalV1[]>("GET", $"lol-champions/v1/inventories/{currentSummonerId}/champions-minimal");
                 Console.Clear();
                 if (!ownedChampsResp.IsSuccessStatusCode || ownedChampsResp.Data == null)
@@ -121,7 +121,7 @@ namespace Leauge_Auto_Accept
 
                 List<itemList> list = new List<itemList>();
 
-                Print.printCentered("Getting runes list...", 15);
+                Print.printCentered(Strings.Get("getting_runes_list"), 15);
                 var runesResp = LCU.clientRequestUntilSuccess<LCUTypes.LolPerksPagesV1[]>("GET", "lol-perks/v1/pages");
                 Console.Clear();
                 if (!runesResp.IsSuccessStatusCode || runesResp.Data == null)
@@ -147,7 +147,7 @@ namespace Leauge_Auto_Accept
             Log.Debug("spellsSorted.Count={0}", spellsSorted?.Count);
             if (!spellsSorted.Any())
             {
-                Print.printCentered("Getting a list of available summoner spells...", 15);
+                Print.printCentered(Strings.Get("getting_spells_list"), 15);
                 var spellsResp = LCU.clientRequest<JsonArray>("GET", "lol-game-data/assets/v1/summoner-spells.json");
                 Console.Clear();
                 if (!spellsResp.IsSuccessStatusCode || spellsResp.Data == null)
