@@ -91,6 +91,8 @@ namespace Leauge_Auto_Accept
 
                 champs = ownedChampsResp.Data
                     .Where(x => x.Name != "None")
+                    .GroupBy(x => x.Name, StringComparer.OrdinalIgnoreCase)
+                    .Select(group => group.OrderBy(x => x.Id).First())
                     .Select(x => {
                         bool isAvailable = x.Ownership.Owned || x.Ownership.XboxGPReward || x.FreeToPlay;
                         return new itemList() { name = x.Name, id = x.Id.ToString(), free = isAvailable };
